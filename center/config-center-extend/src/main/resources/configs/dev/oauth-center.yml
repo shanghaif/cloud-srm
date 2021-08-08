@@ -1,0 +1,73 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-dev.xml
+  logstashhost: 10.0.10.50 #logstash服务器
+spring:
+  redis:
+    host: 10.17.145.83
+    port: 6379
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.17.149.182:3306/nsrm_cloud_biz_base?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: cdc_base_new
+    password: 123456
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+ribbon:
+  eager-load:
+    enabled: true
+    clients: rbac-center
+  ConnectTimeout: 5000
+  ReadTimeout: 600000
+#elasticsearch
+es:
+  host: 10.17.145.110
+  port: 9200
+  scheme: http
+## IDM系统设置
+IDM:
+  ## 是否使用Idm上的用户名/密码登陆(是-true,否false，生产的必须为true)
+  userIdmPassword: false
+  clientId: NSrm
+  clientSecret: 602cf51c-1de4-4e4a-b2d5-a1158185c0b7
+  grantType: password
+  ####code授权方式
+  grantCodeType: authorization_code
+  ####应用回调地址,需要http格式化
+  redirectUrl: http://10.16.87.99
+  ####redirectUrl: http://127.0.0.1:8080
+  ####通过用户名/密码获取Idm认证中心token
+  accessTokenUrl: https://esctest.longi-silicon.com/esc-sso/oauth2.0/accessToken?client_id=%s&grant_type=%s&username=%s&password=%s
+  ####获取IDM用户信息url
+  profileUrl: https://esctest.longi-silicon.com/esc-sso/oauth2.0/profile?access_token=
+  ####获取IDM认证中心校验是否有效
+  checkAccessTokenUrl: https://esctest.longi-silicon.com/esc-sso/api/v1/loginLog/checkAccessToken?accesstoken=
+  ####通过授权码获取Idm认证中心token
+  accessTokenCodeUrl: https://esctest.longi-silicon.com/esc-sso/oauth2.0/accessToken?grant_type=%s&oauth_timestamp=%s&client_id=%s&client_secret=%s&code=%s&redirect_uri=%s
+  ####IDM退出url
+  logoutUrl: https://esctest.longi-silicon.com/esc-sso/logout
+  ####检测自助服务是否正常，无宕机成功返回ok
+  heartBeatUrl: https://esctest.longi-silicon.com/esc-self/heartbeat

@@ -1,0 +1,69 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-prd.xml
+  logstashhost: 10.0.3.184 #logstash服务器
+spring:
+  redis:
+    host: 10.0.3.182
+    port: 6379
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.0.3.172:3306/cloud_flow?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: apprun
+    password: sre5Prd!j4
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 100
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  aop:
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+mybatis-plus:
+  type-aliases-package: com.midea.cloud.flow
+  mapper-locations: classpath*:/mybatis-mappers/**/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+security:
+  oauth2:
+    resource:
+      prefer-token-info: false
+task:      
+  server.port: 8808
+  ### Paas统一控制台地址
+  ####执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"http://{host}:{port}/djs http://10.16.81.158:8000/djs；
+  #网关sit
+  xxl.job.admin.addresses: http://10.16.81.158:8000/djs
+  ### 执行器AppName：执行器心跳注册分组依据；和执行器终端的AppName对应
+  xxl.job.executor.appName: SRM_SIT
+  ### 执行器AppName对应的accessToken，见执行器列表中系统分配的token
+  xxl.job.accessToken: 5f3f1ad6bdb5497caf2ea02d8bc9d2c2
+  ### 执行器IP [选填]：默认为空表示自动获取IP，多网卡时可手动设置指定IP，该IP不会绑定Host仅作为通讯实用；
+  #### 地址信息用于 "执行器注册" 和 "调度中心请求并触发任务"(### 执行器端口号 [选填]：小于等于0则自动获取；)；
+  xxl.job.executor.ip: 
+  #### 默认端口为9999，单机部署多个执行器时，注意要配置不同执行器端口；
+  xxl.job.executor.port: 9990
+  ### 执行器运行日志文件存储磁盘路径 [选填] ：需要对该路径拥有读写权限；为空则使用默认路径；
+  xxl.job.executor.logpath: /apps/svr/cloud_srm_application/logs/jobLogs
+  ### 执行器日志文件保存天数 [选填] ： 过期日志自动清理, 限制值大于等于3时生效; 否则, 如-1, 关闭自动清理功能；
+  xxl.job.executor.logretentiondays: 30
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000

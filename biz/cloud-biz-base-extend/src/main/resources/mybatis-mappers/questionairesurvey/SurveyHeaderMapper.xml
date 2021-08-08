@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.questionairesurvey.mapper.SurveyHeaderMapper">
+
+    <select id="queryHeaderList" resultType="com.midea.cloud.srm.model.base.questionairesurvey.dto.HeaderScopeVendorDto">
+        select
+        header.SURVEY_ID as surveyId,
+        header.BU_CODE as buCode,
+        header.SURVEY_TITLE as surveyTitle,
+        header.PUBLISH_DATE as publishDate,
+        header.END_DATE as endDate,
+        scopeVendor.RESULT_FLAG as resultFlag,
+        scopeVendor.VENDOR_SCOPE_ID as vendorScopeId
+        from scc_base_survey_header header
+        join scc_base_survey_scope_vendor scopeVendor
+        on header.SURVEY_ID = scopeVendor.SURVEY_ID
+        where scopeVendor.VENDOR_CODE =#{vendorCode}
+        <if test="buCode!=null and buCode!=''">
+            and header.BU_CODE =#{buCode}
+        </if>
+        <if test="surveyTitle!=null and surveyTitle!=''">
+            and header.SURVEY_TITLE like '%' #{surveyTitle} '%'
+        </if>
+        <if test="resultFlag!=null and resultFlag!=''">
+            and scopeVendor.RESULT_FLAG =#{resultFlag}
+        </if>
+        order by header.PUBLISH_DATE desc
+    </select>
+</mapper>

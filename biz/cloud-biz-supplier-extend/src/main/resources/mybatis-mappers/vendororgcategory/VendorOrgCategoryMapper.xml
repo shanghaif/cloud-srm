@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.vendororgcategory.mapper.VendorOrgCategoryMapper">
+
+    <select id="list"
+            resultType="com.midea.cloud.srm.model.supplier.vendororgcategory.dto.VendorOrgCategoryDTO">
+        select
+        sci.COMPANY_ID VENDOR_ID,
+        sci.COMPANY_NAME VENDOR_NAME,
+        sci.COMPANY_CODE VENDOR_CODE,
+        soi.ORG_ID,
+        soi.ORG_CODE,
+        soi.ORG_NAME,
+        soi.SERVICE_STATUS ORG_SERVICE_STATUS,
+        soi.START_DATE ORG_START_DATE,
+        soi.END_DATE ORG_END_DATE,
+        soc.CATEGORY_ID,
+        soc.CATEGORY_CODE,
+        soc.CATEGORY_NAME,
+        soc.CATEGORY_FULL_NAME,
+        soc.SERVICE_STATUS CATEGORY_SERVICE_STATUS,
+        soc.START_DATE   CATEGORY_START_DATE,
+        soc.END_DATE  CATEGORY_END_DATE
+        from  scc_sup_company_info sci,scc_sup_org_info soi,scc_sup_org_category soc where
+        sci.COMPANY_ID=soi.COMPANY_ID and
+        soi.COMPANY_ID = soc.COMPANY_ID and
+        soi.ORG_ID = soc.ORG_ID
+        <if test="vendorId != null">
+            and  sci.COMPANY_ID= #{vendorId}
+        </if>
+        <if test="vendorName !=null and vendorName !='' ">
+            and sci.COMPANY_NAME  LIKE concat('%', #{vendorName}, '%')
+        </if>
+        <if test="vendorCode != null and vendorName !='' ">
+            and  sci.VENDOR_CODE = #{vendorCode}
+        </if>
+        <if test="orgId != null">
+            and soi.ORG_ID = #{orgId}
+        </if>
+        <if test="orgCode != null and orgCode !=''">
+            and soi.ORG_CODE = #{orgCode}
+        </if>
+        <if test="orgName != null and orgName != ''">
+            and soi.ORG_NAME LIKE concat('%', #{orgName}, '%')
+        </if>
+        <if test="orgServiceStatus != null and orgServiceStatus !=''">
+            and  soi.SERVICE_STATUS = #{orgServiceStatus}
+        </if>
+        <if test="categoryId != null">
+            and soc.CATEGORY_ID = #{categoryId}
+        </if>
+        <if test="categoryCode != null and categoryCode !=''">
+            and soc.CATEGORY_CODE = #{categoryCode}
+        </if>
+        <if test="categoryName != null and categoryName !=''">
+            and soc.CATEGORY_NAME  LIKE concat('%', #{categoryName}, '%')
+        </if>
+        <if test="categoryServiceStatus != null and categoryServiceStatus !=''">
+            and  soc.SERVICE_STATUS = #{categoryServiceStatus}
+        </if>
+    </select>
+    <select id="listIntelligentRecommendInfo"
+            resultType="com.midea.cloud.srm.model.bid.purchaser.projectmanagement.bidinitiating.vo.IntelligentRecommendVO">
+        select
+        sci.COMPANY_ID VENDOR_ID,
+        sci.COMPANY_NAME VENDOR_NAME,
+        sci.COMPANY_CODE VENDOR_CODE
+        from  scc_sup_company_info sci,scc_sup_org_info soi,
+        scc_sup_org_category soc where
+        sci.COMPANY_ID = soi.COMPANY_ID and soi.COMPANY_ID = soc.COMPANY_ID and soi.ORG_ID = soc.ORG_ID
+        and soi.SERVICE_STATUS = 'EFFECTIVE' and soc.SERVICE_STATUS = 'QUALIFIED'
+        and soi.ORG_ID = #{recommendParam.orgId}
+        <if test="recommendParam.categoryIdList != null">
+            and soc.CATEGORY_ID in
+            <foreach item="categoryId" collection="recommendParam.categoryIdList" separator="," open="(" close=")" index="">
+                #{categoryId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.template.mapper.PerfTemplateHeaderMapper">
+
+    <!-- 根据条件获(模型头和采购分类表)取绩效模型头结果集Map-->
+    <resultMap id="findPerTemplateHeadListResultMap" type="com.midea.cloud.srm.model.perf.template.dto.PerfTemplateHeaderDTO">
+        <id column="TEMPLATE_HEAD_ID" property="templateHeadId" jdbcType="BIGINT" />
+        <result column="CREATED_FULL_NAME" property="createdFullName" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_FULL_NAME" property="lastUpdatedFullName" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="TEMPLATE_NAME" property="templateName" jdbcType="VARCHAR" />
+        <result column="EVALUATION_PERIOD" property="evaluationPeriod" jdbcType="VARCHAR" />
+        <result column="TEMPLATE_STATUS" property="templateStatus" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+        <result column="VERSION" property="version" jdbcType="VARCHAR" />
+
+        <collection property="perfTemplateCategoryList" javaType="java.util.List" ofType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateCategory" />
+    </resultMap>
+
+    <!-- 根据条件获(模型头和采购分类表)取绩效模型头结果集-->
+    <select id="findPerTemplateHeadList" resultMap="findPerTemplateHeadListResultMap"
+            parameterType="com.midea.cloud.srm.model.perf.template.dto.PerfTemplateHeaderQueryDTO">
+        SELECT th.CREATED_FULL_NAME,th.CREATION_DATE,th.LAST_UPDATED_FULL_NAME,th.LAST_UPDATE_DATE,th.TEMPLATE_HEAD_ID,th.TEMPLATE_NAME,
+        th.EVALUATION_PERIOD,th.TEMPLATE_STATUS,th.ORGANIZATION_CODE,th.ORGANIZATION_NAME,th.VERSION
+        FROM scc_perf_template_header th
+        LEFT JOIN scc_perf_template_category toc ON th.TEMPLATE_HEAD_ID = toc.TEMPLATE_HEAD_ID
+        <include refid="findPerTemplateHeadAndOrgCateGorySql"  />
+        order by th.LAST_UPDATE_DATE desc
+    </select>
+
+    <!-- 根据条件获取绩效模型头和采购分类表结果集-->
+    <resultMap id="findPerTemplateHeadAndOrgCateGoryMap" type="com.midea.cloud.srm.model.perf.template.dto.PerfTemplateDTO">
+        <collection property="perfTemplateHeader" ofType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateHeader">
+            <id column="TEMPLATE_HEAD_ID" property="templateHeadId" jdbcType="BIGINT" />
+            <result column="CREATED_FULL_NAME" property="createdFullName" jdbcType="VARCHAR" />
+            <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+            <result column="LAST_UPDATED_FULL_NAME" property="lastUpdatedFullName" jdbcType="VARCHAR" />
+            <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+            <result column="TEMPLATE_NAME" property="templateName" jdbcType="VARCHAR" />
+            <result column="EVALUATION_PERIOD" property="evaluationPeriod" jdbcType="VARCHAR" />
+            <result column="TEMPLATE_STATUS" property="templateStatus" jdbcType="VARCHAR" />
+            <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR" />
+            <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+        </collection>
+
+        <collection property="perfTemplateCategoryList" ofType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateCategory" >
+            <id column="TEMPLATE_CATEGORY_ID" property="templateCategoryId" jdbcType="BIGINT" />
+            <result column="TEMPLATE_HEAD_ID" property="templateHeadId" jdbcType="BIGINT" />
+            <result column="CATEGORY_ID" property="categoryId" jdbcType="BIGINT" />
+            <result column="CATEGORY_CODE" property="categoryCode" jdbcType="VARCHAR" />
+            <result column="CATEGORY_NAME" property="categoryName" jdbcType="VARCHAR" />
+            <result column="CATEGORY_FULL_NAME" property="categoryFullName" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+
+    <!-- 根据条件获取绩效模型头和采购分类表-->
+    <select id="findPerTemplateHeadAndOrgCateGory" resultMap="findPerTemplateHeadAndOrgCateGoryMap"
+            parameterType="com.midea.cloud.srm.model.perf.template.dto.PerfTemplateHeaderQueryDTO">
+        SELECT th.CREATED_FULL_NAME,th.CREATION_DATE,th.LAST_UPDATED_FULL_NAME,th.LAST_UPDATE_DATE,th.TEMPLATE_HEAD_ID,th.TEMPLATE_NAME,
+        th.EVALUATION_PERIOD,th.TEMPLATE_STATUS,th.ORGANIZATION_CODE,th.ORGANIZATION_NAME,toc.TEMPLATE_CATEGORY_ID,
+        toc.TEMPLATE_HEAD_ID,toc.CATEGORY_ID,toc.CATEGORY_CODE,toc.CATEGORY_NAME,toc.CATEGORY_FULL_NAME
+        FROM scc_perf_template_header th
+        LEFT JOIN scc_perf_template_category toc ON th.TEMPLATE_HEAD_ID = toc.TEMPLATE_HEAD_ID
+        <include refid="findPerTemplateHeadAndOrgCateGorySql"  />
+    </select>
+
+    <!-- 模型头和采购分类表组合Sql -->
+    <sql id="findPerTemplateHeadAndOrgCateGorySql" >
+        <where>
+            <if test="null != pefTemplateHeader.deleteFlag and '' != pefTemplateHeader.deleteFlag">
+                AND th.DELETE_FLAG = #{pefTemplateHeader.deleteFlag}
+            </if>
+            <if test="null != pefTemplateHeader.templateName and '' != pefTemplateHeader.templateName">
+                <bind name="templateName" value="'%' + pefTemplateHeader.templateName + '%'" />
+                AND th.TEMPLATE_NAME like #{templateName}
+            </if>
+            <if test="null != pefTemplateHeader.templateStatus and '' != pefTemplateHeader.templateStatus">
+                AND th.TEMPLATE_STATUS= #{pefTemplateHeader.templateStatus}
+            </if>
+            <if test="null != pefTemplateHeader.evaluationPeriod and '' != pefTemplateHeader.evaluationPeriod">
+                AND th.EVALUATION_PERIOD= #{pefTemplateHeader.evaluationPeriod}
+            </if>
+            <if test="null != pefTemplateHeader.organizationId ">
+                AND th.ORGANIZATION_ID= #{pefTemplateHeader.organizationId}
+            </if>
+            <if test="null != pefTemplateHeader.version">
+                AND th.VERSION = #{pefTemplateHeader.version}
+            </if>
+            <if test="null != pefTemplateHeader.categoryId ">
+                AND toc.CATEGORY_ID = #{pefTemplateHeader.categoryId}
+            </if>
+            <if test="null != pefTemplateHeader.categoryCode and '' != pefTemplateHeader.categoryCode">
+                AND toc.CATEGORY_CODE = #{pefTemplateHeader.categoryCode}
+            </if>
+            <if test="null != pefTemplateHeader.categoryName and '' != pefTemplateHeader.categoryName">
+                AND toc.CATEGORY_NAME = #{pefTemplateHeader.categoryName}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

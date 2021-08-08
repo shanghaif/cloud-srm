@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.order.entry.Order" >
+        <id column="ORDER_ID" property="orderId" jdbcType="BIGINT" />
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT" />
+        <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT" />
+        <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR" />
+        <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR" />
+        <result column="ORDER_STATUS" property="orderStatus" jdbcType="VARCHAR" />
+        <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+        <result column="ORDER_AMOUNT" property="orderAmount" jdbcType="DECIMAL" />
+        <result column="RFQ_SETTLEMENT_CURRENCY" property="rfqSettlementCurrency" jdbcType="VARCHAR" />
+        <result column="TERM_OF_PAYMENT" property="termOfPayment" jdbcType="VARCHAR" />
+        <result column="PAYMENT_METHOD" property="paymentMethod" jdbcType="VARCHAR" />
+        <result column="DELIVERY_LEVEL" property="deliveryLevel" jdbcType="VARCHAR" />
+        <result column="BUYER_NAME" property="buyerName" jdbcType="VARCHAR" />
+        <result column="TEL" property="tel" jdbcType="VARCHAR" />
+        <result column="TAX_CODE" property="taxCode" jdbcType="VARCHAR" />
+        <result column="TAX_KEY" property="taxKey" jdbcType="VARCHAR" />
+        <result column="TAX_RATE" property="taxRate" jdbcType="DECIMAL" />
+        <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+        <result column="SUBMITTED_ID" property="submittedId" jdbcType="BIGINT" />
+        <result column="SUBMITTED_BY" property="submittedBy" jdbcType="VARCHAR" />
+        <result column="SUBMITTED_TIME" property="submittedTime" jdbcType="TIMESTAMP" />
+        <result column="COMFIRM_ID" property="comfirmId" jdbcType="BIGINT" />
+        <result column="COMFIRM_BY" property="comfirmBy" jdbcType="VARCHAR" />
+        <result column="COMFIRM_TIME" property="comfirmTime" jdbcType="TIMESTAMP" />
+        <result column="REFUSE_ID" property="refuseId" jdbcType="BIGINT" />
+        <result column="REFUSE_BY" property="refuseBy" jdbcType="VARCHAR" />
+        <result column="REFUSE_TIME" property="refuseTime" jdbcType="TIMESTAMP" />
+        <result column="REFUSE_REASON" property="refuseReason" jdbcType="VARCHAR" />
+        <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+        <result column="VERSION" property="version" jdbcType="BIGINT" />
+        <result column="RESPONSE_STATUS" property="responseStatus" jdbcType="VARCHAR" />
+        <result column="EXTERNAL_NUM" property="externalNum" jdbcType="VARCHAR" />
+        <result column="SOURCE_SYSTEM" property="sourceSystem" jdbcType="VARCHAR" />
+        <result column="JIT_ORDER" property="jitOrder" jdbcType="VARCHAR"/>
+        <result column="ORDER_TYPE" property="orderType" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapCeea" type="com.midea.cloud.srm.model.suppliercooperate.order.entry.Order" >
+        <id column="ORDER_ID" property="orderId" jdbcType="BIGINT" />
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT" />
+        <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT" />
+        <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR" />
+        <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR" />
+        <result column="ORDER_STATUS" property="orderStatus" jdbcType="VARCHAR" />
+        <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+        <result column="ORDER_AMOUNT" property="orderAmount" jdbcType="DECIMAL" />
+        <result column="RFQ_SETTLEMENT_CURRENCY" property="rfqSettlementCurrency" jdbcType="VARCHAR" />
+        <result column="TERM_OF_PAYMENT" property="termOfPayment" jdbcType="VARCHAR" />
+        <result column="PAYMENT_METHOD" property="paymentMethod" jdbcType="VARCHAR" />
+        <result column="DELIVERY_LEVEL" property="deliveryLevel" jdbcType="VARCHAR" />
+        <result column="BUYER_NAME" property="buyerName" jdbcType="VARCHAR" />
+        <result column="TEL" property="tel" jdbcType="VARCHAR" />
+        <result column="TAX_CODE" property="taxCode" jdbcType="VARCHAR" />
+        <result column="TAX_KEY" property="taxKey" jdbcType="VARCHAR" />
+        <result column="TAX_RATE" property="taxRate" jdbcType="DECIMAL" />
+        <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+        <result column="SUBMITTED_ID" property="submittedId" jdbcType="BIGINT" />
+        <result column="SUBMITTED_BY" property="submittedBy" jdbcType="VARCHAR" />
+        <result column="SUBMITTED_TIME" property="submittedTime" jdbcType="TIMESTAMP" />
+        <result column="COMFIRM_ID" property="comfirmId" jdbcType="BIGINT" />
+        <result column="COMFIRM_BY" property="comfirmBy" jdbcType="VARCHAR" />
+        <result column="COMFIRM_TIME" property="comfirmTime" jdbcType="TIMESTAMP" />
+        <result column="REFUSE_ID" property="refuseId" jdbcType="BIGINT" />
+        <result column="REFUSE_BY" property="refuseBy" jdbcType="VARCHAR" />
+        <result column="REFUSE_TIME" property="refuseTime" jdbcType="TIMESTAMP" />
+        <result column="REFUSE_REASON" property="refuseReason" jdbcType="VARCHAR" />
+        <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+        <result column="VERSION" property="version" jdbcType="BIGINT" />
+        <result column="RESPONSE_STATUS" property="responseStatus" jdbcType="VARCHAR" />
+        <result column="EXTERNAL_NUM" property="externalNum" jdbcType="VARCHAR" />
+        <result column="SOURCE_SYSTEM" property="sourceSystem" jdbcType="VARCHAR" />
+        <result column="JIT_ORDER" property="jitOrder" jdbcType="VARCHAR"/>
+        <result column="ORDER_TYPE" property="orderType" jdbcType="VARCHAR"/>
+        <!--ceea-->
+        <result column="CEEA_ORG_ID" property="ceeaOrgId" jdbcType="BIGINT"/>
+        <result column="CEEA_IF_SUPPLIER_CONFIRM" property="ceeaIfSupplierConfirm" jdbcType="VARCHAR"/>
+        <result column="CEEA_DEPARTMENT_ID" property="ceeaDepartmentId" jdbcType="VARCHAR"/>
+        <result column="CEEA_QUALITY_ASSURANCE_AGREEMENT_NO" property="ceeaQualityAssuranceAgreementNo" jdbcType="VARCHAR"/>
+        <result column="CEEA_RECEIVE_ADDRESS" property="ceeaReceiveAddress" jdbcType="VARCHAR"/>
+        <result column="CEEA_RECEIVE_CONTACTS" property="ceeaReceiveContacts" jdbcType="VARCHAR"/>
+        <result column="CEEA_RECEIVE_TELEPHONE" property="ceeaReceiveTelephone" jdbcType="VARCHAR"/>
+        <result column="CEEA_SUPPLIER_CONTACTS" property="ceeaSupplierContacts" jdbcType="VARCHAR"/>
+        <result column="CEEA_SUPPLIER_ADDRESS" property="ceeaSupplierAddress" jdbcType="VARCHAR"/>
+        <result column="CEEA_TOTAL_NUM" property="ceeaTotalNum" jdbcType="BIGINT"/>
+        <result column="CEEA_TOTAL_AMOUNT_INCLUDING_TAX" property="ceeaTotalAmountIncludingTax" jdbcType="DECIMAL"/>
+        <result column="CEEA_TOTAL_AMOUNT_EXCLUDING_TAX" property="ceeaTotalAmountExcludingTax" jdbcType="DECIMAL"/>
+        <result column="CEEA_IF_CONSIGNMENT" property="ceeaIfConSignment" jdbcType="VARCHAR"/>
+        <result column="CEEA_IF_POWER_STATION_BUSINESS" property="ceeaIfPowerStationBusiness" jdbcType="VARCHAR"/>
+        <result column="CEEA_OPINION" property="ceeaOpinion" jdbcType="VARCHAR"/>
+        <result column="CEEA_COST_TYPE" property="ceeaCostType" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findList" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.Order">
+        SELECT o.*
+        FROM scc_sc_order o
+        <where>
+            <if test="orderNumber != null and orderNumber != ''">
+                and o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="orderType != null and orderType != ''">
+                and o.ORDER_TYPE = #{orderType}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and o.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and o.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="orgIds != null and orgIds.size() > 0">
+                and o.CEEA_ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+                <if test="ceeaIfPowerStationBusiness != null and ceeaIfPowerStationBusiness != ''">
+                and o.CEEA_IF_POWER_STATION_BUSINESS = #{ceeaIfPowerStationBusiness}
+            </if>
+            <if test="ceeaIfConSignment != null and ceeaIfConSignment != ''">
+                and o.CEEA_IF_CONSIGNMENT = #{ceeaIfConSignment}
+            </if>
+            <if test="userIds != null and userIds.size() > 0">
+                and o.CEEA_EMP_USER_ID in
+                <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="orderDetailStatus != null and orderDetailStatus != ''">
+                and exists (
+                    select 1
+                    from scc_sc_order_detail od
+                    left join scc_sc_order o2 on o2.ORDER_ID = od.ORDER_ID
+                    where od.ORDER_DETAIL_STATUS = #{orderDetailStatus}
+                )
+            </if>
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId}
+                and (o.ORDER_STATUS in ('APPROVED','ACCEPT','REFUSED'))
+            </if>
+            <if test="orderStatus != null and orderStatus !=''">
+                and o.ORDER_STATUS = #{orderStatus}
+            </if>
+            <if test="ceeaIfSupplierConfirm != null and ceeaIfSupplierConfirm != ''">
+                and o.CEEA_IF_SUPPLIER_CONFIRM = #{ceeaIfSupplierConfirm}
+            </if>
+            <if test="costType != null and costType !=''">
+                and o.CEEA_COST_TYPE = #{costType}
+            </if>
+        </where>
+        ORDER BY o.LAST_UPDATE_DATE DESC
+    </select>
+
+    <select id="findListUpdates" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"
+            resultMap="BaseResultMapCeea">
+        SELECT o.* FROM scc_sc_order o
+        <where>
+            <!--<if test="createdId != null">
+                and o.CREATED_ID = #{createdId}
+            </if>-->
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId} and (o.ORDER_STATUS = 'APPROVED' or o.ORDER_STATUS = 'ACCEPT')
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                and o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="orderType != null and orderType != ''">
+                and o.ORDER_TYPE = #{orderType}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and o.CEEA_PURCHASE_ORDER_DATE &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and o.CEEA_PURCHASE_ORDER_DATE &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="orgIds != null and orgIds.size() > 0">
+                and o.CEEA_ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+            <if test="vendorKey != null and vendorKey != ''">
+                and (o.VENDOR_CODE like concat('%',#{vendorKey},'%') or o.VENDOR_NAME like concat('%',#{vendorKey},'%'))
+            </if>
+            <if test="costType != null and costType !=''">
+                and o.CEEA_COST_TYPE = #{costType}
+            </if>
+            <if test="orderStatus != null and orderStatus !=''">
+                and o.ORDER_STATUS = #{orderStatus}
+            </if>
+            <if test="ceeaIfSupplierConfirm != null and ceeaIfSupplierConfirm != ''">
+                and o.CEEA_IF_SUPPLIER_CONFIRM = #{ceeaIfSupplierConfirm}
+            </if>
+            <if test="ceeaIfConSignment != null and ceeaIfConSignment != ''">
+                and o.CEEA_IF_CONSIGNMENT = #{ceeaIfConSignment}
+            </if>
+            <if test="ceeaIfPowerStationBusiness != null and ceeaIfPowerStationBusiness != ''">
+                and o.CEEA_IF_POWER_STATION_BUSINESS = #{ceeaIfPowerStationBusiness}
+            </if>
+            <if test="userIds != null and userIds.size() > 0">
+                and o.CREATED_ID in
+                <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="ceeaIfEditDone != null and ceeaIfEditDone != ''">
+                and o.CEEA_IF_EDIT_DONE = #{ceeaIfEditDone}
+            </if>
+            and (o.VERSION > 0 or (o.VERSION = 0 and (o.ORDER_STATUS = 'ACCEPT' or o.ORDER_STATUS = 'APPROVED')))
+        </where>
+        ORDER BY o.LAST_UPDATE_DATE DESC
+    </select>
+
+    <select id="countSubmit" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"
+            resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM scc_sc_order o
+        <where>
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId} and o.ORDER_STATUS != 'UNISSUED'
+            </if>
+            <if test="orderStatus != null and orderStatus !=''">
+                and o.ORDER_STATUS = #{orderStatus}
+            </if>
+        </where>
+    </select>
+
+
+
+    <select id="findOrderDetailList" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        select od.ORDER_DETAIL_ID,o.ORDER_ID,o.ORDER_NUMBER,od.LINE_NUM,od.MATERIAL_ID,od.MATERIAL_CODE,od.MATERIAL_NAME,
+			od.CEEA_PLAN_RECEIVE_DATE,od.ORDER_NUM,od.CEEA_ORGANIZATION_NAME,o.VENDOR_NAME
+			from scc_sc_order_detail od
+			inner join scc_sc_order o on od.ORDER_ID = o.ORDER_ID
+        <where>
+            <!--<if test="createdId != null">
+                and o.CREATED_ID = #{createdId}
+            </if>-->
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId} and (o.ORDER_STATUS in ('APPROVED','ACCEPT','REFUSED'))
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                and o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="orderType != null and orderType != ''">
+                and o.ORDER_TYPE = #{orderType}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and o.CEEA_PURCHASE_ORDER_DATE &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and o.CEEA_PURCHASE_ORDER_DATE &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="orgIds != null and orgIds.size() > 0">
+                and o.CEEA_ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+            <if test="vendorKey != null and vendorKey != ''">
+                and (o.VENDOR_CODE like concat('%',#{vendorKey},'%') or o.VENDOR_NAME like concat('%',#{vendorKey},'%'))
+            </if>
+            <if test="costType != null and costType !=''">
+                and o.CEEA_COST_TYPE = #{costType}
+            </if>
+            
+            <if test="orderDetailStatus != null and orderDetailStatus !=''">
+                AND od.ORDER_DETAIL_STATUS = #{orderDetailStatus}
+            </if>
+
+            <if test="orderStatus != null and orderStatus != ''">
+                and o.order_status = #{orderStatus}
+            </if>
+
+            <if test="ceeaIfSupplierConfirm != null and ceeaIfSupplierConfirm != ''">
+                and o.CEEA_IF_SUPPLIER_CONFIRM = #{ceeaIfSupplierConfirm}
+            </if>
+            <if test="ceeaIfConSignment != null and ceeaIfConSignment != ''">
+                and o.CEEA_IF_CONSIGNMENT = #{ceeaIfConSignment}
+            </if>
+            <if test="ceeaIfPowerStationBusiness != null and ceeaIfPowerStationBusiness != ''">
+                and o.CEEA_IF_POWER_STATION_BUSINESS = #{ceeaIfPowerStationBusiness}
+            </if>
+            <if test="userIds != null and userIds.size() > 0">
+                and o.CREATED_ID in
+                <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="version != null">
+                and o.VERSION >= #{version}
+            </if>
+            <if test="ceeaIfEditDone != null and ceeaIfEditDone != ''">
+                and o.CEEA_IF_EDIT_DONE = #{ceeaIfEditDone}
+            </if>
+            <if test="ceeaPurchaseOrderDate != null">
+                and o.CEEA_PURCHASE_ORDER_DATE = #{ceeaPurchaseOrderDate}
+            </if>
+
+             <if test="keyWord != null">
+                and (
+                	o.ORDER_NUMBER LIKE CONCAT('%',#{keyWord},'%') or
+                	od.MATERIAL_CODE LIKE CONCAT('%',#{keyWord},'%') or
+                	od.MATERIAL_NAME LIKE CONCAT('%',#{keyWord},'%')
+                )
+            </if>
+        </where>
+        ORDER BY o.CREATION_DATE DESC
+    </select>
+</mapper>

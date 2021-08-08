@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.DeliveryNoteMapper">
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.deliverynote.entry.DeliveryNote">
+        <id column="DELIVERY_NOTE_ID" property="deliveryNoteId" jdbcType="BIGINT"/>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT"/>
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT"/>
+        <result column="DELIVERY_NUMBER" property="deliveryNumber" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_DATE" property="deliveryDate" jdbcType="DATE"/>
+        <result column="EXPECTED_ARRIVAL_DATE" property="expectedArrivalDate" jdbcType="DATE"/>
+        <result column="OLD_DELIVERY_NOTE_ID" property="oldDeliveryNoteId" jdbcType="BIGINT"/>
+        <result column="DELIVERY_NOTE_STATUS" property="deliveryNoteStatus" jdbcType="VARCHAR"/>
+        <result column="COMMENTS" property="comments" jdbcType="VARCHAR"/>
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT"/>
+        <result column="VERSION" property="version" jdbcType="BIGINT"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR"/>
+        <result column="SUBMITTED_ID" property="submittedId" jdbcType="BIGINT"/>
+        <result column="SUBMITTED_BY" property="submittedBy" jdbcType="VARCHAR"/>
+        <result column="SUBMITTED_TIME" property="submittedTime" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_ID" property="createdId" jdbcType="BIGINT"/>
+        <result column="ORGANIZATION_CODE" property="organizationCode"/>
+        <result column="ORGANIZATION_NAME" property="organizationName"/>
+        <result column="VENDOR_CODE" property="vendorCode"/>
+        <result column="VENDOR_NAME" property="vendorName"/>
+        <result column="CONTACT_PEOPLE" property="contactPeople"/>
+        <result column="CONTACT_NUMBER" property="contactNumber"/>
+        <result column="RECEIVED_FACTORY" property="receivedFactory"/>
+    </resultMap>
+
+     <resultMap id="ceeaBaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.deliverynote.entry.DeliveryNote">
+        <id column="DELIVERY_NOTE_ID" property="deliveryNoteId" jdbcType="BIGINT"/>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT"/>
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT"/>
+        <result column="DELIVERY_NUMBER" property="deliveryNumber" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_DATE" property="deliveryDate" jdbcType="DATE"/>
+        <result column="EXPECTED_ARRIVAL_DATE" property="expectedArrivalDate" jdbcType="DATE"/>
+        <result column="OLD_DELIVERY_NOTE_ID" property="oldDeliveryNoteId" jdbcType="BIGINT"/>
+        <result column="DELIVERY_NOTE_STATUS" property="deliveryNoteStatus" jdbcType="VARCHAR"/>
+        <result column="COMMENTS" property="comments" jdbcType="VARCHAR"/>
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT"/>
+        <result column="VERSION" property="version" jdbcType="BIGINT"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR"/>
+        <result column="SUBMITTED_ID" property="submittedId" jdbcType="BIGINT"/>
+        <result column="SUBMITTED_BY" property="submittedBy" jdbcType="VARCHAR"/>
+        <result column="SUBMITTED_TIME" property="submittedTime" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_ID" property="createdId" jdbcType="BIGINT"/>
+        <result column="ORGANIZATION_CODE" property="organizationCode"/>
+        <result column="ORGANIZATION_NAME" property="organizationName"/>
+        <result column="VENDOR_CODE" property="vendorCode"/>
+        <result column="VENDOR_NAME" property="vendorName"/>
+        <result column="CONTACT_PEOPLE" property="contactPeople"/>
+        <result column="CONTACT_NUMBER" property="contactNumber"/>
+        <result column="RECEIVED_FACTORY" property="receivedFactory"/>
+        <result column="ORG_ID" property="orgId"/>
+        <result column="ORG_CODE" property="orgCode"/>
+        <result column="ORG_NAME" property="orgName"/>
+        <result column="CEEA_DELIVERY_PLACE" property="ceeaDeliveryPlace"/>
+    </resultMap>
+
+    <resultMap id="ceeaListResultMap" extends="BaseResultMap"
+               type="com.midea.cloud.srm.model.suppliercooperate.deliverynote.dto.DeliveryNoteDTO">
+        <result column="OLD_DELIVERY_NUMBER" property="oldDeliveryNumber"/>
+    </resultMap>
+
+
+    <resultMap id="ListResultMap" extends="BaseResultMap"
+               type="com.midea.cloud.srm.model.suppliercooperate.deliverynote.dto.DeliveryNoteDTO">
+        <result column="OLD_DELIVERY_NUMBER" property="oldDeliveryNumber"/>
+    </resultMap>
+
+     <select id="countCreate" parameterType="com.midea.cloud.srm.model.suppliercooperate.deliverynote.dto.DeliveryNoteRequestDTO"
+            resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM scc_sc_delivery_note o
+        <where>
+            <choose>
+                <when test="vendorId == null">
+                    AND o.DELIVERY_NOTE_STATUS != 'CREATE'
+                </when>
+                <when test="vendorId != null">
+                    AND o.VENDOR_ID = #{vendorId}
+                </when>
+            </choose>
+            <if test="deliveryNoteStatus != null and deliveryNoteStatus !=''">
+                AND o.DELIVERY_NOTE_STATUS = #{deliveryNoteStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.deliverynote.dto.DeliveryNoteRequestDTO"
+            resultMap="ceeaListResultMap">
+        SELECT DISTINCT
+        o.*, old.DELIVERY_NUMBER as OLD_DELIVERY_NUMBER
+        FROM scc_sc_delivery_note o
+        <choose>
+            <when test="orderNumber !=null and orderNumber != ''">
+                INNER JOIN scc_sc_delivery_note_detail dno ON dno.DELIVERY_NOTE_ID = o.DELIVERY_NOTE_ID
+                INNER JOIN scc_sc_order_detail od ON od.ORDER_DETAIL_ID = dno.ORDER_DETAIL_ID
+                INNER JOIN scc_sc_order o1 ON o1.ORDER_ID = od.ORDER_ID
+            </when>
+            <when test="startSubmittedTime !=null and startSubmittedTime != ''">
+                INNER JOIN scc_sc_delivery_note_detail dno ON dno.DELIVERY_NOTE_ID = o.DELIVERY_NOTE_ID
+                INNER JOIN scc_sc_order_detail od ON od.ORDER_DETAIL_ID = dno.ORDER_DETAIL_ID
+                INNER JOIN scc_sc_order o1 ON o1.ORDER_ID = od.ORDER_ID
+            </when>
+            <when test="endSubmittedTime !=null and endSubmittedTime != ''">
+                INNER JOIN scc_sc_delivery_note_detail dno ON dno.DELIVERY_NOTE_ID = o.DELIVERY_NOTE_ID
+                INNER JOIN scc_sc_order_detail od ON od.ORDER_DETAIL_ID = dno.ORDER_DETAIL_ID
+                INNER JOIN scc_sc_order o1 ON o1.ORDER_ID = od.ORDER_ID
+            </when>
+        </choose>
+        <if test="orderNumber !=null and orderNumber != ''">
+            AND o1.ORDER_NUMBER = #{orderNumber}
+        </if>
+        <if test="startSubmittedTime !=null and startSubmittedTime != ''">
+            AND o1.SUBMITTED_TIME &gt;= STR_TO_DATE(#{startSubmittedTime},'%Y-%m-%d')
+        </if>
+        <if test="endSubmittedTime !=null and endSubmittedTime != ''">
+            AND o1.SUBMITTED_TIME &lt;= STR_TO_DATE(#{endSubmittedTime},'%Y-%m-%d')
+        </if>
+        <if test="deliveryAppointNumber != null and deliveryAppointNumber !=''">
+            INNER JOIN scc_sc_appoint_delivery_note adn ON adn.DELIVERY_NOTE_ID = o.DELIVERY_NOTE_ID
+            INNER JOIN scc_sc_delivery_appoint da ON da.DELIVERY_APPOINT_ID = adn.DELIVERY_APPOINT_ID
+            AND da.DELIVERY_APPOINT_NUMBER LIKE CONCAT('%',#{deliveryAppointNumber},'%')
+        </if>
+
+        LEFT JOIN scc_sc_delivery_note old ON old.DELIVERY_NOTE_ID = o.OLD_DELIVERY_NOTE_ID
+        <where>
+            <choose>
+                <when test="vendorId == null">
+                    AND o.DELIVERY_NOTE_STATUS != 'CREATE'
+                </when>
+                <when test="vendorId != null">
+                    AND o.VENDOR_ID = #{vendorId}
+                </when>
+            </choose>
+            <if test="receivedFactory != null and receivedFactory !=''">
+                AND o.RECEIVED_FACTORY = #{receivedFactory}
+            </if>
+            <if test="vendorCode != null and vendorCode != ''">
+                AND o.VENDOR_CODE = #{vendorCode}
+            </if>
+            <if test="organizationId != null">
+                AND o.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <if test="deliveryNumber != null and deliveryNumber !=''">
+                AND o.DELIVERY_NUMBER LIKE CONCAT('%',#{deliveryNumber},'%')
+            </if>
+            <if test="containOld != null and containOld">
+                AND o.OLD_DELIVERY_NOTE_ID IS NOT NULL
+            </if>
+            <if test="eqDeliveryDate != null and eqDeliveryDate != ''">
+                AND o.DELIVERY_DATE &gt;= STR_TO_DATE(#{eqDeliveryDate}, '%Y-%m-%d')
+                AND o.DELIVERY_DATE &lt;= STR_TO_DATE(#{eqDeliveryDate}, '%Y-%m-%d')
+            </if>
+            <if test="startDeliveryDate != null and startDeliveryDate != ''"><!-- 送货日期从 -->
+                AND o.DELIVERY_DATE &gt;= STR_TO_DATE(#{startDeliveryDate}, '%Y-%m-%d')
+            </if>
+            <if test="endDeliveryDate != null and endDeliveryDate != ''"><!-- 送货日期至 -->
+                AND o.DELIVERY_DATE &lt;= STR_TO_DATE(#{endDeliveryDate}, '%Y-%m-%d')
+            </if>
+
+            <if test="orgIds != null and orgIds.size > 0 "><!-- 业务实体 多选 -->
+                AND o.ORG_ID IN
+                <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="organizationIds != null and organizationIds.size > 0"><!-- 业务实体 多选 -->
+                AND o.ORGANIZATION_ID IN
+                <foreach collection="organizationIds" index="index" item="organizationId" open="(" close=")" separator=",">
+                    #{organizationId}
+                </foreach>
+            </if>
+
+            <if test="deliveryNoteStatus != null and deliveryNoteStatus !=''">
+                AND o.DELIVERY_NOTE_STATUS = #{deliveryNoteStatus}
+            </if>
+        </where>
+        ORDER BY o.CREATION_DATE DESC
+    </select>
+
+    <select id="findDeliveryNoteList"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.deliverynote.dto.DeliveryNoteRequestDTO"
+            resultMap="ceeaListResultMap">
+        SELECT DISTINCT
+        o.*
+        FROM scc_sc_delivery_note o
+        inner join scc_sc_delivery_note_detail nod on o.DELIVERY_NOTE_ID=nod.DELIVERY_NOTE_ID
+        inner join  scc_sc_order_detail od on nod.ORDER_DETAIL_ID=od.ORDER_DETAIL_ID
+        inner join  scc_sc_order odr on od.ORDER_ID=odr.ORDER_ID
+
+        <where>
+            1=1
+            <!--货号订单模糊查询-->
+            <if test="deliveryNumber!=null and deliveryNumber!=''">
+                and o.DELIVERY_NUMBER like CONCAT('%',#{deliveryNumber},'%')
+            </if>
+            <!-- 送货日期从 -->
+            <if test="startDeliveryDate != null and startDeliveryDate != ''">
+                AND o.DELIVERY_DATE &gt;= STR_TO_DATE(#{startDeliveryDate}, '%Y-%m-%d')
+            </if>
+            <!-- 送货日期至 -->
+            <if test="endDeliveryDate != null and endDeliveryDate != ''">
+                AND o.DELIVERY_DATE &lt;= STR_TO_DATE(#{endDeliveryDate}, '%Y-%m-%d')
+            </if>
+            <!-- 业务实体 多选 -->
+            <if test="orgIds != null and orgIds.size > 0 ">
+                AND o.ORG_ID IN
+                <foreach collection="orgIds" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <!-- 库存组织 多选 -->
+            <if test="organizationIds != null and organizationIds.size > 0">
+                AND o.ORGANIZATION_ID IN
+                <foreach collection="organizationIds" index="index" item="organizationId" open="(" close=")" separator=",">
+                    #{organizationId}
+                </foreach>
+            </if>
+            <!-- 交货地点 模糊查询 -->
+            <if test="ceeaDeliveryPlace != null and ceeaDeliveryPlace !=''">
+                AND o.CEEA_DELIVERY_PLACE LIKE CONCAT('%',#{ceeaDeliveryPlace},'%')
+            </if>
+            <!--供应商id -->
+            <choose>
+                <when test="vendorId == null">
+                    AND o.DELIVERY_NOTE_STATUS != 'CREATE'
+                </when>
+                <when test="vendorId != null">
+                    AND o.VENDOR_ID = #{vendorId}
+                </when>
+            </choose>
+
+            <if test="deliveryNoteStatus!=null and deliveryNoteStatus!=''">
+                and o.DELIVERY_NOTE_STATUS =#{deliveryNoteStatus}
+            </if>
+            <if test="receivedFactory != null and receivedFactory !=''">
+                AND o.RECEIVED_FACTORY = #{receivedFactory}
+            </if>
+            <if test="vendorCode != null and vendorCode != ''">
+                AND o.VENDOR_CODE = #{vendorCode}
+            </if>
+            <if test="deliveryNumber != null and deliveryNumber !=''"><!-- 送货单号 模糊查询 -->
+                AND o.DELIVERY_NUMBER LIKE CONCAT('%',#{deliveryNumber},'%')
+            </if>
+            <if test="eqDeliveryDate != null and eqDeliveryDate != ''">
+                AND o.DELIVERY_DATE &gt;= STR_TO_DATE(#{eqDeliveryDate}, '%Y-%m-%d')
+                AND o.DELIVERY_DATE &lt;= STR_TO_DATE(#{eqDeliveryDate}, '%Y-%m-%d')
+            </if>
+            <if test="deliveryNoteStatus != null and deliveryNoteStatus !=''"><!-- 单据状态 -->
+                AND o.DELIVERY_NOTE_STATUS = #{deliveryNoteStatus}
+            </if>
+            <if test="orderNumber !=null and orderNumber != ''">
+                AND odr.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+        </where>
+        group by o.DELIVERY_NOTE_ID
+        ORDER BY o.CREATION_DATE DESC
+    </select>
+
+    <select id="list" resultType="com.midea.cloud.srm.model.suppliercooperate.deliverynote.dto.DeliveryNoteDTO">
+        select *
+        from scc_sc_delivery_note
+        <where>
+            <if test="deliveryNumber != null and deliveryNumber != ''">
+                and DELIVERY_NUMBER like concat('%',#{deliveryNumber},'%')
+            </if>
+            <if test="fromDate != null">
+                and CREATION_DATE >= #{fromDate}
+            </if>
+            <if test="toDate != null">
+                and CREATION_DATE &lt;= #{fromDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="listInDeliveryAppoint"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.deliverynote.dto.DeliveryNoteRequestDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.deliverynote.dto.DeliveryNoteDTO">
+        select *
+        from scc_sc_delivery_note o
+        <where>
+            <!--货号订单模糊查询-->
+            <if test="deliveryNumber != null and deliveryNumber != ''">
+                and o.DELIVERY_NUMBER like CONCAT('%',#{deliveryNumber},'%')
+            </if>
+            <!-- 送货日期从 -->
+            <if test="startDeliveryDate != null and startDeliveryDate != ''">
+                AND o.DELIVERY_DATE &gt;= STR_TO_DATE(#{startDeliveryDate}, '%Y-%m-%d')
+            </if>
+            <!-- 送货日期至 -->
+            <if test="endDeliveryDate != null and endDeliveryDate != ''">
+                AND o.DELIVERY_DATE &lt;= STR_TO_DATE(#{endDeliveryDate}, '%Y-%m-%d')
+            </if>
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId}
+            </if>
+            and o.DELIVERY_NOTE_STATUS = 'DELIVERED'
+            and (o.IF_CREATE_DELIVERY_APPOINTMENT = 'N' or o.IF_CREATE_DELIVERY_APPOINTMENT is null)
+        </where>
+    </select>
+
+</mapper>

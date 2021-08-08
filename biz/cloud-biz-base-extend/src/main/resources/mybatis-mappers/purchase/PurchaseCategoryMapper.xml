@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.purchase.mapper.PurchaseCategoryMapper">
+
+    <select id="listPageByParm" resultType="com.midea.cloud.srm.model.base.purchase.entity.PurchaseCategory">
+        SELECT
+        a.* ,
+        b.CATEGORY_NAME AS parentName,
+        b.CATEGORY_CODE AS parentCode
+        FROM scc_base_purchase_category a
+        LEFT JOIN scc_base_purchase_category b
+        ON a.PARENT_ID = b.CATEGORY_ID
+        <where>
+            <if test="categoryName != null and categoryName != ''">
+                AND a.CATEGORY_NAME LIKE concat('%', #{categoryName}, '%')
+            </if>
+            <if test="categoryCode != null and categoryCode != ''">
+                AND a.CATEGORY_CODE LIKE concat('%', #{categoryCode}, '%')
+            </if>
+            <if test="parentName != null and parentName !=''">
+                AND b.CATEGORY_NAME LIKE concat('%', #{parentName},'%')
+            </if>
+            <if test="level != null">
+                AND a.LEVEL = #{level}
+            </if>
+            <if test="enabled != null and enabled !=''">
+                AND a.ENABLED = #{enabled}
+            </if>
+        </where>
+        ORDER BY a.LAST_UPDATE_DATE DESC
+    </select>
+
+    <select id="queryByParam" resultType="com.midea.cloud.srm.model.base.purchase.entity.PurchaseCategory">
+        select *
+        from scc_base_purchase_category a
+        where CATEGORY_ID IN
+        (select CATEGORY_ID
+        from scc_base_purchase_category
+        where CATEGORY_NAME LIKE CONCAT('%', #{param}, '%')
+        UNION
+        select CATEGORY_ID
+        from scc_base_purchase_category
+        where CATEGORY_CODE LIKE CONCAT('%', #{param}, '%'))
+        <if test="enabled != null and enabled !=''">
+            AND a.ENABLED = #{enabled}
+        </if>
+        GROUP BY a.CATEGORY_ID
+    </select>
+
+    <select id="queryCategoryByType" resultType="com.midea.cloud.srm.model.base.purchase.entity.PurchaseCategory">
+        select *
+        from scc_base_purchase_category a
+        <where>
+            <if test="param != null and param !=''">
+                AND (a.CATEGORY_NAME LIKE CONCAT('%', #{param}, '%') OR a.CATEGORY_CODE LIKE CONCAT('%', #{param}, '%'))
+                <!-- AND CATEGORY_ID IN
+                (select CATEGORY_ID
+                from scc_base_purchase_category
+                where CATEGORY_NAME LIKE CONCAT('%', #{param}, '%')
+                UNION
+                select CATEGORY_ID
+                from scc_base_purchase_category
+                where CATEGORY_CODE LIKE CONCAT('%', #{param}, '%'))-->
+            </if>
+            <if test="enabled != null and enabled !=''">
+                AND a.ENABLED = #{enabled}
+            </if>
+            <if test="null != level and level != ''">
+                AND a.LEVEL = #{level}
+            </if>
+        </where>
+        GROUP BY a.CATEGORY_ID
+    </select>
+
+    <select id="listByParam" resultType="com.midea.cloud.srm.model.base.purchase.entity.PurchaseCategory">
+        SELECT
+        a.* ,
+        b.CATEGORY_NAME AS parentName,
+        b.CATEGORY_CODE AS parentCode
+        FROM scc_base_purchase_category a
+        LEFT JOIN scc_base_purchase_category b ON a.PARENT_ID = b.CATEGORY_ID
+        LEFT JOIN scc_base_purchase_category c ON b.PARENT_ID = c.CATEGORY_ID
+        <where>
+            <if test="categoryName != null and categoryName != ''">
+                AND (
+                a.CATEGORY_NAME LIKE concat('%', #{categoryName}, '%') or
+                b.CATEGORY_NAME LIKE concat('%', #{categoryName}, '%') or
+                c.CATEGORY_NAME LIKE concat('%', #{categoryName}, '%')
+                )
+            </if>
+            <if test="categoryCode != null and categoryCode != ''">
+                AND a.CATEGORY_CODE LIKE concat('%', #{categoryCode}, '%')
+            </if>
+            <if test="parentCode != null and parentCode != ''">
+                AND c.CATEGORY_CODE = #{parentCode}
+            </if>
+            <if test="level != null">
+                AND a.LEVEL = #{level}
+            </if>
+            <if test="enabled != null and enabled !=''">
+                AND a.ENABLED = #{enabled}
+            </if>
+        </where>
+        ORDER BY a.LAST_UPDATE_DATE DESC
+    </select>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.statement.mapper.StatementHeadMapper" >
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.pm.ps.statement.entity.StatementHead" >
+    <id column="STATEMENT_HEAD_ID" property="statementHeadId" jdbcType="BIGINT" />
+    <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT" />
+    <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR" />
+    <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR" />
+    <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT" />
+    <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR" />
+    <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+    <result column="CURRENCY" property="currency" jdbcType="VARCHAR" />
+    <result column="TAX_KEY" property="taxKey" jdbcType="VARCHAR" />
+    <result column="TAX_RATE" property="taxRate" jdbcType="DECIMAL" />
+    <result column="STATEMENT_STATUS" property="statementStatus" jdbcType="VARCHAR" />
+    <result column="REJECT_REASON" property="rejectReason" jdbcType="VARCHAR" />
+    <result column="STATEMENT_START_TIME" property="statementStartTime" jdbcType="DATE" />
+    <result column="STATEMENT_END_TIME" property="statementEndTime" jdbcType="DATE" />
+    <result column="PAYMENT_TYPE" property="paymentType" jdbcType="VARCHAR" />
+    <result column="TERM_OF_PAYMENT" property="termOfPayment" jdbcType="VARCHAR" />
+    <result column="RECEIPT_AMOUNT" property="receiptAmount" jdbcType="DECIMAL" />
+    <result column="ASSESS_TOTAL_AMOUNT" property="assessTotalAmount" jdbcType="DECIMAL" />
+    <result column="VERIFIED_TOTAL_AMOUNT" property="verifiedTotalAmount" jdbcType="DECIMAL" />
+    <result column="STATEMENT_TOTAL_AMOUNT" property="statementTotalAmount" jdbcType="DECIMAL" />
+    <result column="STATEMENT_NUMBER" property="statementNumber" jdbcType="VARCHAR" />
+    <result column="PURCHASER_NOTE" property="purchaserNote" jdbcType="VARCHAR" />
+    <result column="SUPPLIER_NOTE" property="supplierNote" jdbcType="VARCHAR" />
+    <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+    <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+    <result column="VERSION" property="version" jdbcType="BIGINT" />
+  </resultMap>
+</mapper>

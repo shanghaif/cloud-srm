@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.info.mapper.OrgInfoMapper">
+    <select id="queryOrgInfoByVendorId" resultType="com.midea.cloud.srm.model.supplier.info.entity.OrgInfo">
+        SELECT b.ENABLED, a.*
+        FROM cloud_biz_supplier.scc_sup_org_info a
+                 LEFT JOIN cloud_biz_base.scc_base_organization b ON a.ORG_ID = b.ORGANIZATION_ID
+        where a.COMPANY_ID = #{companyId}
+    </select>
+</mapper>

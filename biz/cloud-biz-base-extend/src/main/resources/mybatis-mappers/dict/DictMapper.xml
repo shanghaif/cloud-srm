@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.dict.mapper.DictMapper">
+    <select id="findByLanguageAndCode" resultType="int">
+    select count(DICT_ID) from  scc_base_dict
+        <where>
+            <if test="dictCode != null and dictCode != ''">
+                AND DICT_CODE = #{dictCode}
+            </if>
+            <if test="language != null and language != ''">
+                AND LANGUAGE = #{language}
+            </if>
+            <if test="id != null">
+                AND DICT_ID != #{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByNameAndId" resultType="int">
+        select count(DICT_ID) from  scc_base_dict
+        <where>
+            <if test="dictName != null and dictName != ''">
+                AND DICT_NAME = #{dictName}
+            </if>
+            <if test="id != null">
+                AND DICT_ID != #{id}
+            </if>
+        </where>
+    </select>
+    <select id="queryPageByConditions" parameterType="com.midea.cloud.srm.model.base.dict.entity.Dict"
+     resultType="com.midea.cloud.srm.model.base.dict.entity.Dict">
+        select a.* from  scc_base_dict a
+      <where>
+            <if test="dictName != null and dictName != ''">
+                AND a.DICT_NAME LIKE  CONCAT('%',#{dictName},'%')
+            </if>
+            <if test="dictCode != null and dictCode != ''">
+                AND a.DICT_CODE LIKE CONCAT('%',#{dictCode},'%')
+            </if>
+            <if test="description != null and description != ''">
+                AND a.description LIKE CONCAT('%',#{description},'%')
+            </if>
+            <if test="language != null and language != ''">
+                AND a.language = #{language}
+            </if>
+            <if test="null != dictItemCode and dictItemCode != ''">
+                EXISTS(
+                    select 1 from scc_base_dict_item b where
+                    a.DICT_ID = b.DICT_ID
+                    AND b.DICT_ITEM_CODE = #{dictItemCode}
+                )
+            </if>
+            <if test="null != dictItemName and dictItemName != ''">
+                EXISTS(
+                    select 1 from scc_base_dict_item b where
+                    a.DICT_ID = b.DICT_ID
+                    AND b.DICT_ITEM_NAME = #{dictItemName}
+                )
+            </if>
+        </where>
+        ORDER BY CREATION_DATE DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.vendorasses.mapper.VendorAssesFormMapper">
+
+    <select id="queryIndicator" parameterType="java.lang.String"
+            resultType="com.midea.cloud.srm.model.perf.vendorasses.VendorAssesForm">
+        SELECT
+            H.INDICATOR_HEAD_ID indicatorHeadId, #指标库头表ID
+            H.INDICATOR_NAME      indicatorName,   #指标名称
+            H.INDICATOR_DIMENSION indicatorDimension, # 指标维度
+            L.INDICATOR_LINE_DES  indicatorLineDes,  # 指标行信息
+            L.ASSESSMENT_PENALTY  assessmentPenalty  # 建议考核金额
+        FROM SCC_PERF_INDICATORS_LINE L
+                 LEFT JOIN SCC_PERF_INDICATORS_HEADER H ON H.INDICATOR_HEAD_ID = L.INDICATOR_HEAD_ID
+        WHERE 1=1
+          AND H.INDICATOR_NAME = #{indicatorName}
+          AND H.INDICATOR_TYPE = 'ASSESSMENT';
+    </select>
+    <select id="ListCopy" parameterType="com.midea.cloud.srm.model.perf.vendorasses.VendorAssesForm"
+            resultType="com.midea.cloud.srm.model.perf.vendorasses.dto.VendorAssesFormOV">
+    SELECT
+    *,
+    (IFNULL(ACTUAL_ASSESSMENT_AMOUNT_Y,0) - IFNULL(ACTUAL_ASSESSMENT_AMOUNT_N,0)) AS TAX
+     FROM  scc_perf_vendor_asses_form
+     ${ew.customSqlSegment}
+    </select>
+</mapper>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.cm.contract.mapper.ContractMaterialMapper">
+
+    <select id="listPageMaterialDTOByParm"
+            resultType="com.midea.cloud.srm.model.cm.contract.dto.ContractMaterialDTO">
+        SELECT
+          SCH.CONTRACT_HEAD_ID,
+          SCH.CONTRACT_NO,
+          SCH.VENDOR_ID,
+          SCH.VENDOR_CODE,
+          SCH.VENDOR_NAME,
+          SCH.ORGANIZATION_ID,
+          SCH.ORGANIZATION_CODE,
+          SCH.ORGANIZATION_NAME,
+          SCH.CONTRACT_STATUS,
+          SCH.CURRENCY_ID,
+          SCH.CURRENCY_NAME,
+          SCH.CURRENCY_CODE,
+          SCM.CONTRACT_MATERIAL_ID,
+          SCM.LINE_NUMBER,
+          SCM.MATERIAL_ID,
+          SCM.MATERIAL_CODE,
+          SCM.MATERIAL_NAME,
+          SCM.CATEGORY_CODE,
+          SCM.CATEGORY_ID,
+          SCM.CATEGORY_NAME,
+          SCM.AMOUNT,
+          SCM.CONTRACT_QUANTITY,
+          SCM.ORDER_QUANTITY,
+          SCM.UNTAXED_PRICE,
+          SCM.UNIT_CODE,
+          SCM.UNIT_ID,
+          SCM.UNIT_NAME,
+          SCM.TAXED_PRICE,
+          SCM.PRICE_UNIT
+        FROM
+          scc_contract_head SCH
+        LEFT JOIN
+          scc_contract_material SCM
+        ON
+          SCH.CONTRACT_HEAD_ID = SCM.CONTRACT_HEAD_ID
+        <where>
+            <if test="vendorName != null and vendorName != ''">
+                AND SCH.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                AND SCM.MATERIAL_CODE LIKE CONCAT('%', #{materialCode}, '%')
+            </if>
+            <if test="organizationName != null and organizationName != ''">
+                AND SCH.ORGANIZATION_NAME LIKE CONCAT('%', #{organizationName}, '%')
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                AND SCM.CATEGORY_NAME LIKE CONCAT('%', #{categoryName}, '%')
+            </if>
+            <if test="contractStatus != null and contractStatus != ''">
+                AND SCH.CONTRACT_STATUS LIKE CONCAT('%', #{contractStatus}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND SCH.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="organizationId != null">
+                AND SCH.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <if test="materialId != null">
+                AND SCH.MATERIAL_ID = #{materialId}
+            </if>
+        </where>
+    </select>
+</mapper>

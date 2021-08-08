@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.ou.mapper.BaseOuGroupMapper">
+    <resultMap id="BaseOuDetailVOList" type="com.midea.cloud.srm.model.base.ou.vo.BaseOuGroupDetailVO">
+        <id column="OU_GROUP_ID" property="ouGroupId" jdbcType="BIGINT"/>
+        <result column="OU_" property="ouGroupName" jdbcType="VARCHAR"/>
+        <result column="OU_GROUP_NAME" property="ouGroupName" jdbcType="VARCHAR"/>
+        <result column="OU_GROUP_CODE" property="ouGroupCode" jdbcType="VARCHAR"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="DATE"/>
+        <result column="GROUP_STATUS" property="groupStatus" jdbcType="VARCHAR"/>
+        <collection property="details" ofType="com.midea.cloud.srm.model.base.ou.vo.BaseOuDetailVO">
+            <id column="OU_DETAIL_ID" property="ouDetailId" jdbcType="BIGINT"/>
+            <result column="d.OU_GROUP_ID" property="ouGroupId" jdbcType="BIGINT"/>
+            <result column="BU_ID" property="buId" jdbcType="BIGINT"/>
+            <result column="BU_NAME" property="buName" jdbcType="VARCHAR"/>
+            <result column="OU_CODE" property="ouCode" jdbcType="VARCHAR"/>
+            <result column="OU_ID" property="ouId" jdbcType="BIGINT"/>
+            <result column="OU_NAME" property="ouName" jdbcType="VARCHAR"/>
+            <result column="INV_CODE" property="invCode" jdbcType="VARCHAR"/>
+            <result column="INV_ID" property="invId" jdbcType="BIGINT"/>
+            <result column="INV_NAME" property="invName" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <select id="queryBaseOuGroupDetailByPage" resultMap="BaseOuDetailVOList">
+        SELECT g.OU_GROUP_ID,g.OU_GROUP_NAME,g.OU_GROUP_CODE,g.CREATED_BY,g.CREATION_DATE,g.GROUP_STATUS
+        FROM ceea_base_ou_group g WHERE
+        g.GROUP_STATUS != 'ABANDON' and
+        EXISTS(SELECT 1 FROM ceea_base_ou_detail d WHERE d.ou_group_id = g.ou_group_id
+        <if test="dto.groupStatus!=null">and g.GROUP_STATUS=#{dto.groupStatus}</if>
+        <if test="dto.ouCode!=null">AND d.OU_CODE=#{dto.ouCode}</if>
+        <if test="dto.ouId!=null">AND d.OU_ID=#{dto.ouId}</if>
+        <if test="userName!=null">AND g.CREATED_BY=#{userName}</if>
+        <if test="dto.ouName!=null">AND d.OU_NAME like concat('%',#{dto.ouName,jdbcType=VARCHAR},'%') ESCAPE '/'</if>
+        <if test="dto.ouGroupCode!=null">AND g.OU_GROUP_CODE=#{dto.ouGroupCode}</if>
+        <if test="dto.ouGroupName!=null">AND g.OU_GROUP_NAME like concat('%',#{dto.ouGroupName,jdbcType=VARCHAR},'%')
+            ESCAPE '/'
+        </if>
+        )
+    </select>
+
+    <select id="queryBaseOuDetailByCode" resultType="com.midea.cloud.srm.model.base.ou.entity.BaseOuDetail">
+        select a.* from ceea_base_ou_detail a
+                            JOIN ceea_base_ou_group b ON a.OU_GROUP_ID = b.OU_GROUP_ID
+        where b.OU_GROUP_CODE = #{ouGroupCode}
+    </select>
+</mapper>

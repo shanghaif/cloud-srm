@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.scoreproject.mapper.PerfScoreItemManSupIndMapper">
+
+    <!-- 根据添加查询绩效评分项目评分人供应商指标集合Map-->
+    <!--    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemManSupInd">-->
+    <!--        <id column="SCORE_ITEM_MAN_SUP_IND_ID" property="scoreItemManSupIndId" jdbcType="BIGINT" />-->
+    <!--        <result column="SCORE_ITEMS_MAN_ID" property="scoreItemsManId" jdbcType="BIGINT" />-->
+    <!--        <result column="SCORE_ITEMS_ID" property="scoreItemsId" jdbcType="BIGINT" />-->
+    <!--        <result column="SCORE_ITEMS_SUP_ID" property="scoreItemsSupId" jdbcType="BIGINT" />-->
+    <!--        <result column="COMPANY_ID" property="companyId" jdbcType="VARCHAR" />-->
+    <!--        <result column="COMPANY_CODE" property="companyCode" jdbcType="VARCHAR" />-->
+    <!--        <result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR" />-->
+    <!--        <result column="COMPANY_EN_NAME" property="companyEnName" jdbcType="VARCHAR" />-->
+    <!--        <result column="TEMPLATE_DIM_WEIGHT_ID" property="templateDimWeightId" jdbcType="VARCHAR" />-->
+    <!--        <result column="INDICATOR_DIMENSION" property="indicatorDimension" jdbcType="VARCHAR" />-->
+    <!--        <result column="TEMPLATE_LINE_ID" property="templateLineId" jdbcType="VARCHAR" />-->
+    <!--        <result column="INDICATOR_NAME" property="indicatorName" jdbcType="VARCHAR" />-->
+    <!--        <result column="ENABLE_FLAG" property="enableFlag" jdbcType="VARCHAR" />-->
+    <!--        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />-->
+    <!--        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />-->
+    <!--        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />-->
+    <!--        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />-->
+    <!--    </resultMap>-->
+
+    <!-- 根据添加查询绩效评分项目评分人-供应商指标表集合-->
+    <select id="listScoreItemManSupInd" resultType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemManSupInd"
+            parameterType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemManSupInd">
+        select SCORE_ITEM_MAN_SUP_IND_ID,SCORE_ITEMS_MAN_ID,SCORE_ITEMS_ID,SCORE_ITEMS_SUP_ID,COMPANY_ID,COMPANY_CODE,COMPANY_NAME,COMPANY_EN_NAME
+        ,TEMPLATE_DIM_WEIGHT_ID,INDICATOR_DIMENSION,TEMPLATE_LINE_ID,INDICATOR_NAME,ENABLE_FLAG,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE
+        from scc_perf_score_item_man_supind
+        <include refid="listScoreItemsManSupIndSql" />
+    </select>
+
+    <!-- 查询绩效评分项目-供应商指标表sql组装语句 -->
+    <sql id="listScoreItemsManSupIndSql">
+        <where>
+            1 = 1
+            <if test="null != scoreItemManSupIndId">
+                and SCORE_ITEM_MAN_SUP_IND_ID = #{scoreItemManSupIndId}
+            </if>
+            <if test="null != scoreItemsManId">
+                and SCORE_ITEMS_MAN_ID = #{scoreItemsManId}
+            </if>
+            <if test="null != scoreItemsId">
+                and SCORE_ITEMS_ID = #{scoreItemsId}
+            </if>
+        </where>
+    </sql>
+</mapper>

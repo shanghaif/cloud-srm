@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.dept.mapper.VirtualDepartMapper">
+    <select id="queryVirtualDepartByOrgId"
+            resultType="com.midea.cloud.srm.model.base.dept.dto.DeptDto"
+         parameterType="com.midea.cloud.srm.model.base.dept.dto.DeptDto">
+        SELECT b.VIRTUAL_DEPART_ID virtualDepartId,
+               b.COMPANY company,
+               b.COMPANY_DESCR companyDescr,
+               b.DEPTID deptid,
+               b.DESCR descr,
+               b.PART_DEPTID_CHN partDeptidChn,
+               b.PART_DESCR_CHN partDescrChn,
+               b.LGI_DEPT_LEVEL lgiDeptLevel,
+               b.START_DATE startDate,
+               b.EFF_STATUS effStatus,
+               b.END_DATE ,
+               b.LAST_UPDATE_DATE lastUpdateDate,
+               b.LAST_UPDATED_BY lastUpdatedBy,
+               'Y'  isEdit
+        FROM scc_base_virtual_depart b
+        where 1=1
+        AND b.COMPANY = #{company}
+        <if test="null != descr and descr != ''">
+            AND DESCR like CONCAT('%',#{descr},'%')
+        </if>
+    </select>
+
+    <select id="queryBeptidAll" resultType="java.lang.String">
+        select DEPTID
+        from scc_base_virtual_depart
+    </select>
+</mapper>

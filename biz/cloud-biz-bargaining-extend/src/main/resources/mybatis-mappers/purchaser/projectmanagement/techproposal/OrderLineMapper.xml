@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bargaining.purchaser.projectmanagement.techproposal.mapper.OrderLineMapper">
+
+    <select id="getRequirementLineByBidingId"
+            resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.BidOrderLineVO">
+        SELECT
+        req.BIDING_ID bidingId,
+        req.REQUIREMENT_LINE_ID requirementLineId,
+        req.TARGET_NUM targetNum,
+        req.TARGET_DESC targetDesc,
+        req.ITEM_GROUP itemGroup,
+        req.ORG_NAME orgName,
+        req.QUANTITY quantity,
+        req.UOM_CODE uomCode,
+        req.UOM_DESC uomDesc,
+        req.COMMENTS commnets,
+        req.COMPANY_CODE companyCode,
+        req.ORGANIZATION_CODE organizationCode,
+        req.PRICE_START_TIME priceStartTime,
+        req.PRICE_END_TIME priceEndTime,
+        req.TAX_KEY taxKey,
+        req.TAX_RATE taxRate,
+        req.CATEGORY_NAME categoryName,
+        req.TARGET_PRICE targetPrice
+        FROM
+        scc_brg_requirement_line req
+        where req.BIDING_ID = #{bidingId}
+        AND req.REQUIREMENT_LINE_ID NOT IN (
+        SELECT REQUIREMENT_LINE_ID from scc_brg_quote_authorize auth
+        WHERE auth.BIDING_ID = req.BIDING_ID AND auth.BID_VENDOR_ID =  #{bidVendorId}
+        )
+
+
+    </select>
+
+    <select id="getWinOrderLineByBidingIdAndVendorId"
+            resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.BidOrderLineVO">
+        SELECT
+        req.BIDING_ID bidingId,
+        req.REQUIREMENT_LINE_ID requirementLineId,
+        req.TARGET_NUM targetNum,
+        req.TARGET_DESC targetDesc,
+        req.ITEM_GROUP itemGroup,
+        req.ORG_NAME orgName,
+        req.QUANTITY quantity,
+        req.UOM_CODE uomCode,
+        req.UOM_DESC uomDesc,
+        req.COMMENTS commnets,
+        req.COMPANY_CODE companyCode,
+        req.ORGANIZATION_CODE organizationCode,
+        req.PRICE_START_TIME priceStartTime,
+        req.PRICE_END_TIME priceEndTime,
+        line.TAX_KEY taxKey,
+        line.TAX_RATE taxRate,
+        req.CATEGORY_NAME categoryName,
+        req.TARGET_PRICE targetPrice,
+        line.price price,
+        line.CEEA_OU_ID ouId,
+        line.CEEA_OU_NAME ouName,
+        line.CEEA_IS_BASE_OU baseOu,
+        line.CEEA_DELIVERY_PLACE deliveryPlace,
+        line.CEEA_MQO MQO,
+        line.CEEA_TRADE_TERM tradeTerm,
+        line.CEEA_TRANSPORT_TYPE transportType,
+        line.CEEA_WARRANTY_PERIOD warrantyPeriod,
+        line.CEEA_PURCHASE_TYPE purchaseType,
+        line.CEEA_CURRENCY_TYPE currencyType,
+        line.CEEA_PAYMENT_DAY paymentDay,
+        line.CEEA_PAYMENT_TERM paymentTerm
+        FROM
+        scc_brg_requirement_line req
+        LEFT JOIN scc_brg_order_line line ON Line.REQUIREMENT_LINE_ID = req.REQUIREMENT_LINE_ID
+        LEFT JOIN (SELECT BID_VENDOR_ID,ORDER_HEAD_ID FROM scc_brg_order_head oh WHERE oh.ROUND = (
+        SELECT MAX(ROUND) FROM scc_brg_order_head oh1 WHERE oh1.BID_VENDOR_ID=oh.BID_VENDOR_ID AND oh1.order_status='SUBMISSION'
+        )) head ON head.ORDER_HEAD_ID = line.ORDER_HEAD_ID
+        WHERE head.BID_VENDOR_ID IN (
+        SELECT bid_vendor_id FROM  scc_brg_vendor sbv WHERE sbv.BIDING_ID= #{bidingId}
+        AND sbv.VENDOR_ID = #{vendorId})
+        AND line.WIN = 'Y' AND req.CEEA_QUOTE_STATUS = 'Y'
+    </select>
+
+    <select id="getOrderLineByBidingIdAndVendorId"
+            resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.BidOrderLineVO">
+
+        SELECT
+        orderLine.ORDER_LINE_ID orderLineId,
+        orderLine.BIDING_ID bidingId,
+        orderLine.ORDER_HEAD_ID orderHeadId,
+        orderLine.ORDER_STATUS orderStatus,
+        orderLine.ROUND ROUND,
+        orderLine.BID_VENDOR_ID bidVerdorId,
+        orderLine.PRICE price,
+        (
+        SELECT MIN(ll.price)
+        FROM scc_brg_order_line ll
+        WHERE ll.biding_id = orderLine.BIDING_ID AND ll.SELECTION_STATUS = 'WIN' AND ll.REQUIREMENT_LINE_ID = orderLine.REQUIREMENT_LINE_ID
+        ) finalPrice,
+        orderLine.WITH_STANDARD_PERMISSION withStandardPerssiom,
+        orderLine.WITH_STANDARD withStandard,
+        orderLine.win,
+        orderLine.SELECTION_STATUS selectionStatus,
+        orderLine.RANK rank,
+        orderLine.TOTAL_AMOUNT totalAmount,
+
+        req.REQUIREMENT_LINE_ID requirementLineId,
+        req.TARGET_NUM targetNum,
+        req.TARGET_DESC targetDesc,
+        req.ITEM_GROUP itemGroup,
+        req.ORG_NAME orgName,
+        req.QUANTITY quantity,
+        req.UOM_CODE uomCode,
+        req.UOM_DESC uomDesc,
+        req.COMMENTS commnets,
+        req.COMPANY_CODE companyCode,
+        req.ORGANIZATION_CODE organizationCode,
+        req.PRICE_START_TIME priceStartTime,
+        req.PRICE_END_TIME priceEndTime,
+        req.CEEA_INV_NAME invName,
+        orderLine.TAX_KEY taxKey,
+        orderLine.TAX_RATE taxRate,
+        req.CATEGORY_NAME categoryName,
+        req.TARGET_PRICE targetPrice,
+        req.CEEA_FORMULA_ID formulaId,
+        req.CEEA_FORMULA_VALUE formulaValue,
+        req.TARGET_ID targetId,
+        orderLine.CEEA_OU_ID ouId,
+        orderLine.CEEA_OU_NAME ouName,
+        orderLine.CEEA_IS_BASE_OU baseOu,
+        orderLine.CEEA_DELIVERY_PLACE deliveryPlace,
+        orderLine.CEEA_MQO MQO,
+        orderLine.CEEA_TRADE_TERM tradeTerm,
+        orderLine.CEEA_TRANSPORT_TYPE transportType,
+        orderLine.CEEA_WARRANTY_PERIOD warrantyPeriod,
+        orderLine.CEEA_PURCHASE_TYPE purchaseType,
+        orderLine.CEEA_CURRENCY_TYPE currencyType,
+        orderLine.CEEA_PAYMENT_DAY paymentDay,
+        orderLine.CEEA_PAYMENT_TERM paymentTerm,
+        orderLine.CEEA_PAYMENT_WAY paymentWay,
+        orderLine.CEEA_PAYMENT_TERM_ID paymentTermId,
+        orderLine.CEEA_LEAD_TIME leadTime,
+        orderLine.CEEA_DELIVER_DATE deliverDate,
+        orderLine.CEEA_DISCOUNT_PRICE discountPrice,
+        orderLine.CEEA_CUR_ROUND_MIN_DISC_PRICE currentRoundMinDiscountPrice,
+        orderLine.CEEA_CUR_ROUND_MAX_DISC_PRICE currentRoundMaxDiscountPrice,
+        orderLine.CEEA_TOTAL_DISCOUNT_AMOUNT totalDiscountAmount,
+        orderLine.CEEA_CUR_ROUND_MIN_DISC_AMOUNT currentRoundMinDiscountAmount,
+        orderLine.CEEA_CUR_ROUND_MAX_DISC_AMOUNT currentRoundMAXDiscountAmount
+        FROM
+        scc_brg_order_line orderLine
+        LEFT JOIN scc_brg_requirement_line req ON orderLine.REQUIREMENT_LINE_ID = req.REQUIREMENT_LINE_ID
+        WHERE orderLine.BID_VENDOR_ID IN (
+        SELECT bid_vendor_id
+        FROM  scc_brg_vendor sbv
+        WHERE sbv.BIDING_ID= #{bidingId} AND sbv.VENDOR_ID = #{vendorId})
+        ORDER BY orderheadId, ROUND
+
+
+    </select>
+
+    <select id="getOrderLineByOrderHeadId"
+            resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.BidOrderLineVO">
+        SELECT
+        orderLine.ORDER_LINE_ID orderLineId,
+        req.BIDING_ID bidingId,
+        orderLine.ORDER_HEAD_ID orderHeadId,
+        orderLine.ORDER_STATUS orderStatus,
+        orderLine.ROUND round,
+        orderLine.BID_VENDOR_ID bidVerdorId,
+        orderLine.PRICE price,
+        (
+        SELECT MIN(ll.price)
+        FROM scc_brg_order_line ll
+        WHERE ll.biding_id = orderLine.BIDING_ID AND ll.SELECTION_STATUS = 'WIN' AND ll.REQUIREMENT_LINE_ID = orderLine.REQUIREMENT_LINE_ID
+        ) finalPrice,
+        orderLine.WITH_STANDARD_PERMISSION withStandardPerssiom,
+        orderLine.WITH_STANDARD withStandard,
+        orderLine.win,
+        orderLine.SELECTION_STATUS selectionStatus,
+        orderLine.RANK rank,
+        orderLine.TOTAL_AMOUNT totalAmount,
+
+        req.REQUIREMENT_LINE_ID requirementLineId,
+        req.TARGET_NUM targetNum,
+        req.TARGET_DESC targetDesc,
+        req.ITEM_GROUP itemGroup,
+        req.ORG_NAME orgName,
+        req.QUANTITY quantity,
+        req.UOM_CODE uomCode,
+        req.UOM_DESC uomDesc,
+        req.COMMENTS commnets,
+        req.CEEA_INV_NAME invName,
+        req.COMPANY_CODE companyCode,
+        req.ORGANIZATION_CODE organizationCode,
+        req.PRICE_START_TIME priceStartTime,
+        req.PRICE_END_TIME priceEndTime,
+        orderLine.TAX_KEY taxKey,
+        orderLine.TAX_RATE taxRate,
+        req.CATEGORY_NAME categoryName,
+        req.TARGET_PRICE targetPrice,
+        orderLine.CEEA_OU_ID ouId,
+        orderLine.CEEA_OU_NAME ouName,
+        orderLine.CEEA_IS_BASE_OU baseOu,
+        orderLine.CEEA_DELIVERY_PLACE deliveryPlace,
+        orderLine.CEEA_MQO MQO,
+        orderLine.CEEA_TRADE_TERM tradeTerm,
+        orderLine.CEEA_TRANSPORT_TYPE transportType,
+        orderLine.CEEA_WARRANTY_PERIOD warrantyPeriod,
+        orderLine.CEEA_PURCHASE_TYPE purchaseType,
+        orderLine.CEEA_CURRENCY_TYPE currencyType,
+        orderLine.CEEA_PAYMENT_DAY paymentDay,
+        orderLine.CEEA_PAYMENT_TERM paymentTerm,
+        orderLine.CEEA_PAYMENT_WAY paymentWay,
+        orderLine.CEEA_PAYMENT_TERM_ID paymentTermId,
+        orderLine.CEEA_LEAD_TIME leadTime,
+        orderLine.CEEA_DELIVER_DATE deliverDate,
+        orderLine.CEEA_DISCOUNT_PRICE discountPrice,
+        orderLine.CEEA_CUR_ROUND_MIN_DISC_PRICE currentRoundMinDiscountPrice,
+        orderLine.CEEA_CUR_ROUND_MAX_DISC_PRICE currentRoundMaxDiscountPrice,
+        orderLine.CEEA_TOTAL_DISCOUNT_AMOUNT totalDiscountAmount,
+        orderLine.CEEA_CUR_ROUND_MIN_DISC_AMOUNT currentRoundMinDiscountAmount,
+        orderLine.CEEA_CUR_ROUND_MAX_DISC_AMOUNT currentRoundMAXDiscountAmount,
+        orderLine.comments,
+        req.CEEA_FORMULA_ID formulaId,
+        req.CEEA_FORMULA_VALUE formulaValue,
+        req.TARGET_ID targetId
+
+        FROM
+        scc_brg_requirement_line req
+        LEFT JOIN scc_brg_order_line orderLine ON orderLine.REQUIREMENT_LINE_ID = req.REQUIREMENT_LINE_ID
+        where orderLine.order_Head_Id = #{orderHeadId}
+
+    </select>
+
+    <select id="getWithStandardOrderInfoByOrderHeadId"
+            resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.BidOrderLineVO">
+        SELECT
+        orderLine.ORDER_LINE_ID orderLineId,
+        req.BIDING_ID bidingId,
+        orderLine.ORDER_HEAD_ID orderHeadId,
+        orderLine.ORDER_STATUS orderStatus,
+        orderLine.ROUND round,
+        orderLine.BID_VENDOR_ID bidVerdorId,
+        orderLine.PRICE price,
+        (
+        SELECT MIN(ll.price)
+        FROM scc_brg_order_line ll
+        WHERE ll.biding_id = orderLine.BIDING_ID AND ll.SELECTION_STATUS = 'WIN' AND ll.REQUIREMENT_LINE_ID = orderLine.REQUIREMENT_LINE_ID
+        ) finalPrice,
+        orderLine.WITH_STANDARD_PERMISSION withStandardPerssiom,
+        orderLine.WITH_STANDARD withStandard,
+        orderLine.win,
+        orderLine.SELECTION_STATUS selectionStatus,
+        orderLine.RANK rank,
+        orderLine.TOTAL_AMOUNT totalAmount,
+
+        req.REQUIREMENT_LINE_ID requirementLineId,
+        req.TARGET_NUM targetNum,
+        req.TARGET_DESC targetDesc,
+        req.ITEM_GROUP itemGroup,
+        req.ORG_NAME orgName,
+        req.QUANTITY quantity,
+        req.UOM_CODE uomCode,
+        req.UOM_DESC uomDesc,
+        req.COMMENTS commnets,
+        req.CEEA_INV_NAME invName,
+        req.COMPANY_CODE companyCode,
+        req.ORGANIZATION_CODE organizationCode,
+        req.PRICE_START_TIME priceStartTime,
+        req.PRICE_END_TIME priceEndTime,
+        orderLine.TAX_KEY taxKey,
+        orderLine.TAX_RATE taxRate,
+        req.CATEGORY_NAME categoryName,
+        orderLine.TARGET_PRICE targetPrice,
+        req.CEEA_FORMULA_ID formulaId,
+        req.CEEA_FORMULA_VALUE formulaValue,
+        req.TARGET_ID targetId,
+       orderLine.CEEA_OU_ID ouId,
+        orderLine.CEEA_OU_NAME ouName,
+        orderLine.CEEA_IS_BASE_OU baseOu,
+        orderLine.CEEA_DELIVERY_PLACE deliveryPlace,
+        orderLine.CEEA_MQO MQO,
+        orderLine.CEEA_TRADE_TERM tradeTerm,
+        orderLine.CEEA_TRANSPORT_TYPE transportType,
+        orderLine.CEEA_WARRANTY_PERIOD warrantyPeriod,
+        orderLine.CEEA_PURCHASE_TYPE purchaseType,
+        orderLine.CEEA_CURRENCY_TYPE currencyType,
+        orderLine.CEEA_PAYMENT_DAY paymentDay,
+        orderLine.CEEA_PAYMENT_TERM paymentTerm,
+        orderLine.CEEA_PAYMENT_WAY paymentWay,
+        orderLine.CEEA_PAYMENT_TERM_ID paymentTermId,
+        orderLine.CEEA_LEAD_TIME leadTime,
+        orderLine.CEEA_DELIVER_DATE deliverDate,
+        orderLine.CEEA_DISCOUNT_PRICE discountPrice,
+        orderLine.CEEA_CUR_ROUND_MIN_DISC_PRICE currentRoundMinDiscountPrice,
+        orderLine.CEEA_CUR_ROUND_MAX_DISC_PRICE currentRoundMaxDiscountPrice,
+        orderLine.CEEA_TOTAL_DISCOUNT_AMOUNT totalDiscountAmount,
+        orderLine.CEEA_CUR_ROUND_MIN_DISC_AMOUNT currentRoundMinDiscountAmount,
+        orderLine.CEEA_CUR_ROUND_MAX_DISC_AMOUNT currentRoundMAXDiscountAmount
+        FROM
+        scc_brg_requirement_line req
+        LEFT JOIN scc_brg_order_line orderLine ON orderLine.REQUIREMENT_LINE_ID = req.REQUIREMENT_LINE_ID
+        where orderLine.order_Head_Id = #{orderHeadId}  and orderLine.WITH_STANDARD_PERMISSION = 'Y'
+
+    </select>
+    <select id="getBidingResultList"
+            resultType="com.midea.cloud.srm.model.bargaining.purchaser.projectmanagement.techproposal.entity.OrderLine">
+        SELECT (
+                SELECT MIN(ll.price)
+                FROM scc_brg_order_line ll
+                WHERE ll.biding_id = #{bidingId}
+                    AND ll.SELECTION_STATUS = 'WIN'
+                    AND ll.REQUIREMENT_LINE_ID = l.REQUIREMENT_LINE_ID
+                GROUP BY ll.REQUIREMENT_LINE_ID
+            ) AS price,l.RANK rank,l.ORDER_LINE_ID ordreLineId,l.BIDING_ID bidingId
+            ,l.REQUIREMENT_LINE_ID requirementLineId
+            ,l.BID_VENDOR_ID,l.TAX_KEY taxKey,l.TAX_RATE taxRate,l.SELECTION_STATUS selectionStatus,
+           l.CEEA_OU_ID ouId,
+        l.CEEA_OU_NAME ouName,
+        l.CEEA_IS_BASE_OU baseOu,
+        l.CEEA_DELIVERY_PLACE deliveryPlace,
+        l.CEEA_MQO MQO,
+        l.CEEA_TRADE_TERM tradeTerm,
+        l.CEEA_TRANSPORT_TYPE transportType,
+        l.CEEA_WARRANTY_PERIOD warrantyPeriod,
+        l.CEEA_PURCHASE_TYPE purchaseType,
+        l.CEEA_CURRENCY_TYPE currencyType,
+        l.CEEA_PAYMENT_DAY paymentDay,
+        l.CEEA_PAYMENT_TERM paymentTerm,
+        l.CEEA_PAYMENT_WAY paymentWay,
+        l.CEEA_PAYMENT_TERM_ID paymentTermId,
+        l.CEEA_LEAD_TIME leadTime,
+        l.CEEA_DELIVER_DATE deliverDate,
+        l.CEEA_DISCOUNT_PRICE discountPrice,
+        l.CEEA_CUR_ROUND_MIN_DISC_PRICE currentRoundMinDiscountPrice,
+        l.CEEA_CUR_ROUND_MAX_DISC_PRICE currentRoundMaxDiscountPrice,
+        l.CEEA_TOTAL_DISCOUNT_AMOUNT totalDiscountAmount,
+        l.CEEA_CUR_ROUND_MIN_DISC_AMOUNT currentRoundMinDiscountAmount,
+        l.CEEA_CUR_ROUND_MAX_DISC_AMOUNT currentRoundMAXDiscountAmount
+        FROM scc_brg_order_line l
+        WHERE l.biding_id = #{bidingId}
+            AND l.SELECTION_STATUS IN ('WIN', 'FOLLOW')
+    </select>
+
+</mapper>

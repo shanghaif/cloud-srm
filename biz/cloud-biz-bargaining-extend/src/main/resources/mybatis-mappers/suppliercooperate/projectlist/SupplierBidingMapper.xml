@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bargaining.suppliercooperate.projectlist.mapper.SupplierBidingMapper">
+
+    <select id="getSupplierBidingList" resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.SupplierBidingVO">
+        SELECT
+        sbb.BIDING_ID bidingId,
+        sbb.BIDING_NUM bidingNum,
+        sbb.BIDING_NAME bidingName,
+        sbb.BIDING_TYPE bidingType,
+        sbb.TARGET_TYPE targetType,
+        sbb.BIDING_SCOPE bidingScope,
+        sbb.BIDING_STATUS bidingStatus,
+        sbb.CURRENT_ROUND currentRound,
+        sbb.ENROLL_END_DATETIME enrollEndDatetime,
+        sbb.BIDING_START_DATETIME bidingStartDatetime,
+        sbb.RELEASE_DATETIME releaseDatetime,
+        sbb.DECIMAL_ACCURACY decimalAccuracy,
+        sbb.BIDING_CURRENCY bidingCurrency,
+        sbb.TAX_INCLUSIVE_PRICE taxInclusivePrice,
+        sbb.EVALUATE_METHOD evaluateMethod,
+        sbb.BIDING_AWARD_WAY bidingAwardWay,
+        sbb.WITHDRAW_BIDING withdrawBiding,
+        sbb.CREATED_BY createdBy,
+        sbr.ROUND_ID roundId,
+        sbr.ROUND ROUND,
+        sbr.BUSINESS_OPEN_BID businessOpenBid,
+        sbr.START_TIME startTime,
+        sbr.END_TIME endTime,
+        sbv.BID_VENDOR_ID bidVendorId,
+        signUp.SIGN_UP_ID signUpId,
+        signUp.SIGN_UP_STATUS signUpStatus,
+        orderhead.ORDER_STATUS orderStatus,
+        orderhead.ORDER_HEAD_ID orderHeadId,
+        #{supplierBidingVO.vendorId} vendorId,
+        (SELECT COUNT(1) perssiom FROM
+        scc_brg_order_line line
+        where line.WITH_STANDARD_PERMISSION = 'Y' AND line.ORDER_HEAD_ID=orderhead.ORDER_HEAD_ID ) bidPerssion
+        FROM
+        scc_brg_biding sbb
+
+        LEFT JOIN scc_brg_vendor sbv ON sbv.BIDING_ID = sbb.BIDING_ID AND sbv.VENDOR_ID = #{supplierBidingVO.vendorId}
+
+        LEFT JOIN scc_brg_sign_up signUp ON signUp.BIDING_ID = sbb.BIDING_ID
+        AND signUp.VENDOR_ID = #{supplierBidingVO.vendorId}
+
+        LEFT JOIN scc_brg_round sbr ON sbr.BIDING_ID = sbb.BIDING_ID AND sbr.round = sbb.CURRENT_ROUND
+        LEFT JOIN
+            (
+            SELECT ORDER_HEAD_ID,ORDER_STATUS,bid_vendor_id,ROUND FROM scc_brg_order_head oh
+            WHERE order_head_id IN (SELECT MAX(order_head_id) FROM scc_brg_order_head oh2 WHERE oh.BID_VENDOR_ID = oh2.BID_VENDOR_ID
+            AND oh.ROUND = oh2.ROUND)
+            ) orderhead ON orderhead.bid_vendor_id = sbv.bid_vendor_id AND orderhead.ROUND = sbb.CURRENT_ROUND
+
+        WHERE
+        (sbb.BIDING_SCOPE = 'OPEN_TENDER'
+        OR sbb.BIDING_ID IN (SELECT BIDING_ID FROM scc_brg_vendor WHERE VENDOR_ID= #{supplierBidingVO.vendorId}))
+        and sbb.biding_status not in ('ALL','DRAW_UP')
+        and sbb.AUDIT_STATUS = 'APPROVED'
+        <!-- 如果正式上线，需要加上判断条件，biding_status not in ('ALL','DRAW_UP') -->
+        <if test="supplierBidingVO.bidingNum != null">
+            AND BIDING_NUM like concat('%', #{supplierBidingVO.bidingNum}, '%')
+        </if>
+        <if test="supplierBidingVO.bidingId != null">
+            AND sbb.BIDING_ID = #{supplierBidingVO.bidingId}
+        </if>
+        <if test="supplierBidingVO.bidingName != null">
+            AND BIDING_NAME like concat('%', #{supplierBidingVO.bidingName}, '%')
+        </if>
+        <if test="supplierBidingVO.bidingStatus != null and supplierBidingVO.bidingStatus != ''">
+            AND BIDING_STATUS = #{supplierBidingVO.bidingStatus}
+        </if>
+        <if test='supplierBidingVO.orderStatus != null and supplierBidingVO.orderStatus =="NOT_QUOTED"'>
+            AND (ORDER_STATUS is null or ORDER_STATUS in ('DRAFT','WITHDRAW',''))
+        </if>
+        <if test='supplierBidingVO.orderStatus != null and supplierBidingVO.orderStatus != "NOT_QUOTED"'>
+            AND ORDER_STATUS = #{supplierBidingVO.orderStatus}
+        </if>
+        <if test="supplierBidingVO.signUpStatus != null and supplierBidingVO.signUpStatus != ''">
+            AND SIGN_UP_STATUS = #{supplierBidingVO.signUpStatus}
+        </if>
+        ORDER BY sbb.RELEASE_DATETIME desc
+    </select>
+
+
+    <select id="countCreate" resultType="java.lang.Integer">
+        select count(1) from scc_brg_vendor sbv
+            left join scc_brg_biding sbb on sbb.BIDING_ID = sbv.BIDING_ID
+            left join scc_brg_order_head head on head.BID_VENDOR_ID = sbv.BID_VENDOR_ID and head.ORDER_STATUS = #{supplierBidingVO.orderStatus}
+            where 1=1
+            and sbb.BIDING_STATUS =  #{supplierBidingVO.bidingStatus}
+
+        <if test="supplierBidingVO.vendorId != null">
+            and sbv.VENDOR_ID  =  #{supplierBidingVO.vendorId}
+        </if>
+    </select>
+</mapper>

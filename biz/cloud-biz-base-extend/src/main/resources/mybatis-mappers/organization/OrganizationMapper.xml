@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.organization.mapper.OrganizationMapper">
+
+    <select id="selectOrganizationDTO"
+            resultType="com.midea.cloud.srm.model.base.organization.dto.OrganizationDTO"></select>
+
+    <select id="getOrganizationByOrgCode"
+            parameterType="com.midea.cloud.srm.model.base.organization.dto.OrganizationParamDto"
+            resultType="com.midea.cloud.srm.model.base.organization.entity.Organization">
+        select b.*
+        from scc_base_organization_user a
+                 JOIN scc_base_organization b on a.ORGANIZATION_ID = b.ORGANIZATION_ID
+        where USER_ID = #{userId}
+          and b.ORGANIZATION_TYPE_CODE = #{organizationTypeCode};
+    </select>
+    <select id="getOrgTypeDtoList" resultType="com.midea.cloud.srm.model.base.organization.dto.OrgTypeDto">
+        select ORGANIZATION_TYPE_CODE organizationTypeCode,
+               ORGANIZATION_TYPE_NAME organizationTypeName
+        from SCC_BASE_ORGANIZATION
+        GROUP BY ORGANIZATION_TYPE_CODE;
+    </select>
+
+    <select id="getFatherByChild" resultType="com.midea.cloud.srm.model.base.organization.entity.Organization">
+        SELECT *
+        FROM scc_base_organization
+        WHERE ORGANIZATION_ID IN
+              (SELECT PARENT_ORGANIZATION_ID
+               FROM scc_base_organization_rel
+               WHERE ORGANIZATION_ID = #{orgId}
+              )
+        ORDER BY ORGANIZATION_ID DESC
+    </select>
+
+    <select id="queryOuIdByBuId" resultType="java.lang.Long">
+        select ORGANIZATION_ID
+        from scc_base_organization
+        where ORGANIZATION_ID in (
+            SELECT ORGANIZATION_ID FROM scc_base_organization_rel WHERE PARENT_ORGANIZATION_ID = #{buId}
+        )
+        GROUP BY ORGANIZATION_ID
+    </select>
+
+    <select id="getInvOrganizationsByOrgId"
+            resultType="com.midea.cloud.srm.model.base.organization.entity.Organization">
+        select b.* from cloud_biz_base.scc_base_organization a
+        left join cloud_biz_base.scc_base_organization b on b.PARENT_ORGANIZATION_IDS = a.ORGANIZATION_ID
+        where a.ORGANIZATION_ID = #{orgId} and b.enabled = 'Y';
+    </select>
+
+    <select id="listAllOrganizationForImport" resultType="com.midea.cloud.srm.model.base.organization.entity.Organization">
+        select o.ORGANIZATION_ID,o.ORGANIZATION_NAME,o.ORGANIZATION_CODE,o.ORGANIZATION_TYPE_CODE
+        from scc_base_organization o
+    </select>
+
+    <select id="listOrganizationByOrgCode"
+            parameterType="com.midea.cloud.srm.model.base.organization.dto.OrganizationParamDto"
+            resultType="com.midea.cloud.srm.model.base.organization.entity.Organization">
+        select b.*
+        from scc_base_organization_user a
+                 JOIN scc_base_organization b on a.ORGANIZATION_ID = b.ORGANIZATION_ID
+        where USER_ID = #{userId}
+          and b.ORGANIZATION_TYPE_CODE = #{organizationTypeCode}
+          and b.DIVISION_ID != 'LONGI_NEW-ENERGY'
+          and b.DIVISION_ID != 'CLEAN_ENERGY'
+          and b.DIVISION_ID is not null;
+    </select>
+</mapper>

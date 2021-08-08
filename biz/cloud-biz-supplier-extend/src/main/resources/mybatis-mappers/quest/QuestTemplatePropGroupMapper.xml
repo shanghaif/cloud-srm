@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.quest.mapper.QuestTemplatePropGroupMapper">
+
+    <select id="queryByQuestSupId" parameterType="long"
+            resultType="com.midea.cloud.srm.model.supplier.quest.entity.QuestTemplatePropGroup">
+        select * from scc_sup_quest_template_prop_group where quest_template_prop_group_id in(
+        select quest_template_prop_group_id from scc_sup_quest_result where quest_sup_id =#{questSupId})
+    </select>
+</mapper>

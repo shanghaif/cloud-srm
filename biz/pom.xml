@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud-srm</artifactId>
+        <groupId>com.midea</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloud-biz</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>cloud-biz-api-extend</module>
+        <module>cloud-biz-commons-extend</module>
+        <module>cloud-biz-gateway-extend</module>
+        <module>cloud-biz-base-extend</module>
+        <module>cloud-biz-supplier-extend</module>
+        <module>cloud-biz-supplier-cooperate-extend</module>
+        <module>cloud-biz-inq-extend</module>
+        <module>cloud-biz-bid-extend</module>
+        <module>cloud-biz-feign-extend</module>
+        <module>cloud-biz-performance-extend</module>
+        <module>cloud-biz-contract-extend</module>
+		<module>cloud-biz-price-extend</module>
+		<module>cloud-biz-bargaining-extend</module>
+        <module>cloud-biz-logistics-extend</module>
+        <module>cloud-biz-report-extend</module>
+    </modules>
+
+</project>

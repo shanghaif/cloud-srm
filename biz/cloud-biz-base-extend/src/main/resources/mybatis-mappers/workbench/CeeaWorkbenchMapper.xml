@@ -1,0 +1,919 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.workbench.mapper.CeeaWorkbenchMapper">
+
+    <!-- 查询资质审查待办 -->
+    <select id="findQuaReviewProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            ssarf.REVIEW_FORM_ID as FORM_ID,
+            ssarf.REVIEW_FORM_NUMBER AS FORM_NO,
+            '资质审查' as MODULE_NAME,
+            '/vendorManagement/quaOfReview' as SEARCH_URL,
+            CONCAT(ssarf.VENDOR_NAME, '资质审查单') AS TITLE,
+            ssarf.CREATED_BY AS CREATE_NAME,
+            ssarf.CREATION_DATE
+        from scc_sup_auth_review_form ssarf
+        where 1=1
+        and ssarf.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and ssarf.APPROVE_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(ssarf.VENDOR_NAME, '资质审查单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '资质审查' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND ssarf.REVIEW_FORM_NUMBER LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND ssarf.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(ssarf.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+
+    </select>
+
+    <!-- 供应商认证待办 -->
+    <select id="findSiteReviewProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            ssasf.SITE_FORM_ID as FORM_ID,
+            ssasf.SITE_FORM_NUMBER AS FORM_NO,
+            '供应商认证' as MODULE_NAME,
+            '/vendorManagement/siteAssessment' as SEARCH_URL,
+            CONCAT(ssasf.VENDOR_NAME, '供应商认证单') AS TITLE,
+            ssasf.CREATED_BY AS CREATE_NAME,
+            ssasf.CREATION_DATE
+        from scc_sup_auth_site_form ssasf
+        where 1=1
+        and ssasf.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and ssasf.APPROVE_STATUS = #{formStatus}
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '供应商认证' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(ssasf.VENDOR_NAME, '供应商认证单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND ssasf.SITE_FORM_NUMBER LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND ssasf.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(ssasf.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 跨组织引入 -->
+    <select id="findVendorImportProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            csvi.IMPORT_ID AS FORM_ID,
+            csvi.IMPORT_NUM AS FORM_NO,
+            '跨组织引入' AS MODULE_NAME,
+            '/vendorManagement/crossOrgImport' AS SEARCH_URL,
+            CONCAT(csvi.VENDOR_NAME, '跨组织引入单') AS TITLE,
+            csvi.CREATED_BY AS CREATE_NAME,
+            csvi.CREATION_DATE
+        from ceea_sup_vendor_import csvi
+        where 1 = 1
+            and csvi.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and csvi.IMPORT_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(csvi.VENDOR_NAME, '跨组织引入单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '跨组织引入' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND csvi.IMPORT_NUM LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND csvi.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(csvi.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 供应商绿色通道待办 -->
+    <select id="findCompanyInfoProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            ssci.COMPANY_ID AS FORM_ID,
+            ssci.COMPANY_CODE AS FORM_NO,
+            '供应商绿色通道' AS MODULE_NAME,
+            '/vendorManagement/vendorGreenChannel' AS SEARCH_URL,
+            CONCAT(ssci.COMPANY_NAME, '绿色通道单') AS TITLE,
+            ssci.CREATED_BY AS CREATE_NAME,
+            ssci.CREATION_DATE
+        from scc_sup_company_info ssci
+        where 1 = 1
+            and ssci.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and ssci.STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(ssci.COMPANY_NAME, '绿色通道单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '供应商绿色通道' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND ssci.COMPANY_CODE LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND ssci.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(ssci.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 供应商信息变更 -->
+    <select id="findVendorInfoChangeProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            ssic.CHANGE_ID AS FORM_ID,
+            ssic.CHANGE_APPLY_NO AS FORM_NO,
+            '供应商信息变更' AS MODULE_NAME,
+            '/vendorManagement/vendorInfoChange' AS SEARCH_URL,
+            CONCAT(ssic.CHANGE_APPLY_NO, '供应商信息变更单') AS TITLE,
+            ssic.CREATED_BY AS CREATE_NAME,
+            ssic.CREATION_DATE
+        from scc_sup_info_change ssic
+        where 1 = 1
+            and ssic.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and ssic.CHANGE_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(ssic.CHANGE_APPLY_NO, '供应商信息变更单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '供应商信息变更' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND ssic.CHANGE_APPLY_NO LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND ssic.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(ssic.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 绩效评分项目-待办 -->
+    <select id="findPerfScoreManProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            spsi.SCORE_ITEMS_ID AS FORM_ID,
+            '绩效评分项目' AS MODULE_NAME,
+            '/performanceManagement/performanceScoreItems' AS SEARCH_URL,
+            CONCAT(spsi.PROJECT_NAME, '绩效评分单') AS TITLE,
+            spsi.CREATED_BY AS CREATE_NAME,
+            spsi.CREATION_DATE
+        from scc_perf_score_items spsi
+        where 1 = 1
+        and spsi.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and spsi.PROJECT_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(spsi.PROJECT_NAME, '绩效评分单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '绩效评分项目' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND spsi.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(spsi.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+        union
+        select distinct
+            spsi2.SCORE_ITEMS_ID AS FORM_ID,
+            '绩效评分项目' AS MODULE_NAME,
+            '/performanceManagement/performanceScoreItems' AS SEARCH_URL,
+            CONCAT(spsi2.PROJECT_NAME, '绩效评分单') AS TITLE,
+            spsi2.CREATED_BY AS CREATE_NAME,
+            spsi2.CREATION_DATE
+        from scc_perf_score_items spsi2
+            inner join scc_perf_score_man_scoring spsms on spsms.SCORE_ITEMS_ID = spsi2.SCORE_ITEMS_ID
+        where 1 = 1
+            and spsi2.PROJECT_STATUS = 'SCORE_NOTIFIED'
+            and spsms.SCORE is null
+            and spsms.SCORE_USER_NAME = #{userName}
+        <if test="title != null and title != ''">
+            AND CONCAT(spsi2.PROJECT_NAME, '绩效评分单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '绩效评分项目' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND spsi2.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(spsi2.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 招投标项目管理 -->
+    <select id="findBidingProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            sbb.BIDING_ID AS FORM_ID,
+            sbb.BIDING_NUM AS FORM_NO,
+            '招投标-项目管理' AS MODULE_NAME,
+            '/biddingManagement/biddingProject' AS SEARCH_URL,
+            CONCAT(sbb.BIDING_NAME, '招投标项目管理单') AS TITLE,
+            sbb.CREATED_BY AS CREATE_NAME,
+            sbb.CREATION_DATE
+        from scc_bid_biding sbb
+        where 1 = 1
+            and sbb.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and sbb.AUDIT_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(sbb.BIDING_NAME, '招投标项目管理单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '招投标-项目管理' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND sbb.BIDING_NUM LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sbb.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sbb.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 招投标项目管理 -->
+    <select id="findInqProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            sbb.BIDING_ID AS FORM_ID,
+            sbb.BIDING_NUM AS FORM_NO,
+            '询比价' AS MODULE_NAME,
+            '/queryComparePriceSynergy/vendorBiddingList_new' AS SEARCH_URL,
+            CONCAT(sbb.BIDING_NAME, '询比价单') AS TITLE,
+            sbb.CREATED_BY AS CREATE_NAME,
+            sbb.CREATION_DATE
+        from scc_brg_biding sbb
+        where 1 = 1
+        <if test="userId != null">
+            and sbb.CREATED_ID = #{userId}
+        </if>
+        <if test="formStatus != null and formStatus != ''">
+            and sbb.AUDIT_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(sbb.BIDING_NAME, '询比价单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '询比价' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND sbb.INQUIRY_NO LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sbb.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sbb.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+        <if test="vendorId != null">
+            and EXISTS (
+				select sbv.bid_vendor_id,orderhead.ROUND,orderhead.ORDER_STATUS,sbv.BIDING_ID from scc_brg_vendor sbv 
+				inner JOIN
+				            (
+				            SELECT ORDER_HEAD_ID,ORDER_STATUS,bid_vendor_id,ROUND,oh.BIDING_ID FROM scc_brg_order_head oh
+				            WHERE order_head_id IN (SELECT MAX(order_head_id) FROM scc_brg_order_head oh2 WHERE oh.BID_VENDOR_ID = oh2.BID_VENDOR_ID
+				            AND oh.ROUND = oh2.ROUND)  
+				            ) orderhead ON orderhead.bid_vendor_id = sbv.bid_vendor_id 
+				where   sbv.VENDOR_ID = #{vendorId} 
+				
+				AND orderhead.ROUND = sbb.CURRENT_ROUND and sbv.biding_id = sbb.biding_id
+				
+				<if test="queryType != null and queryType == 'wait'">
+            	 AND (ORDER_STATUS is null or ORDER_STATUS in ('DRAFT','WITHDRAW','')) 
+           	 </if>
+           	 
+           	  <if test="queryType != null and queryType == 'done'">
+            	AND ORDER_STATUS = 'SUBMISSION' 
+           	 </if>
+				
+				)
+        </if>
+        
+    </select>
+
+    <!-- 价格审批单 -->
+    <select id="findPriceApproveProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            spah.APPROVAL_HEADER_ID AS FORM_ID,
+            spah.APPROVAL_NO AS FORM_NO,
+            '价格审批单' AS MODULE_NAME,
+            '/inquiryManagement/inquiryApprovalFlow' AS SEARCH_URL,
+            CONCAT(spah.CEEA_TITLE, '价格审批单') AS TITLE,
+            spah.CREATED_BY AS CREATE_NAME,
+            spah.CREATION_DATE
+        from scc_price_approval_header spah
+        where 1 = 1
+            and spah.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and spah.STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(spah.CEEA_TITLE, '询比价单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '价格审批单' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND spah.APPROVAL_NO LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND spah.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(spah.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 配额调整 -->
+    <select id="findQuotaAdjustProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            ciqa.QUOTA_ADJUST_ID AS FORM_ID,
+            ciqa.QUOTA_ADJUST_CODE AS FORM_NO,
+            '配额调整' AS MODULE_NAME,
+            '/quotaManagement/quotaModulation' AS SEARCH_URL,
+            CONCAT(ciqa.QUOTA_ADJUST_NAME, '配额调整单') AS TITLE,
+            ciqa.CREATED_BY AS CREATE_NAME,
+            ciqa.CREATION_DATE
+        from ceea_inquiry_quota_adjust ciqa
+        where 1 = 1
+        and ciqa.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and ciqa.STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(ciqa.QUOTA_ADJUST_NAME, '配额调整单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '配额调整' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND ciqa.QUOTA_ADJUST_CODE LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND ciqa.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(ciqa.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 采购申请管理 -->
+    <select id="findRequirementProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select distinct
+            sprh.REQUIREMENT_HEAD_ID AS FORM_ID,
+            sprh.REQUIREMENT_HEAD_NUM AS FORM_NO,
+            '采购申请管理' AS MODULE_NAME,
+            '/purchasingDemand/purchaseApplication' AS SEARCH_URL,
+            CONCAT(sprh.REQUIREMENT_HEAD_NUM, '采购申请单') AS TITLE,
+            sprh.CREATED_BY AS CREATE_NAME,
+            sprh.CREATION_DATE
+        from scc_pr_requirement_head sprh
+            inner join scc_pr_requirement_line sprl on sprh.REQUIREMENT_HEAD_ID = sprl.REQUIREMENT_HEAD_ID
+        where 1 = 1
+            and sprh.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            and (sprh.AUDIT_STATUS = #{formStatus} or (sprh.AUDIT_STATUS = 'APPROVED' and sprl.APPLY_STATUS = 'RETURNING'))
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(sprh.REQUIREMENT_HEAD_NUM, '采购申请单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '采购申请管理' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND sprh.REQUIREMENT_HEAD_NUM LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sprh.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sprh.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 需求池管理 -->
+    <select id="findRequirementManageProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            sprl.REQUIREMENT_LINE_ID AS FORM_ID,
+            CONCAT(sprl.REQUIREMENT_HEAD_NUM, '-', sprl.ROW_NUM) AS FORM_NO,
+            '需求池管理' AS MODULE_NAME,
+            '/purchasingDemand/demandPoolManagement' AS SEARCH_URL,
+            CONCAT(sprl.REQUIREMENT_HEAD_NUM, '需求池管理单') AS TITLE,
+            sprl.CREATED_BY AS CREATE_NAME,
+            sprl.CREATION_DATE
+        from scc_pr_requirement_line sprl
+        where 1 = 1
+            and (sprl.CEEA_STRATEGY_USER_ID = #{userId} or sprl.CEEA_PERFORM_USER_ID = #{userId})
+
+            and sprl.ORDER_QUANTITY > 0
+        <if test="title != null and title != ''">
+            AND CONCAT(sprl.REQUIREMENT_HEAD_NUM, '需求池管理单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '需求池管理' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND CONCAT(sprl.REQUIREMENT_HEAD_NUM, '-', sprl.ROW_NUM) LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sprl.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sprl.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 采购订单 -->
+    <select id="findPurchaseOrderProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            sso.ORDER_ID AS FORM_ID,
+            sso.ORDER_NUMBER AS FORM_NO,
+            '采购订单' AS MODULE_NAME,
+            '/buyerOrderSynergy/buyerPurchaseOrder' AS SEARCH_URL,
+            sso.ORDER_NUMBER AS TITLE,
+            sso.CREATED_BY AS CREATE_NAME,
+            sso.CREATION_DATE
+        from scc_sc_order sso
+        where 1 = 1
+        <if test="userId != null">
+            and sso.CREATED_ID = #{userId}
+        </if>
+        <if test="queryType != null and queryType == 'process'"><!-- 待办查询生效 -->
+            and sso.ORDER_STATUS IN ('REJECT', 'REFUSED')
+        </if>
+        <if test="formStatus != null and formStatus == ''"><!-- 查询已办 -->
+            and sso.ORDER_STATUS = #{formStatus} 
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(sso.ORDER_NUMBER, '采购订单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '采购订单' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND sso.ORDER_NUMBER LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sso.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sso.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+        <if test="vendorId != null">
+            and sso.VENDOR_ID = #{vendorId}
+              <if test="queryType != null and queryType == 'wait'">
+            	and exists ( select 1 from scc_sc_order_detail ssod where ssod.order_id = sso.order_id and ssod.order_detail_status = 'WAITING_VENDOR_CONFIRM' ) 
+           	 </if>
+           	 
+           	  <if test="queryType != null and queryType == 'done'">
+            	and exists ( select 1 from scc_sc_order_detail ssod where ssod.order_id = sso.order_id and ssod.order_detail_status in ('ACCEPT','REJECT') ) 
+           	 </if>
+        </if>
+    </select>
+
+    <!-- 采购订单变更 -->
+    <select id="findPurchaseOrderChangeProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            sso.ORDER_ID AS FORM_ID,
+            sso.ORDER_NUMBER AS FORM_NO,
+            '采购订单变更' AS MODULE_NAME,
+            '/buyerOrderSynergy/purchaseOrderChange' AS SEARCH_URL,
+            CONCAT(sso.ORDER_NUMBER, '采购订单') AS TITLE,
+            sso.CREATED_BY AS CREATE_NAME,
+            sso.CREATION_DATE
+        from scc_sc_order sso
+        where 1 = 1
+        AND sso.VERSION != 0
+        and sso.CREATED_ID = #{userId}
+        <if test="queryType != null and queryType == 'process'">
+            and sso.ORDER_STATUS IN ('REJECT','REFUSED')
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(sso.ORDER_NUMBER, '采购订单变更') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '采购订单变更' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND sso.ORDER_NUMBER LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sso.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sso.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+        union
+        select
+            sso.ORDER_ID AS FORM_ID,
+            sso.ORDER_NUMBER AS FORM_NO,
+            '采购订单变更' AS MODULE_NAME,
+            '/buyerOrderSynergy/purchaseOrderChange' AS SEARCH_URL,
+            CONCAT(sso.ORDER_NUMBER, '采购订单变更') AS TITLE,
+            sso.CREATED_BY AS CREATE_NAME,
+            sso.CREATION_DATE
+        from scc_sc_order sso
+            INNER JOIN (SELECT ssob.ORDER_NUMBER, MAX(VERSION) FROM scc_sc_order ssob GROUP BY ssob.ORDER_NUMBER) B
+        ON sso.ORDER_NUMBER = B.ORDER_NUMBER
+        where 1 = 1
+            and sso.CREATED_ID = #{userId}
+            and sso.ORDER_STATUS = 'DRAFT'
+        <if test="title != null and title != ''">
+            AND CONCAT(sso.ORDER_NUMBER, '采购订单变更') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '采购订单变更' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND sso.ORDER_NUMBER LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sso.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sso.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 合同列表 -->
+    <select id="findContractProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            sch.CONTRACT_HEAD_ID AS FORM_ID,
+            sch.CONTRACT_NO AS FORM_NO,
+            '合同列表' AS MODULE_NAME,
+            '/contractManagement/contractMaintainList' AS SEARCH_URL,
+            CONCAT(sch.CONTRACT_CODE, '合同列表单') AS TITLE,
+            sch.CREATED_BY AS CREATE_NAME,
+            sch.CREATION_DATE
+        from scc_contract_head sch
+        where 1 = 1
+            and sch.CREATED_ID = #{userId}
+        <if test="queryType != null and queryType == 'process'">
+            and (sch.CONTRACT_STATUS IN ('REJECTED', 'SUPPLIER_CONFIRMED') or
+                <![CDATA[ (to_days(sch.EFFECTIVE_DATE_TO) - to_days(CURDATE()) <= 7 and sch.EFFECTIVE_DATE_TO > CURDATE())) ]]>
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(sch.CONTRACT_CODE, '合同列表单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '合同列表' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND sch.CONTRACT_NO LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sch.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sch.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 验收申请列表 -->
+    <select id="findInspectionApplyProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            scao.ACCEPT_ORDER_ID AS FORM_ID,
+            scao.CEEA_ACCEPT_APPLICATION_NUM AS FORM_NO,
+            '验收申请列表' AS MODULE_NAME,
+            '/contractManagement/inspectionApplyBill' AS SEARCH_URL,
+            CONCAT(scao.CEEA_ACCEPT_APPLICATION_NUM, '验收申请单') AS TITLE,
+            scao.CREATED_BY AS CREATE_NAME,
+            scao.CREATION_DATE
+        from scc_contract_accept_order scao
+        where 1=1
+            and scao.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            AND scao.ACCEPT_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(scao.CEEA_ACCEPT_APPLICATION_NUM, '验收申请单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '验收申请列表' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND scao.CEEA_ACCEPT_APPLICATION_NUM LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND scao.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(scao.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 验收单 -->
+    <select id="findInspectionProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            scao.ACCEPT_ORDER_ID AS FORM_ID,
+            scao.ACCEPT_NUMBER AS FORM_NO,
+            '验收单列表' AS MODULE_NAME,
+            '/contractManagement/inspectionBill' AS SEARCH_URL,
+            CONCAT(scao.ACCEPT_NUMBER, '验收单') AS TITLE,
+            scao.CREATED_BY AS CREATE_NAME,
+            scao.CREATION_DATE
+        from scc_contract_accept_order scao
+        where 1=1
+            and scao.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            AND scao.ACCEPT_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(scao.ACCEPT_NUMBER, '验收单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '验收单列表' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND scao.ACCEPT_NUMBER LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND scao.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(scao.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 预付款申请 -->
+    <select id="findAdvancePaymentProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            cpaah.ADVANCE_APPLY_HEAD_ID AS FORM_ID,
+            cpaah.ADVANCE_APPLY_NUM AS FORM_NO,
+            '预付款申请' AS MODULE_NAME,
+            '/purSettlement/advancePayment' AS SEARCH_URL,
+            CONCAT(cpaah.ADVANCE_APPLY_NUM, '预付款申请单') AS TITLE,
+            cpaah.CREATED_BY AS CREATE_NAME,
+            cpaah.CREATION_DATE
+        from ceea_ps_advance_apply_head cpaah
+        where 1=1
+        and cpaah.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            AND cpaah.ADVANCE_APPLY_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(cpaah.ADVANCE_APPLY_NUM, '预付款申请单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '预付款申请' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND cpaah.ADVANCE_APPLY_NUM LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND cpaah.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(cpaah.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 开票通知 -->
+    <select id="findPurInvoiceProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            ssin.INVOICE_NOTICE_ID AS FORM_ID,
+            ssin.INVOICE_NOTICE_NUMBER AS FORM_NO,
+            '开票通知' AS MODULE_NAME,
+            '/purSettlement/purInvoice' AS SEARCH_URL,
+            CONCAT(ssin.INVOICE_NOTICE_NUMBER, '开票通知单') AS TITLE,
+            ssin.CREATED_BY AS CREATE_NAME,
+            ssin.CREATION_DATE
+        from scc_sc_invoice_notice ssin
+        where 1=1
+            and ssin.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            AND ssin.INVOICE_NOTICE_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(ssin.INVOICE_NOTICE_NUMBER, '开票通知单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '开票通知' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND ssin.INVOICE_NOTICE_NUMBER LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND ssin.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(ssin.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 网上发票 -->
+    <select id="findOnlineInvoiceProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            csoi.ONLINE_INVOICE_ID AS FORM_ID,
+            csoi.ONLINE_INVOICE_NUM AS FORM_NO,
+            '网上发票' AS MODULE_NAME,
+            '/purSettlement/onlineInvoice' AS SEARCH_URL,
+            CONCAT(csoi.ONLINE_INVOICE_NUM, '网上发票单') AS TITLE,
+            csoi.CREATED_BY AS CREATE_NAME,
+            csoi.CREATION_DATE
+        from ceea_sc_online_invoice csoi
+        where 1=1
+        and csoi.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            AND csoi.INVOICE_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(csoi.ONLINE_INVOICE_NUM, '网上发票单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '网上发票' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND csoi.ONLINE_INVOICE_NUM LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND csoi.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(csoi.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 代理网上开票 -->
+    <select id="findAgentOnlineInvoiceProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            csoi.ONLINE_INVOICE_ID AS FORM_ID,
+            csoi.ONLINE_INVOICE_NUM AS FORM_NO,
+            '代理网上开票' AS MODULE_NAME,
+            '/purSettlement/agentOnlineInvoice' AS SEARCH_URL,
+            CONCAT(csoi.ONLINE_INVOICE_NUM, '代理网上开票单') AS TITLE,
+            csoi.CREATED_BY AS CREATE_NAME,
+            csoi.CREATION_DATE
+        from ceea_sc_online_invoice csoi
+        where 1=1
+            and csoi.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            AND csoi.INVOICE_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(csoi.ONLINE_INVOICE_NUM, '代理网上开票单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '代理网上开票' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND csoi.ONLINE_INVOICE_NUM LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND csoi.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(csoi.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 付款申请 -->
+    <select id="findPurPaymentApplyProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            cppah.PAYMENT_APPLY_HEAD_ID AS FORM_ID,
+            cppah.PAYMENT_APPLY_NUMBER AS FORM_NO,
+            '付款申请' AS MODULE_NAME,
+            '/purSettlement/purPaymentApply' AS SEARCH_URL,
+            CONCAT(cppah.PAYMENT_APPLY_NUMBER, '付款申请单') AS TITLE,
+            cppah.CREATED_BY AS CREATE_NAME,
+            cppah.CREATION_DATE
+        from ceea_ps_payment_apply_head cppah
+        where 1=1
+            and cppah.CREATED_ID = #{userId}
+        <if test="formStatus != null and formStatus != ''">
+            AND cppah.RECEIPT_STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(cppah.PAYMENT_APPLY_NUMBER, '付款申请单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '付款申请' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND cppah.PAYMENT_APPLY_NUMBER LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND cppah.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(cppah.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 购物车 -->
+    <select id="findShoppingCartProcess" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            cpsc.SHOP_CART_ID AS FORM_ID,
+            '购物车' AS MODULE_NAME,
+            '/oneStopShopping/shoppingCart' AS SEARCH_URL,
+            CONCAT(cpsc.MATERIAL_NAME, '-购物车单') AS TITLE,
+            cpsc.CREATED_BY AS CREATE_NAME,
+            cpsc.CREATION_DATE
+        from ceea_pr_shop_cart cpsc
+        where 1=1
+            and (cpsc.SUMMARY_USER_ID = #{userId} or cpsc.NOTICE_USER_ID = #{userId})
+        <if test="formStatus != null and formStatus != ''">
+            AND cpsc.STATUS = #{formStatus}
+        </if>
+        <if test="title != null and title != ''">
+            AND CONCAT(cpsc.MATERIAL_NAME, '-购物车单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '购物车' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND cpsc.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(cpsc.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 绩效评分已办 -->
+    <select id="findPerfScoreManWorked" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select distinct
+            spsi.SCORE_ITEMS_ID as FORM_ID,
+            '绩效评分项目' as MODULE_NAME,
+            '/performanceManagement/performanceScoreItems' as SEARCH_URL,
+            CONCAT(spsi.PROJECT_NAME, '绩效评分单')   AS TITLE,
+            spsi.CREATED_BY     AS CREATE_NAME,
+            spsi.CREATION_DATE
+        from scc_perf_score_items spsi
+            inner join scc_perf_score_man_scoring spsms on spsms.SCORE_ITEMS_ID = spsi.SCORE_ITEMS_ID
+        where 1 = 1
+        and not exists(select 1
+            from scc_perf_score_man_scoring ss
+            where spsi.SCORE_ITEMS_ID = ss.SCORE_ITEMS_ID
+            and ss.SCORE is null)
+        and spsms.SCORE_USER_NAME = #{userName}
+        <if test="title != null and title != ''">
+            AND CONCAT(spsi.PROJECT_NAME, '绩效评分单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '绩效评分项目' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND spsi.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(spsi.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 需求池管理-已办 -->
+    <select id="findRequirementManageWorked" resultType="com.midea.cloud.srm.model.flow.vo.WorkbenchMyTaskVo">
+        select
+            sprl.REQUIREMENT_LINE_ID AS FORM_ID,
+            CONCAT(sprl.REQUIREMENT_HEAD_NUM, '-', sprl.ROW_NUM) AS FORM_NO,
+            '需求池管理' AS MODULE_NAME,
+            '/purchasingDemand/demandPoolManagement' AS SEARCH_URL,
+            CONCAT(sprl.REQUIREMENT_HEAD_NUM, '需求池管理单') AS TITLE,
+            sprl.CREATED_BY AS CREATE_NAME,
+            sprl.CREATION_DATE
+        from scc_pr_requirement_line sprl
+        where 1 = 1
+            and (sprl.CEEA_STRATEGY_USER_ID = #{userId} or sprl.CEEA_PERFORM_USER_ID = #{userId})
+            and sprl.APPLY_STATUS = 'ASSIGNED'
+            and sprl.ORDER_QUANTITY = 0
+        <if test="title != null and title != ''">
+            AND CONCAT(sprl.REQUIREMENT_HEAD_NUM, '需求池管理单') LIKE concat('%', #{title}, '%')
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            AND '需求池管理' LIKE concat('%', #{moduleName}, '%')
+        </if>
+        <if test="formNo != null and formNo !=''">
+            AND CONCAT(sprl.REQUIREMENT_HEAD_NUM, '-', sprl.ROW_NUM) LIKE concat('%', #{formNo},'%')
+        </if>
+        <if test="createName != null and createName != ''">
+            AND sprl.CREATED_BY = #{createName}
+        </if>
+        <if test="creationDate != null">
+            AND DATE_FORMAT(sprl.CREATION_DATE, '%Y-%m-%d') = DATE_FORMAT(#{creationDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+</mapper>

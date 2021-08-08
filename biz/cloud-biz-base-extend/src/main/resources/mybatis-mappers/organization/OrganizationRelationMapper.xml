@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.organization.mapper.OrganizationRelationMapper">
+    <update id="replaceFullPathId">
+        update
+        scc_base_organization_rel
+        set
+        ORG_FULL_PATH_ID = replace ( ORG_FULL_PATH_ID, #{oldIds}, #{newIds} )
+        where REL_ID = #{relId}
+    </update>
+
+    <select id="selectByParam" resultType="com.midea.cloud.srm.model.base.organization.entity.OrganizationRelation">
+        SELECT
+        orl.REL_ID,
+        orl.PARENT_ORGANIZATION_ID,
+        orl.ORGANIZATION_ID,
+        o.ORGANIZATION_NAME,
+        o.ORGANIZATION_CODE,
+        ot.ORGANIZATION_TYPE_CODE,
+        ot.ORGANIZATION_TYPE_NAME,
+        o.CREATED_BY,
+        o.CREATION_DATE,
+        o.LAST_UPDATED_BY,
+        o.LAST_UPDATE_DATE,
+        o.VERSION,
+        o.TENANT_ID,
+        o.CEEA_COMPANY_NAME,
+        o.CEEA_COMPANY_SHORT,
+        o.CEEA_COMPANY_CODE,
+        o.ENABLED
+        FROM
+        SCC_BASE_ORGANIZATION_REL orl
+        LEFT JOIN SCC_BASE_ORGANIZATION o ON orl.ORGANIZATION_ID = o.ORGANIZATION_ID
+        LEFT JOIN SCC_BASE_ORGANIZATION_TYPE ot ON o.ORGANIZATION_TYPE_ID = ot.TYPE_ID
+        <if test="organizationRelation.userId != null and organizationRelation.fullPathId != null and organizationRelation.fullPathId != ''">
+            LEFT JOIN SCC_BASE_ORGANIZATION_USER ou ON o.ORGANIZATION_ID = ou.ORGANIZATION_ID
+        </if>
+        <where>
+            <if test="organizationRelation.relId != null">
+                AND orl.REL_ID = #{organizationRelation.relId}
+            </if>
+            <if test="organizationRelation.organizationId != null">
+                AND orl.ORGANIZATION_ID = #{organizationRelation.organizationId}
+            </if>
+            <if test="organizationRelation.parentOrganizationId != null">
+                AND orl.PARENT_ORGANIZATION_ID = #{organizationRelation.parentOrganizationId}
+            </if>
+            <if test="organizationRelation.organizationName != null">
+                AND o.ORGANIZATION_NAME like concat('%', #{organizationRelation.organizationName}, '%')
+            </if>
+            <if test="organizationRelation.organizationCode != null">
+                OR o.ORGANIZATION_CODE = #{organizationRelation.organizationCode}
+            </if>
+            <if test="organizationRelation.userId != null and organizationRelation.fullPathId != null and organizationRelation.fullPathId != ''">
+                AND ou.USER_ID = #{organizationRelation.userId} AND ou.FULL_PATH_ID = #{organizationRelation.fullPathId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByParamNew" resultType="com.midea.cloud.srm.model.base.organization.entity.OrganizationRelation">
+        SELECT
+        orl.REL_ID,
+        orl.PARENT_ORGANIZATION_ID,
+        orl.ORGANIZATION_ID,
+        o.ORGANIZATION_NAME,
+        o.ORGANIZATION_CODE,
+        ot.ORGANIZATION_TYPE_CODE,
+        ot.ORGANIZATION_TYPE_NAME,
+        o.CREATED_BY,
+        o.CREATION_DATE,
+        o.LAST_UPDATED_BY,
+        o.LAST_UPDATE_DATE,
+        o.VERSION,
+        o.TENANT_ID
+        FROM
+        SCC_BASE_ORGANIZATION_REL orl
+        LEFT JOIN SCC_BASE_ORGANIZATION o ON orl.ORGANIZATION_ID = o.ORGANIZATION_ID
+        LEFT JOIN SCC_BASE_ORGANIZATION_TYPE ot ON o.ORGANIZATION_TYPE_ID = ot.TYPE_ID
+        <if test="organizationRelation.userId != null and fullPathIds != null">
+            LEFT JOIN SCC_BASE_ORGANIZATION_USER ou ON o.ORGANIZATION_ID = ou.ORGANIZATION_ID
+        </if>
+        <where>
+            <if test="organizationRelation.relId != null">
+                AND orl.REL_ID = #{organizationRelation.relId}
+            </if>
+            <if test="organizationRelation.organizationId != null">
+                AND orl.ORGANIZATION_ID = #{organizationRelation.organizationId}
+            </if>
+            <if test="organizationRelation.parentOrganizationId != null">
+                AND orl.PARENT_ORGANIZATION_ID = #{organizationRelation.parentOrganizationId}
+            </if>
+            <if test="organizationRelation.organizationName != null">
+                AND o.ORGANIZATION_NAME like concat('%', #{organizationRelation.organizationName}, '%')
+            </if>
+            <if test="organizationRelation.organizationCode != null">
+                OR o.ORGANIZATION_CODE = #{organizationRelation.organizationCode}
+            </if>
+            <if test="organizationRelation.userId != null and fullPathIds != null">
+                AND ou.USER_ID = #{organizationRelation.userId}
+            </if>
+            <if test="fullPathIds != null">
+                AND ou.FULL_PATH_ID in
+                <foreach collection="fullPathIds" item="item" index="index"
+                         open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.test.materialImport.mapper.MaterialTestMapper">
+
+    <update id="updateMaterialItem" statementType="CALLABLE">
+        SELECT @struct := (SELECT REPLACE(struct, '-', ',') FROM scc_base_purchase_category t WHERE t.CATEGORY_CODE = @categoryCode := #{cCode});
+        SELECT @categoryFullName := GROUP_CONCAT(t.CATEGORY_NAME SEPARATOR  '-') FROM scc_base_purchase_category t WHERE INSTR (@struct, t.CATEGORY_ID );
+        UPDATE scc_base_material_item mi, scc_base_purchase_category pc
+        SET mi.category_id = pc.category_id,
+        mi.category_name = pc.category_name,
+        mi.struct = REPLACE(@struct, ',', '-'),
+        mi.category_full_name = @categoryFullName
+        WHERE mi.material_code = #{mCode} AND pc.category_code = @categoryCode
+    </update>
+</mapper>

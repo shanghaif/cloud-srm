@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.organization.mapper.OrganizationUserMapper">
+
+    <select id="listByParam" resultType="com.midea.cloud.srm.model.base.organization.entity.OrganizationUser">
+        SELECT
+        ou.ORGANIZATION_USER_REL_ID,
+        ou.ORGANIZATION_ID,
+        o.ORGANIZATION_NAME,
+        ou.USER_ID,
+        ou.FULL_PATH_ID,
+        ou.START_DATE,
+        ou.END_DATE,
+        ou.CREATED_BY,
+        ou.CREATION_DATE,
+        ou.CREATED_BY_IP,
+        ou.LAST_UPDATED_BY,
+        ou.LAST_UPDATE_DATE,
+        ou.LAST_UPDATED_BY_IP,
+        ou.VERSION,
+        ou.TENANT_ID,
+        o.ENABLED
+        FROM
+        SCC_BASE_ORGANIZATION_USER ou
+        LEFT JOIN SCC_BASE_ORGANIZATION o ON o.ORGANIZATION_ID = ou.ORGANIZATION_ID
+        <where>
+            <if test="organizationUser.userId != null ">
+                AND ou.USER_ID = #{organizationUser.userId}
+            </if>
+            <if test="organizationUser.organizationId != null ">
+                AND ou.ORGANIZATION_ID = #{organizationUser.organizationId}
+            </if>
+        </where>
+    </select>
+    
+    <select id="getFullPathIdByTypeCode"
+            resultType="com.midea.cloud.srm.model.base.organization.entity.Organization">
+        SELECT
+            ou.FULL_PATH_ID,
+            o.ORGANIZATION_TYPE_CODE,
+            o.ORGANIZATION_NAME
+        FROM scc_base_organization_user ou
+        LEFT JOIN scc_base_organization o
+        ON ou.ORGANIZATION_ID = o.ORGANIZATION_ID
+        WHERE ou.USER_ID=#{userId}
+    </select>
+
+</mapper>

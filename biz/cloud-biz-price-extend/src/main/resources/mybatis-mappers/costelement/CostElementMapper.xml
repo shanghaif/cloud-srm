@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.price.costelement.mapper.CostElementMapper">
+
+    <select id="listPage" resultType="com.midea.cloud.srm.model.price.costelement.entity.CostElement"
+            parameterType="com.midea.cloud.srm.model.price.costelement.entity.CostElement">
+        SELECT a.*
+        FROM SCC_PRICE_COST_ELEMENT a
+        WHERE 1 = 1
+        <if test="null != elementCode and elementCode != ''">
+            AND a.ELEMENT_CODE like concat('%',#{elementCode},'%')
+        </if>
+        <if test="null != elementName and elementName != ''">
+            AND a.ELEMENT_NAME like concat('%',#{elementName},'%')
+        </if>
+        <if test="null != orgId">
+            AND a.ORG_ID = #{orgId}
+        </if>
+        <if test="null != orgCode and orgCode != ''">
+            AND a.ORG_CODE = #{orgCode}
+        </if>
+        <if test="null != orgName and orgName != ''">
+            AND a.ORG_NAME = #{orgName}
+        </if>
+        <if test="null != creationDate">
+            AND a.CREATION_DATE &gt;= #{creationDate}
+        </if>
+        <if test="null != lastUpdateDate">
+            AND a.LAST_UPDATE_DATE &lt;= #{lastUpdateDate}
+        </if>
+        <if test="null != status and status != ''">
+            AND a.STATUS = #{status}
+        </if>
+        <if test='null != isNew and isNew == "Y"'>
+            AND a.COST_ELEMENT_ID IN
+            (select MAX(COST_ELEMENT_ID) from SCC_PRICE_COST_ELEMENT GROUP BY ELEMENT_CODE )
+        </if>
+        order by a.LAST_UPDATE_DATE desc
+    </select>
+</mapper>

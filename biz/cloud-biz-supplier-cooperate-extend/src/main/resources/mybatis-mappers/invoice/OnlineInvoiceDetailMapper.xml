@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.invoice.mapper.OnlineInvoiceDetailMapper">
+
+    <update id="updateChangeFlag">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.PO_UNIT_PRICE_CHANGE_FLAG =''
+        where t.ONLINE_INVOICE_ID IN
+        <foreach collection="collect" index="0" item="item" open="(" close=")" separator=",">
+            <if test="item != null">
+                #{item}
+            </if>
+        </foreach>
+    </update>
+
+    <update id="updateUnitPrice">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.UNIT_PRICE_EXCLUDING_TAX = IFNULL(t.ORDER_UNIT_PRICE_TAX_N, 0),
+        t.UNIT_PRICE_CONTAINING_TAX = IFNULL(t.ORDER_UNIT_PRICE_TAX_N, 0) * (1 + t.TAX_RATE / 100)
+        where t.ONLINE_INVOICE_ID IN
+        <foreach collection="collect" index="0" item="item" open="(" close=")" separator=",">
+            <if test="item != null">
+                #{item}
+            </if>
+        </foreach>
+    </update>
+
+    <update id="updateAmount">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.NO_TAX_AMOUNT =ROUND(IFNULL(t.INVOICE_QUANTITY,0) * IFNULL(t.UNIT_PRICE_EXCLUDING_TAX,0),2) ,
+        t.TAX_AMOUNT = ROUND(IFNULL(t.INVOICE_QUANTITY,0)*IFNULL(t.UNIT_PRICE_CONTAINING_TAX,0),2)
+        where t.ONLINE_INVOICE_ID IN
+        <foreach collection="collect" index="0" item="item" open="(" close=")" separator=",">
+            <if test="item != null">
+                #{item}
+            </if>
+        </foreach>
+    </update>
+
+    <update id="updateTax">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.TAX = IFNULL(t.TAX_AMOUNT,0) - IFNULL(t.NO_TAX_AMOUNT,0)
+        where t.ONLINE_INVOICE_ID IN
+        <foreach collection="collect" index="0" item="item" open="(" close=")" separator=",">
+            <if test="item != null">
+                #{item}
+            </if>
+        </foreach>
+    </update>
+
+    <update id="updateCompareResult">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.COMPARE_RESULT = NULL
+        where t.ONLINE_INVOICE_ID IN
+        <foreach collection="collect" index="0" item="item" open="(" close=")" separator=",">
+            <if test="item != null">
+                #{item}
+            </if>
+        </foreach>
+    </update>
+
+
+</mapper>

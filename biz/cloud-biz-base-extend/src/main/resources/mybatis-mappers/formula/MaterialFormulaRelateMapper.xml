@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.formula.mapper.MaterialFormulaRelateMapper">
+    <select id="getMaterialFormulaRelateMapper"
+            resultType="com.midea.cloud.srm.model.base.formula.vo.MaterialFormulaRelateVO">
+        select f.RELATE_ID,
+        f.FORMULA_VALUE pricingFormulaValue,
+        f.FORMULA_ID pricingFormulaHeaderId,
+        f.FORMULA_NAME pricingFormulaName,
+        f.FORMULA_DESC pricingFormulaDesc,
+        f.FORMULA_STATUS pricingFormulaStatus,
+        m.MATERIAL_ID materialId,
+        m.MATERIAL_CODE materialCode,
+        m.MATERIAL_NAME materialName,
+        m.SPECIFICATION specification,
+        m.CATEGORY_ID categoryId,
+        m.CATEGORY_NAME categoryName,
+        m.UNIT unit,
+        m.UNIT_NAME unitName,
+        m.LAST_UPDATED_BY lastUpdatedBy,
+        m.LAST_UPDATE_DATE lastUpdateDate
+        from scc_base_material_item m
+        left join
+        ceea_material_formula_relate f on m.MATERIAL_ID = f.MATERIAL_ID
+        <where>
+            <if test="null != query.materialCode and query.materialCode != ''">
+                AND m.MATERIAL_CODE like CONCAT('%',#{query.materialCode},'%')
+            </if>
+            <if test="null != query.materialName and query.materialName != ''">
+                AND m.MATERIAL_NAME like CONCAT('%',#{query.materialName},'%')
+            </if>
+            <if test="null != query.categoryId ">
+                AND m.CATEGORY_ID = #{query.categoryId}
+            </if>
+        </where>
+    </select>
+</mapper>

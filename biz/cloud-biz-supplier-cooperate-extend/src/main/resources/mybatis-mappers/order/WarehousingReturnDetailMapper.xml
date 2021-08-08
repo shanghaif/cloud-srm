@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.WarehousingReturnDetailMapper">
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.order.entry.WarehousingReturnDetail">
+    </resultMap>
+
+    <select id="findList"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.WarehousingReturnDetailRequestDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.WarehousingReturnDetail">
+        SELECT
+        w.WAREHOUSING_RETURN_DETAIL_ID
+        ,if(w.TYPE='RECEIVE','采购接收','采购退货') TYPE
+        ,w.RECEIVE_ORDER_NO
+        ,w.RECEIVE_ORDER_LINE_NO
+        ,w.DEAL_DATE
+        ,w.ORG_ID
+        ,w.ORG_CODE
+        ,w.ORG_NAME
+        ,w.ORGANIZATION_ID
+        ,w.ORGANIZATION_CODE
+        ,w.ORGANIZATION_NAME
+        ,w.VENDOR_ID
+        ,w.VENDOR_CODE
+        ,w.VENDOR_NAME
+        ,w.CATEGORY_ID
+        ,w.CATEGORY_NAME
+        ,w.CATEGORY_CODE
+        ,w.ITEM_ID
+        ,w.ITEM_CODE
+        ,w.ITEM_NAME
+        ,w.UNIT
+        ,w.UNIT_CODE
+        ,w.RECEIVE_NUM
+        ,w.REQUIREMENT_HEAD_NUM
+        ,w.ROW_NUM
+        ,w.ORDER_NUMBER
+        ,w.LINE_NUM
+        ,w.CONTRACT_NO
+        ,w.CREATED_ID
+        ,w.CREATED_BY
+        ,w.CREATION_DATE
+        ,w.CREATED_BY_IP
+        ,w.TENANT_ID
+        ,w.VERSION
+        ,w.TAX_KEY
+        ,w.TAX_RATE
+        ,w.PROJECT_NUM
+        ,w.PROJECT_NAME
+        ,w.TASK_NUM
+        ,w.TASK_NAME
+        ,w.NOT_INVOICE_QUANTITY
+        ,w.STORAGE_QUANTITY
+        ,w.UNIT_PRICE_CONTAINING_TAX
+        ,w.UNIT_PRICE_EXCLUDING_TAX
+        ,w.CURRENCY_ID
+        ,w.CURRENCY_NAME
+        ,w.CURRENCY_CODE
+        ,w.DEAL_NUM
+        ,w.PO_LINE_ID
+        ,w.RETURN_TO_RECEIVING_NUM
+        ,w.RETURN_TO_SUPPLIER_NUM
+        ,w.IF_CALCULATED
+        ,w.NO_TAX_AMOUNT
+        ,if(w.TYPE='RECEIVE',IFNULL(w.RECEIVE_DATE,w.WAREHOUSING_DATE),IFNULL(w.RETURN_TO_RECEIVING_DATE,w.RETURN_TO_SUPPLIER_DATE)) RECEIVE_DATE
+        FROM ceea_storage_return w
+        <where>
+            <if test="type != null and type != ''">
+                AND w.TYPE = #{type}
+            </if>
+            <if test="startTime != null ">
+                and w.DEAL_DATE &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null">
+                and w.DEAL_DATE &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="receiveOrderNo != null and receiveOrderNo != ''">
+                and w.RECEIVE_ORDER_NO LIKE CONCAT('%',#{receiveOrderNo},'%')
+            </if>
+            <if test="orgIdList != null and orgIdList.size() > 0">
+                and w.ORG_ID in
+                <foreach collection="orgIdList" item="orgIdItem" index="index" open="(" close=")" separator=",">
+                    #{orgIdItem}
+                </foreach>
+            </if>
+            <if test="organizationIdList != null and organizationIdList.size() > 0">
+                and w.ORGANIZATION_ID in
+                <foreach collection="organizationIdList" item="organizationIdItem" index="index" open="(" close=")" separator=",">
+                    #{organizationIdItem}
+                </foreach>
+            </if>
+            <if test="categoryKey != null and categoryKey != ''">
+                and (w.CATEGORY_NAME LIKE CONCAT('%',#{categoryKey},'%') or w.CATEGORY_CODE LIKE CONCAT('%',#{categoryKey},'%'))
+            </if>
+            <if test="materialKey != null and materialKey != ''">
+                and (w.ITEM_CODE LIKE CONCAT('%',#{materialKey},'%') or w.ITEM_NAME LIKE CONCAT('%',#{materialKey},'%'))
+            </if>
+            <if test="supplierKey != null and supplierKey != ''">
+                and (w.VENDOR_CODE LIKE CONCAT('%',#{supplierKey},'%') or w.VENDOR_NAME LIKE CONCAT('%',#{supplierKey},'%'))
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                and w.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="requirementHeadNum != null and requirementHeadNum != ''">
+                and w.REQUIREMENT_HEAD_NUM LIKE CONCAT('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="contractNo != null and contractNo != ''">
+                and w.CONTRACT_NO LIKE CONCAT('%',#{contractNo},'%')
+            </if>
+        </where>
+        order by w.CREATION_DATE desc
+    </select>
+
+    <select id="findListCopy"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.WarehousingReturnDetailRequestDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.WarehousingReturnDetail">
+        select ws.*
+        from (
+        SELECT
+        if(w.TYPE='RECEIVE','采购接收','采购退货')TYPE,
+        w.RECEIVE_ORDER_NO,
+        w.RECEIVE_ORDER_LINE_NO,
+        w.ORG_NAME,
+        if(w.TYPE='RECEIVE',IFNULL(w.RECEIVE_DATE,w.WAREHOUSING_DATE),IFNULL(w.RETURN_TO_RECEIVING_DATE,w.RETURN_TO_SUPPLIER_DATE))RECEIVE_DATE,
+        w.ORGANIZATION_NAME,
+        w.VENDOR_CODE,
+        w.VENDOR_NAME,
+        w.CATEGORY_NAME,
+        w.ITEM_CODE,
+        w.ITEM_NAME,
+        w.UNIT,
+        w.RECEIVE_NUM,
+        w.REQUIREMENT_HEAD_NUM,
+        w.ROW_NUM,
+        w.ORDER_NUMBER,
+        w.LINE_NUM,
+        w.CONTRACT_NO,
+        w.CREATED_BY,
+        w.CREATION_DATE,
+        w.DELIVERY_NUMBER,
+        w.DELIVERY_LINE_NUM
+        FROM ceea_storage_return w
+        <where>
+            <if test="type != null and type != ''">
+                AND w.TYPE = #{type}
+            </if>
+            <if test="receiveOrderNo != null and receiveOrderNo != ''">
+                and w.RECEIVE_ORDER_NO LIKE CONCAT('%',#{receiveOrderNo},'%')
+            </if>
+            <if test="orgIdList != null and orgIdList.size() > 0">
+                and w.ORG_ID in
+                <foreach collection="orgIdList" item="orgIdItem" index="index" open="(" close=")" separator=",">
+                    #{orgIdItem}
+                </foreach>
+            </if>
+            <if test="organizationIdList != null and organizationIdList.size() > 0">
+                and w.ORGANIZATION_ID in
+                <foreach collection="organizationIdList" item="organizationIdItem" index="index" open="(" close=")"
+                         separator=",">
+                    #{organizationIdItem}
+                </foreach>
+            </if>
+            <if test="categoryKey != null and categoryKey != ''">
+                and (w.CATEGORY_NAME LIKE CONCAT('%',#{categoryKey},'%') or w.CATEGORY_CODE LIKE
+                CONCAT('%',#{categoryKey},'%'))
+            </if>
+            <if test="materialKey != null and materialKey != ''">
+                and (w.ITEM_CODE LIKE CONCAT('%',#{materialKey},'%') or w.ITEM_NAME LIKE CONCAT('%',#{materialKey},'%'))
+            </if>
+            <if test="supplierKey != null and supplierKey != ''">
+                and (w.VENDOR_CODE LIKE CONCAT('%',#{supplierKey},'%') or w.VENDOR_NAME LIKE
+                CONCAT('%',#{supplierKey},'%'))
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                and w.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="requirementHeadNum != null and requirementHeadNum != ''">
+                and w.REQUIREMENT_HEAD_NUM LIKE CONCAT('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="contractNo != null and contractNo != ''">
+                and w.CONTRACT_NO LIKE CONCAT('%',#{contractNo},'%')
+            </if>
+        </where>
+        ) ws
+        <where>
+            <if test="startTime != null ">
+                and ws.RECEIVE_DATE &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null">
+                and ws.RECEIVE_DATE &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+        </where>
+        order by ws.CREATION_DATE desc
+    </select>
+
+
+
+
+    <select id="findInvoiceNoticeList"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.WarehousingReturnDetail">
+        SELECT
+        w.*,
+        o.CEEA_EMP_USERNAME
+        FROM ceea_storage_return w
+        LEFT JOIN scc_sc_order o ON w.SRM_ORDER_NUMBER = o.ORDER_NUMBER
+        <where>
+            <if test="type != null and type != ''">
+                AND w.TYPE = #{type}
+            </if>
+            <if test="startTime != null ">
+                and w.DEAL_DATE &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null">
+                and w.DEAL_DATE &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="receiveOrderNo != null and receiveOrderNo != ''">
+                and w.RECEIVE_ORDER_NO LIKE CONCAT('%',#{receiveOrderNo},'%')
+            </if>
+            <if test="orgIdList != null and orgIdList.size() > 0">
+                and w.ORG_ID in
+                <foreach collection="orgIdList" item="orgIdItem" index="index" open="(" close=")" separator=",">
+                    #{orgIdItem}
+                </foreach>
+            </if>
+            <if test="organizationIdList != null and organizationIdList.size() > 0">
+                and w.ORGANIZATION_ID in
+                <foreach collection="organizationIdList" item="organizationIdItem" index="index" open="(" close=")" separator=",">
+                    #{organizationIdItem}
+                </foreach>
+            </if>
+            <if test="categoryKey != null and categoryKey != ''">
+                and (w.CATEGORY_NAME LIKE CONCAT('%',#{categoryKey},'%') or w.CATEGORY_CODE LIKE CONCAT('%',#{categoryKey},'%'))
+            </if>
+            <if test="materialKey != null and materialKey != ''">
+                and (w.ITEM_CODE LIKE CONCAT('%',#{materialKey},'%') or w.ITEM_NAME LIKE CONCAT('%',#{materialKey},'%'))
+            </if>
+            <if test="supplierKey != null and supplierKey != ''">
+                and (w.VENDOR_CODE LIKE CONCAT('%',#{supplierKey},'%') or w.VENDOR_NAME LIKE CONCAT('%',#{supplierKey},'%'))
+            </if>
+            <!-- 结算订单,字段转换-->
+            <if test="orderNumber != null and orderNumber != ''">
+                and w.SETTLEMENT_ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="requirementHeadNum != null and requirementHeadNum != ''">
+                and w.REQUIREMENT_HEAD_NUM LIKE CONCAT('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="contractNo != null and contractNo != ''">
+                and w.CONTRACT_NO LIKE CONCAT('%',#{contractNo},'%')
+            </if>
+            <if test="vendorId != null">
+                and w.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="orgId != null">
+                and w.ORG_ID = #{orgId}
+            </if>
+            <if test="organizationId != null">
+                and w.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <if test="ceeaCostTypeCode != null and ceeaCostTypeCode != ''">
+                and o.CEEA_COST_TYPE_CODE = #{ceeaCostTypeCode}
+            </if>
+            <if test="currencyCode != null and currencyCode != ''">
+                and w.CURRENCY_CODE = #{currencyCode}
+            </if>
+            <if test="ceeaEmpUsername != null and ceeaEmpUsername != ''">
+                and o.CEEA_EMP_USERNAME LIKE CONCAT('%',  #{ceeaEmpUsername}, '%')
+            </if>
+             and w.RECEIVE_NUM != 0 and w.NOT_INVOICE_QUANTITY > 0
+        </where>
+        GROUP BY w.WAREHOUSING_RETURN_DETAIL_ID
+        order by w.CREATION_DATE desc
+    </select>
+</mapper>

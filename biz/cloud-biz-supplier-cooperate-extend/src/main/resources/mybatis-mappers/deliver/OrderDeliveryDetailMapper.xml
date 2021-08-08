@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.deliver.mapper.OrderDeliveryDetailMapper">
+    <!--    <select id="orderDeliveryDetailListPage"
+                parameterType="com.midea.cloud.srm.model.suppliercooperate.deliver.dto.OrderDeliveryDetailDTO"
+                resultType="com.midea.cloud.srm.model.suppliercooperate.deliver.entity.OrderDeliveryDetail">
+    SELECT
+    a.ORDER_DELIVERY_DETAIL_ID,
+    a.DELIVER_PLAN_DETAIL_ID,
+    a.DELIVER_PLAN_ID,
+    a.ORDER_ID,
+    a.ORDER_DETAIL_ID,
+    a.ORDER_NUMBER,
+    a.ORDER_DATE,
+    a.DELIVER_PLAN_NUM,
+    a.VENDOR_ID,
+    a.VENDOR_NAME,
+    a.VENDOR_CODE,
+    a.BUYER_ID,
+    a.BUYER,
+    a.BUYER_NAME,
+    a.CATEGORY_ID,
+    a.CATEGORY_NAME,
+    a.CATEGORY_CODE,
+    a.MATERIAL_ID,
+    a.MATERIAL_CODE,
+    a.MATERIAL_NAME,
+    a.ORDER_QUANTITY,
+    a.REQUIREMENT_DATE,
+    a.PLAN_RECEIVE_NUM,
+    a.DELIVERY_QUANTITY,
+    a.PLAN_RECEIVE_DATE,
+    a.CEEA_EMP_NO,
+    a.CREATED_ID,
+    a.CREATED_BY,
+    a.CREATION_DATE,
+    a.CREATED_BY_IP,
+    a.LAST_UPDATED_ID,
+    a.LAST_UPDATED_BY,
+    a.LAST_UPDATE_DATE,
+    a.LAST_UPDATED_BY_IP,
+    a.TENANT_ID,
+    a.VERSION,
+    c.CEEA_ORGANIZATION_ID AS ORGANIZATION_ID,
+    c.CEEA_ORGANIZATION_NAME AS ORGANIZATION_NAME,
+    c.CEEA_ORGANIZATION_CODE AS ORGANIZATION_CODE,
+    b.CEEA_ORG_ID AS ORG_ID,
+    b.CEEA_ORG_CODE AS ORG_CODE,
+    b.CEEA_ORG_NAME AS ORG_NAME
+    from ceea_sc_order_delivery_detail a
+    LEFT JOIN scc_sc_order b ON a.ORDER_ID=b.ORDER_ID
+    LEFT JOIN scc_sc_order_detail c ON a.ORDER_DETAIL_ID = c.ORDER_DETAIL_ID
+    ${ew.customSqlSegment}
+    </select>-->
+
+    <select id="orderDeliveryDetailListPage"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.deliver.dto.OrderDeliveryDetailDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.deliver.entity.OrderDeliveryDetail">
+            SELECT
+                a.ORDER_NUMBER,
+                b.CEEA_PURCHASE_ORDER_DATE as CEEA_PURCHASE_ORDER_DATE,
+                b.CEEA_ORG_ID as ORG_ID,
+                b.CEEA_ORG_CODE as ORG_CODE,
+                b.CEEA_ORG_NAME as ORG_NAME,
+                c.CEEA_ORGANIZATION_ID as ORGANIZATION_ID,
+                c.CEEA_ORGANIZATION_CODE as ORGANIZATION_CODE,
+                c.CEEA_ORGANIZATION_NAME as ORGANIZATION_NAME,
+                b.VENDOR_NAME,
+                b.BUYER_NAME,
+                c.CATEGORY_NAME,
+                c.MATERIAL_CODE,
+                c.MATERIAL_NAME,
+                c.ORDER_NUM as ORDER_QUANTITY,
+                c.CEEA_PLAN_RECEIVE_DATE as REQUIREMENT_DATE,
+                a.PLAN_RECEIVE_NUM,
+                a.PLAN_RECEIVE_DATE,
+                a.DELIVER_PLAN_NUM
+            from ceea_sc_order_delivery_detail a
+            LEFT JOIN scc_sc_order b ON a.ORDER_ID=b.ORDER_ID
+            LEFT JOIN scc_sc_order_detail c ON a.ORDER_DETAIL_ID = c.ORDER_DETAIL_ID
+            ${ew.customSqlSegment}
+</select>
+    <select id="orderDeliveryDetailListPageCopy"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.deliver.dto.OrderDeliveryDetailDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.deliver.dto.OrderDeliveryDetailDTO">
+            SELECT
+                a.ORDER_DETAIL_ID,
+                a.ORDER_DELIVERY_DETAIL_ID,
+                a.ORDER_NUMBER,
+                b.CEEA_PURCHASE_ORDER_DATE as CEEA_PURCHASE_ORDER_DATE,
+                b.CEEA_ORG_ID as ORG_ID,
+                b.CEEA_ORG_CODE as ORG_CODE,
+                b.CEEA_ORG_NAME as ORG_NAME,
+                c.CEEA_ORGANIZATION_ID as ORGANIZATION_ID,
+                c.CEEA_ORGANIZATION_CODE as ORGANIZATION_CODE,
+                c.CEEA_ORGANIZATION_NAME as ORGANIZATION_NAME,
+                b.VENDOR_NAME,
+                b.BUYER_NAME,
+                c.CATEGORY_NAME,
+                c.MATERIAL_CODE,
+                c.MATERIAL_NAME,
+                c.ORDER_NUM as ORDER_QUANTITY,
+                c.CEEA_PLAN_RECEIVE_DATE as REQUIREMENT_DATE,
+                a.PLAN_RECEIVE_NUM,
+                a.PLAN_RECEIVE_DATE,
+                a.DELIVER_PLAN_NUM,
+                c.LINE_NUM,
+                c.UNIT,
+                c.REQUIREMENT_DATE,
+                IFNULL(a.PLAN_RECEIVE_NUM,0)-IFNULL(a.DELIVERY_QUANTITY,0) as numberRemaining
+            from ceea_sc_order_delivery_detail a
+            inner JOIN scc_sc_order b ON a.ORDER_ID=b.ORDER_ID
+            inner JOIN scc_sc_order_detail c ON a.ORDER_DETAIL_ID = c.ORDER_DETAIL_ID
+            ${ew.customSqlSegment}
+</select>
+
+
+</mapper>

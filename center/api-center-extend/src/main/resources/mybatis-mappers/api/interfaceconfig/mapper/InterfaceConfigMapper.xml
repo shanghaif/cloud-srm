@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.api.interfaceconfig.mapper.InterfaceConfigMapper">
+	<resultMap id="interfaceConfigDTO" type="com.midea.cloud.srm.model.api.interfaceconfig.dto.InterfaceConfigDTO">
+        <id column="INTERFACE_ID" property="interfaceId" />
+        <result column="INTERFACE_CODE" property="interfaceCode"/>
+        <result column="INTERFACE_NAME" property="interfaceName"/>
+        <result column="INTERFACE_URL" property="interfaceUrl"/>
+        <result column="SYSTEM_ID" property="systemId"/>
+        <result column="SOURCE" property="source"/>
+        <result column="DATA_SOURCE" property="dataSource"/>
+        <result column="IF_CHANGE" property="ifChange"/>
+        <result column="DATA_FORMAT" property="dataFormat"/>
+        <result column="DATA_STRUCTURE" property="dataStructure"/>
+        <result column="RETURN_CLASS" property="returnClass"/>
+        <result column="DATA_TYPE" property="dataType"/>
+        <result column="CREATED_ID" property="createdId"/>
+        <result column="CREATED_BY" property="createdBy"/>
+        <result column="CREATION_DATE" property="creationDate"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy"/>
+    </resultMap>
+    
+    <select id="interfaceConfigFindList" parameterType="com.midea.cloud.srm.model.api.interfaceconfig.dto.InterfaceConfigDTO"
+    	resultMap="interfaceConfigDTO">
+    	select i.*,s.system_name,s.type,s.protocol from scc_api_interface_config i
+    	inner join scc_api_system_config s on i.system_id = s.system_id
+    	where 1=1
+    	<if test="systemName !=null and systemName !=''">
+            AND s.system_name like CONCAT('%',#{systemName},'%')
+        </if>
+        <if test="interfaceName !=null and interfaceName !=''">
+            AND i.interface_name like CONCAT('%',#{interfaceName},'%')
+        </if>
+        <if test="interfaceCode !=null and interfaceCode !=''">
+            AND i.interface_code = #{interfaceCode}
+        </if>
+        <if test="protocol !=null and protocol !=''">
+            AND s.protocol = #{protocol}
+        </if>
+        <if test="type !=null and type !=''">
+            AND s.type = #{type}
+        </if>
+        order by i.creation_date desc
+    </select>
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.po.logisticsOrder.mapper.LogisticsOrderHeadMapper">
+    <select id="list" resultType="com.midea.cloud.srm.model.logistics.po.order.entity.OrderHead">
+        select h.*
+        from scc_lgt_order_head h
+        <where>
+            <if test="loginCompanyId != null">
+                and h.VENDOR_ID = #{loginCompanyId}
+                and h.ORDER_STATUS in ('COMPLETED','CANCEL','WAITING_VENDOR_CONFIRM')
+            </if>
+            <if test="orderHeadNum != null and orderHeadNum != ''">
+                and h.ORDER_HEAD_NUM like concat('%',#{orderHeadNum},'%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                and h.VENDOR_NAME like concat('%',#{vendorName},'%')
+            </if>
+            <if test="ceeaApplyUserNickname != null and ceeaApplyUserNickname != ''">
+                and h.CEEA_APPLY_USER_NICKNAME like concat('%',#{ceeaApplyUserNickname},'%')
+            </if>
+            <if test="businessModeCode != null and businessModeCode != ''">
+                and h.BUSINESS_MODE_CODE = #{businessModeCode}
+            </if>
+            <if test="transportModeCode != null and transportModeCode != ''">
+                and h.TRANSPORT_MODE_CODE = #{transportModeCode}
+            </if>
+            <if test="ifNeedVendorComfirm != null and ifNeedVendorComfirm != ''">
+                and h.IF_NEED_VENDOR_COMFIRM = #{ifNeedVendorComfirm}
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                and h.ORDER_STATUS = #{orderStatus}
+            </if>
+            <if test="requirementHeadNum != null and requirementHeadNum != ''">
+                and h.REQUIREMENT_HEAD_NUM like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="serviceProjectName != null and serviceProjectName != ''">
+                and h.SERVICE_PROJECT_NAME like concat('%',#{serviceProjectName},'%')
+            </if>
+            <if test="tmsStatus != null and tmsStatus != ''">
+                and h.TMS_STATUS = #{tmsStatus}
+            </if>
+            <if test="orderSourceFrom != null and orderSourceFrom != ''">
+                and h.ORDRE_SOURCE_FROM = #{orderSourceFrom}
+            </if>
+            <if test="fromDate != null">
+                and h.CREATION_DATE >= #{fromDate}
+            </if>
+            <if test="toDate != null">
+                and h.CREATION_DATE &lt;= #{toDate}
+            </if>
+            <if test="contractCode != null and contractCode != ''">
+                and h.ORDER_HEAD_ID in (
+                    select distinct h1.ORDER_HEAD_ID
+                    from scc_lgt_order_head h1
+                    left join scc_lgt_order_line_contract l1 on l1.ORDER_HEAD_ID = h1.ORDER_HEAD_ID
+                    where l1.CONTRACT_CODE like concat('%',#{contractCode},'%')
+                )
+            </if>
+
+        </where>
+        order by h.LAST_UPDATE_DATE desc
+    </select>
+
+</mapper>

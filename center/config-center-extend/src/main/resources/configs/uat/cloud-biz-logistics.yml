@@ -1,0 +1,106 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-uat.xml
+  logstashhost: 10.0.10.50 #logstash服务器
+spring:
+  redis:
+    host: 10.17.145.83
+    port: 6479
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.17.149.182:3306/usrm_cloud_biz_logistics?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: cdc_base_new
+    password: 123456
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  aop:
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+mybatis-plus:
+  type-aliases-package: com.midea.cloud.srm.model.bid, com.midea.cloud.srm.model.pm
+#  , com.midea.cloud.srm.model.inq
+  mapper-locations: classpath*:/mybatis-mappers-extend/**/*.xml,classpath*:/mybatis-mappers-nextend/**/*.xml,classpath*:/mybatis-mappers/**/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+security:
+  oauth2:
+    resource:
+      prefer-token-info: false
+cloud:
+  scc:
+    quartz:
+      dbConfig:
+        driver: com.mysql.cj.jdbc.Driver
+        connectionUrl: jdbc:mysql://10.17.149.182:3306/usrm_cloud_biz_base?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&autoReconnect=true
+        username: cdc_base_new
+        password: 123456
+      properties:
+        org.quartz.jobStore.isClustered: true
+        org.quartz.scheduler.instanceId: AUTO
+        org.quartz.scheduler.instanceName: SRM_SCHEDULER
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000
+#elasticsearch
+es:
+  host: 10.17.145.110
+  port: 9200
+  scheme: http
+ceea:
+  fssc:
+    #外部接口调用所需秘钥
+    appKey: kz80tkVzXz2YjmQm
+    appSecret: tlJGItiE4XEeErqAm1gu3mcg7iajWwor
+    #费控登录获取token接口
+    loginUrl: http://10.0.10.26/open/auth/token/login
+    #费控作废接口
+    abandonUrl: http://10.0.10.26:28080/interface-internal/syncThirdBoeStatusController/cancelBoe
+    #预算冻结接口
+    applyFreezeUrl: http://10.0.10.26:28080/interface-internal/lgibgt/applyFreeze
+    #预算释放接口
+    applyReleaseUrl: http://10.0.10.26:28080/interface-internal/lgibgt/applyRelease
+    #网上开票  付款申请 预付款申请对接费控接口
+    saveThirdBoeUrl: http://10.0.10.26:28080/interface-internal/syncBoeController/saveThirdBoe
+
+ERP_USER:
+  ####erpWebService接口用户名和密码 erpName/erpPassword为采购订单接口的账户密码  erpName2/erpPassword2 为采购订单修改的账户密码
+  erpName: longi_xasrm01
+  erpPassword: da771ee2653e41f3b2c90d6dc9445c2e
+  erpName2: longi_xansrm01
+  erpPassword2: 932f8f9cfa6d4bcd8fa8478f697cb227
+
+template:
+  purchaseRequirementTempId: 174bee46872692fde82c0344fff9fa40
+  purchaseRequirementSrmLink: http://10.16.87.99/#/formDataPreview?funName=purchaseApplication&formId=$formId$
+  orderTempId: 174d7f30422491c368401d64f758dc21
+  orderSrmLink: http://10.16.87.99/#/formDataPreview?funName=buyerPurchaseOrder&formId=$formId$
+  orderChangeTempId: 0
+  orderChangeSrmLink: http://10.16.87.99/#/formDataPreview?funName=purchaseOrderChange&formId=$formId$
+  priceTempId: 17562998d126b289aff61a048608f018
+  priceSrmLink: http://10.16.87.99/#/formDataPreview?funName=inquiryApprovalFlow&formId=$formId$
+  bidInitProjectTempId: 17562b39900289ff05112854187a3097
+  bidInitProjectSrmLink: http://10.16.87.99/#/formDataPreview?funName=biddingProject&formId=$formId$
+
+SOAP_URL:
+  # ERP_PURCHASE_URL为采购订单接口的地址  URL_EDIT_PURCHASE_ORDER为采购订单修改的地址
+  ERP_PURCHASE_URL: http://soatest.longi.com:8011/SRMSB/Erp/PurchaseOrder/ProxyServices/ErpAcceptPurchaseOrderSoapProxy?wsdl
+  URL_EDIT_PURCHASE_ORDER: http://soatest.longi.com:8011/NSrm/Erp/PurchaseOrder/ProxyServices/ErpCancelPurchaseOrderSoapProxy?wsdl
+  # 物流寻源采购订单对接TMS URL
+  LGT_ORDER_URL: http://10.16.87.99:8842/registerService/TmsLogisticsOrderWsServiceImpl?wsdl

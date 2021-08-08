@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.base.work.mapper.WorkCountMapper">
+    <!-- 统计供应商改善数量 -->
+    <select id="countVendorImprovement" resultType="java.lang.Integer">
+        select count(1)
+        from SCC_PERF_VENDOR_IMPROVE_FORM spvif
+        where 1 = 1
+        and spvif.VENDOR_CODE = #{vendorCode}
+        <if test="status != null and status !=''">
+            and spvif.STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计绩效考核单数量 -->
+    <select id="countPerformanceAssessment" resultType="java.lang.Integer">
+        select count(1)
+        from scc_perf_vendor_asses_form spvaf
+        where 1 = 1
+        and spvaf.VENDOR_CODE = #{vendorCode}
+        <if test="status != null and status !=''">
+            and spvaf.STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计询价单数量 -->
+    <select id="coutInquiryOrders" resultType="java.lang.Integer">
+        select count(1) from (
+            select distinct sbb.BIDING_ID
+            from scc_brg_biding sbb
+                left join scc_brg_vendor sbv on sbb.BIDING_ID = sbv.BIDING_ID
+                left join scc_brg_sign_up sbsu on sbb.BIDING_ID = sbsu.BIDING_ID
+                left join scc_brg_order_head sboh on sbb.BIDING_ID = sboh.BIDING_ID and sbb.CURRENT_ROUND = sboh.ROUND
+            where 1 = 1
+                and sbb.BIDING_STATUS = 'ACCEPT_BID'
+                and (sboh.ORDER_STATUS = 'DRAFT' or sboh.ORDER_STATUS is null)
+            and sbv.VENDOR_ID = #{vendorId}
+        ) aa
+    </select>
+
+    <!-- 统计采购订单数量 -->
+    <select id="coutPurchaseOrder" resultType="java.lang.Integer">
+        select count(1)
+        from scc_sc_order sso
+        where 1 = 1
+            and sso.CEEA_IF_SUPPLIER_CONFIRM = 'Y'
+            and sso.VENDOR_ID = #{vendorId}
+        <if test="status != null and status !=''">
+            and sso.ORDER_STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计送货单数量 -->
+    <select id="coutDeliveryOrder" resultType="java.lang.Integer">
+        select count(1)
+        from scc_sc_delivery_note ssdn
+        where 1 = 1
+            and ssdn.VENDOR_ID = #{vendorId}
+        <if test="status != null and status !=''">
+            and ssdn.DELIVERY_NOTE_STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计供应商验收协同数量 -->
+    <select id="coutInspectionBill" resultType="java.lang.Integer">
+        select count(1)
+        from scc_contract_accept_order scao
+        where 1 = 1
+            and scao.VENDOR_ID = #{vendorId}
+        <if test="status != null and status !=''">
+            and scao.ACCEPT_STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计供应商合同管理数量 -->
+    <select id="coutContract" resultType="java.lang.Integer">
+        select count(1)
+        from scc_contract_head sch
+        where 1 = 1
+            and sch.VENDOR_ID = #{vendorId}
+        <if test="status != null and status !=''">
+            and sch.CONTRACT_STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计到货计划数量 -->
+    <select id="coutDeliverPlan" resultType="java.lang.Integer">
+        select count(1)
+        from ceea_sc_deliver_plan csdp
+        where 1 = 1
+            and csdp.VENDOR_ID = #{vendorId}
+        <if test="status != null and status !=''">
+            and csdp.DELIVER_PLAN_STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计开票通知数量 -->
+    <select id="coutInvoice" resultType="java.lang.Integer">
+        select count(1)
+        from scc_sc_invoice_notice ssin
+        where 1=1
+            and ssin.VENDOR_ID = #{vendorId}
+        <if test="status != null and status !=''">
+            and ssin.INVOICE_NOTICE_STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计供应商网上开票数量 -->
+    <select id="coutOnlineInvoice" resultType="java.lang.Integer">
+        select count(1)
+        from ceea_sc_online_invoice csoi
+        where 1=1
+            and csoi.VENDOR_ID = #{vendorId}
+        <if test="status != null and status !=''">
+            and csoi.INVOICE_STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计物料维护数量 -->
+    <select id="coutMaterialMaintenance" resultType="java.lang.Integer">
+        select count(1)
+        from scc_base_material_item sbmi
+        where 1 = 1
+            and sbmi.CEEA_SUPPLIER_ID = #{vendorId}
+        <if test="status != null and status !=''">
+            and sbmi.CEEA_MATERIAL_STATUS = #{status}
+        </if>
+    </select>
+
+    <!-- 统计招投标项目管理列表数量 -->
+    <select id="coutVendorBidding" resultType="java.lang.Integer">
+        select count(1) from (
+            select distinct sbb.BIDING_ID
+            from scc_bid_biding sbb
+                left join scc_bid_vendor sbv on sbb.BIDING_ID = sbv.BIDING_ID
+                left join scc_bid_sign_up sbsu on sbb.BIDING_ID = sbsu.BIDING_ID
+                left join scc_bid_order_head sboh on sbb.BIDING_ID = sboh.BIDING_ID and sbb.CURRENT_ROUND = sboh.ROUND
+            where 1 = 1
+                and ((sbb.BIDING_SCOPE = 'INVITE_TENDER' and sbb.BIDING_STATUS = 'ACCEPT_BID' and
+                        sboh.ORDER_STATUS in ('DRAFT', 'WITHDRAW'))
+                    or (sbb.BIDING_SCOPE = 'OPEN_TENDER' and sbb.BIDING_STATUS = 'ACCEPT_SIGNUP' and sbsu.SIGN_UP_STATUS = 'NO_SIGNUP')
+                    or (sbb.BIDING_SCOPE = 'OPEN_TENDER' and sbb.BIDING_STATUS = 'ACCEPT_SIGNUP' and sboh.ORDER_STATUS in ('DRAFT', 'WITHDRAW')))
+            and sbv.VENDOR_ID = #{vendorId}
+        ) aa
+    </select>
+</mapper>

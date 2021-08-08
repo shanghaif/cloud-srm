@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud-srm</artifactId>
+        <groupId>com.midea</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloud-tech</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>log-starter-extend</module>
+        <module>base-component-extend</module>
+        <module>code-gernator-extend</module>
+        <module>dynamic-datasource-starter-extend</module>
+        <module>ureport-starter-extend</module>
+        <module>quartz-starter-extend</module>
+        <module>cxf-starter-extend</module>
+        <module>repush-starter-extend</module>
+        <module>flow-starter-extend</module>
+        <module>landray-client-extend</module>
+        <module>signature-starter-extend</module>
+    </modules>
+
+</project>

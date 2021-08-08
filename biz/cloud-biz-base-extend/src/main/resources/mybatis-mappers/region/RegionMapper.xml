@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.region.mapper.RegionMapper">
+    <select id="findRange"  resultType="com.midea.cloud.srm.model.base.region.dto.AreaDTO">
+      select
+      r.REGION_ID as range_id,
+      r.AREA_NAME as range_name
+      from scc_base_region r where r.LEVEL_NO=0 order by r.SORT
+    </select>
+
+    <select id="findProvince"  resultType="com.midea.cloud.srm.model.base.region.dto.AreaDTO">
+        select
+        r.REGION_ID as province_id,
+        r.AREA_NAME as province
+        from scc_base_region r where r.LEVEL_NO=1
+        <if test="null != rangeId">and r.PARENT_ID=#{rangeId}</if>
+        order by r.SORT
+    </select>
+
+    <select id="findCity"  resultType="com.midea.cloud.srm.model.base.region.dto.AreaDTO">
+      select
+      r.REGION_ID as city_id,
+      r.AREA_NAME as city
+      from scc_base_region r where r.LEVEL_NO=2 and r.PARENT_ID=#{provinceId} order by r.SORT
+    </select>
+
+    <select id="findAllCity"  resultType="com.midea.cloud.srm.model.base.region.dto.AreaDTO">
+        select
+        r.REGION_ID as city_id,
+        r.AREA_NAME as city
+        from scc_base_region r where r.LEVEL_NO=2
+        <if test="provinceId != null and provinceId != ''">
+            and r.PARENT_ID=#{provinceId}
+        </if>
+        order by r.SORT
+    </select>
+
+    <select id="findArea"  resultType="com.midea.cloud.srm.model.base.region.dto.AreaDTO">
+  select
+  r.REGION_ID as area_id,
+  r.AREA_NAME as area
+  from scc_base_region r where r.LEVEL_NO=3 and r.PARENT_ID=#{cityId} order by r.SORT
+</select>
+
+    <select id="findTown"  resultType="com.midea.cloud.srm.model.base.region.dto.AreaDTO">
+      select
+      r.REGION_ID as town_id,
+      r.AREA_NAME as town
+      from scc_base_region r where r.LEVEL_NO=4 and r.PARENT_ID=#{areaId} order by r.SORT
+    </select>
+    <select id="findRegionById"  resultType="com.midea.cloud.srm.model.base.region.dto.AreaDataDTO">
+      select
+      r.REGION_ID as id,
+      r.AREA_NAME as areaName,
+      r.SHORT_NAME as shortName,
+      r.SAP_AREA_CODE as sapAreaCode
+      from scc_base_region r where r.ID = #{id}
+    </select>
+
+    <select id="checkCity" parameterType="com.midea.cloud.srm.model.base.region.dto.CityParamDto"
+            resultType="com.midea.cloud.srm.model.base.region.dto.AreaDTO">
+        SELECT R.REGION_ID AS CITY_ID,
+               R.AREA_NAME AS CITY
+        FROM SCC_BASE_REGION R
+        WHERE R.LEVEL_NO = 2
+          AND R.PARENT_ID = #{parentId}
+          AND R.AREA_NAME = #{areaName}
+        ORDER BY R.SORT;
+    </select>
+
+    <select id="listCountyByNameBatch" resultType="com.midea.cloud.srm.model.base.region.entity.Region">
+        select
+        r1.*,
+        r2.AREA_NAME as parentAreaName
+        from scc_base_region r1
+        left join scc_base_region r2 on r1.PARENT_ID = r2.REGION_ID
+        <where>
+            r1.LEVEL_NO = 3
+            <if test="countyNameList != null and countyNameList.size() > 0">
+                and r1.AREA_NAME in
+                <foreach collection="countyNameList" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

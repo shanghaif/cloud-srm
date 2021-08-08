@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.base.work.mapper.WorkMapper">
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.base.work.entry.Work">
+        <id column="WORK_ID" property="workId" jdbcType="BIGINT"/>
+        <result column="FROM_ID" property="fromId" jdbcType="BIGINT"/>
+        <result column="HANDLE_ID" property="handleId" jdbcType="BIGINT"/>
+        <result column="HANDLE_BY" property="handleBy" jdbcType="VARCHAR"/>
+        <result column="HANDLE_NICKNAME" property="handleNickname" jdbcType="VARCHAR"/>
+        <result column="WORK_STATUS" property="workStatus" jdbcType="VARCHAR"/>
+        <result column="SENDER_ID" property="senderId" jdbcType="BIGINT"/>
+        <result column="SEND_TIME" property="sendTime" jdbcType="TIMESTAMP"/>
+        <result column="SEND_BY" property="sendBy" jdbcType="VARCHAR"/>
+        <result column="BILL" property="bill" jdbcType="VARCHAR"/>
+        <result column="TOPIC" property="topic" jdbcType="VARCHAR"/>
+        <result column="LINK_URL" property="linkUrl" jdbcType="VARCHAR"/>
+        <result column="NODE" property="node" jdbcType="VARCHAR"/>
+        <result column="FROM_VENDOR_ID" property="fromVendorId" jdbcType="BIGINT"/>
+        <result column="FROM_VENDOR_CODE" property="fromVendorCode" jdbcType="VARCHAR"/>
+        <result column="FROM_VENDOR_NAME" property="fromVendorName" jdbcType="VARCHAR"/>
+        <result column="TO_VENDOR_ID" property="toVendorId" jdbcType="BIGINT"/>
+        <result column="TO_VENDOR_CODE" property="toVendorCode" jdbcType="VARCHAR"/>
+        <result column="TO_VENDOR_NAME" property="toVendorName" jdbcType="VARCHAR"/>
+        <result column="CREATED_ID" property="createdId" jdbcType="BIGINT"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR"/>
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT"/>
+        <result column="VERSION" property="version" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <select id="workCount" resultType="java.util.Map">
+        SELECT w.TOPIC AS 'topic',COUNT(w.WORK_ID) AS 'count'
+        FROM (
+            SELECT w.TOPIC ,w.WORK_ID FROM scc_base_work w
+            WHERE w.WORK_STATUS = "ON_HAND" AND w.HANDLE_ID = #{handleId}
+            <choose>
+                <when test="toVendorId != null">
+                    AND w.TO_VENDOR_ID = #{toVendorId}
+                </when>
+                <otherwise>
+                    AND w.TO_VENDOR_ID IS NULL
+                </otherwise>
+            </choose>
+            UNION
+            SELECT w.TOPIC ,w.WORK_ID FROM scc_base_work w
+            WHERE w.WORK_STATUS = "ON_HAND"
+            <choose>
+                <when test="toVendorId != null">
+                    AND w.TO_VENDOR_ID = #{toVendorId}
+                </when>
+                <otherwise>
+                    AND w.TO_VENDOR_ID IS NULL
+                </otherwise>
+            </choose>
+        ) w
+        GROUP BY w.TOPIC
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap"
+            parameterType="com.midea.cloud.srm.model.base.work.dto.WorkRequestDTO">
+        SELECT DISTINCT w.* FROM scc_base_work w
+        <!--        <if test="">
+       抄送
+        INNER JOIN aaaa a ON a.AAAA_ID = w.AAAA_ID AND a.AAAA_ID = #{}
+
+              </if>-->
+        <where>
+            <if test="workStatus != null and workStatus != null">
+                AND w.WORK_STATUS = #{workStatus}
+            </if>
+            <if test="startCreationDate != null and startCreationDate != ''">
+                AND w.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startCreationDate},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endCreationDate != null and endCreationDate != ''">
+                AND w.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endCreationDate},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="senderId != null">
+                AND w.SENDER_ID = #{senderId}
+            </if>
+            <if test="sendBy != null and sendBy !=''">
+                AND w.SEND_BY LIKE CONCAT("%",#{sendBy},"%")
+            </if>
+            <if test="createdId != null">
+                AND w.CREATED_ID = #{createdId}
+            </if>
+            <if test="handleNickname != null and handleNickname !=''">
+                AND w.HANDLE_NICKNAME LIKE CONCAT("%",#{handleNickname},"%")
+            </if>
+            <if test="createdBy != null and createdBy !=''">
+                AND w.CREATED_BY LIKE CONCAT("%",#{createdBy},"%")
+            </if>
+            <if test="topic != null and topic !=''">
+              AND w.TOPIC = #{topic}
+            </if>
+            <if test="fromVendorId != null">
+                AND w.FROM_VENDOR_ID = #{fromVendorId}
+            </if>
+            <if test="toVendorId != null">
+                AND w.TO_VENDOR_ID = #{toVendorId}
+            </if>
+        </where>
+        ORDER BY w.SEND_TIME DESC
+    </select>
+</mapper>

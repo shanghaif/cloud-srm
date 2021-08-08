@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="ENVIRONMENT" value="${spring.profiles.active:-local}" />
+	<property name="LOG_DIR" value="${log.dir:-/apps/svr/cloud_srm_logs/}" />
+	<springProperty name="APP_MODULE" source="spring.application.name" scope="context"/>
+	<springProperty name="LOGSTASH_HOST" source="logging.logstashhost" scope="context"/>
+
+	<!-- Console输出 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder charset="UTF-8">  
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss}] [%level] [%X{X-B3-TraceId}] [${APP_MODULE}] [%thread] [%logger:%line]%msg%n</pattern>
+        </encoder>
+	</appender>
+	
+	<!-- File输出，主要用于同时输出到日志系统和本地系统 -->
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/logs/${APP_MODULE}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/logs/${APP_MODULE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">  
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss}] [%level] [%X{X-B3-TraceId}] [${APP_MODULE}] [%thread] [%logger:%line]%msg%n</pattern>
+        </encoder>  
+	</appender>
+	
+	<!-- Logstash输出(系统日志)，全局日志 -->
+	<appender name="LOGSTASH_SYSTEM" 
+		class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+		<destination>${LOGSTASH_HOST}:4560</destination>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<!-- 这里配置需要额外输出的MDC项 -->
+			<includeMdcKeyName>X-B3-TraceId</includeMdcKeyName>
+			<includeMdcKeyName>X-B3-SpanId</includeMdcKeyName>
+			<includeMdcKeyName>X-B3-ParentSpanId</includeMdcKeyName>
+			<!-- 一定要在type字段输出应用编码，否则采集时，会丢弃日志！！！！！！！！！ -->
+			<customFields>{"logtype":"SYSTEM", "appname":"${APP_MODULE}", "environment":"${ENVIRONMENT}"}</customFields>
+		</encoder>
+		<!-- 如果没有日志系统，替换为文件输出的配置 
+		<file>${"LOG_DIR"}/logs/LOGSTASH_SYSTEM/LOGSTASH_SYSTEM.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/logs/LOGSTASH_SYSTEM/LOGSTASH_SYSTEM.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">  
+            <pattern>[%-5level] %d{HH:mm:ss.SSS} [%thread] %logger{36} - %msg%n</pattern>  
+        </encoder>
+        -->
+	</appender>
+
+	<!-- Logstsh输出(操作日志)-->
+	<appender name="LOGSTASH_OPERATION"
+		class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+		<destination>${LOGSTASH_HOST}:4560</destination>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<!-- 这里配置需要额外输出的MDC项 -->
+			<includeMdcKeyName>X-B3-TraceId</includeMdcKeyName>
+			<includeMdcKeyName>X-B3-SpanId</includeMdcKeyName>
+			<includeMdcKeyName>X-B3-ParentSpanId</includeMdcKeyName>
+			<!-- 一定要在type字段输出应用编码，否则采集时，会丢弃日志！！！！！！！！！ -->
+			<customFields>{"logtype":"OPERATION", "appname":"${APP_MODULE}", "environment":"${ENVIRONMENT}"}</customFields>
+		</encoder>
+		<!-- 如果没有日志系统，替换为文件输出的配置 
+		<file>${LOG_DIR}/logs/LOGSTASH_OPERATION/LOGSTASH_OPERATION.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/logs/LOGSTASH_OPERATION/LOGSTASH_OPERATION.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">  
+            <pattern>[%-5level] %d{HH:mm:ss.SSS} [%thread] %logger{36} - %msg%n</pattern>  
+        </encoder>
+        -->
+	</appender>
+	
+	<!-- Logstsh输出(数据审计跟踪日志)-->
+	<appender name="LOGSTASH_DATAAUDIT"
+		class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+		<destination>${LOGSTASH_HOST}:4560</destination>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<!-- 这里配置需要额外输出的MDC项 -->
+			<includeMdcKeyName>X-B3-TraceId</includeMdcKeyName>
+			<includeMdcKeyName>X-B3-SpanId</includeMdcKeyName>
+			<includeMdcKeyName>X-B3-ParentSpanId</includeMdcKeyName>
+			<!-- 一定要在type字段输出应用编码，否则采集时，会丢弃日志！！！！！！！！！ -->
+			<customFields>{"logtype":"DATAAUDIT", "appname":"${APP_MODULE}", "environment":"${ENVIRONMENT}"}</customFields>
+		</encoder>
+		<!-- 如果没有日志系统，替换为文件输出的配置 
+		<file>${LOG_DIR}/logs/LOGSTASH_DATAAUDIT/LOGSTASH_DATAAUDIT.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/logs/LOGSTASH_DATAAUDIT/LOGSTASH_DATAAUDIT.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">  
+            <pattern>[%-5level] %d{HH:mm:ss.SSS} [%thread] %logger{36} - %msg%n</pattern>  
+        </encoder>
+        -->
+	</appender>
+	
+	<!-- Logstsh输出(业务跟踪日志)-->
+	<appender name="LOGSTASH_BUSINESS"
+		class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+		<destination>${LOGSTASH_HOST}:4560</destination>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<!-- 这里配置需要额外输出的MDC项 -->
+			<includeMdcKeyName>X-B3-TraceId</includeMdcKeyName>
+			<includeMdcKeyName>X-B3-SpanId</includeMdcKeyName>
+			<includeMdcKeyName>X-B3-ParentSpanId</includeMdcKeyName>
+			<!-- 一定要在type字段输出应用编码，否则采集时，会丢弃日志！！！！！！！！！ -->
+			<customFields>{"logtype":"BUSINESS", "appname":"${APP_MODULE}", "environment":"${ENVIRONMENT}"}</customFields>
+		</encoder>
+		<!-- 如果没有日志系统，替换为文件输出的配置 
+		<file>${LOG_DIR}/logs/LOGSTASH_BUSINESS/LOGSTASH_BUSINESS.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/logs/LOGSTASH_BUSINESS/LOGSTASH_BUSINESS.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">  
+            <pattern>[%-5level] %d{HH:mm:ss.SSS} [%thread] %logger{36} - %msg%n</pattern>  
+        </encoder>
+        -->
+	</appender>
+
+	<!-- 功能性日志，如果项目上不需要输出，改为ERROR级别 -->
+	<logger name="SRM_LOG_OPERATION" level="INFO" additivity="false">
+		<appender-ref ref="LOGSTASH_OPERATION" />
+	</logger>
+	<logger name="SRM_LOG_BUSINESS" level="INFO" additivity="false">
+		<appender-ref ref="LOGSTASH_BUSINESS" />
+	</logger>
+	<logger name="SRM_LOG_DATAAUDIT" level="INFO" additivity="false">
+		<appender-ref ref="LOGSTASH_DATAAUDIT" />
+	</logger>
+	
+	<!-- 所有 -->
+	<root level="INFO">
+		<appender-ref ref="FILE" />
+		<!-- 输出到其它设备 --> 
+		<appender-ref ref="LOGSTASH_SYSTEM" />
+	</root>
+
+	<!-- jvm监控
+	<appender name="jvm"
+		class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+		<destination>${LOGSTASH_HOST}:4570</destination>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+	</appender>
+	<logger name="jrMonitorJvm" level="INFO" additivity="false">
+		<appender-ref ref="jvm" />
+	</logger>
+	 -->
+	 
+	<logger name="com.midea" level="INFO" additivity="false">
+		<appender-ref ref="FILE" />
+		<!-- 输出到其它设备 --> 
+		<appender-ref ref="LOGSTASH_SYSTEM" />
+	</logger>
+	
+</configuration>

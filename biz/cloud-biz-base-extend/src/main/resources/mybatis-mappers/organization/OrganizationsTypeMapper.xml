@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.organization.mapper.OrganizationsTypeMapper">
+	<select id="getOrgTypeByUser"
+            resultType="com.midea.cloud.srm.model.base.organization.entity.OrganizationsType">
+        select
+        DISTINCT
+        o.ORGANIZATION_TYPE_CODE
+        ,t.ORGANIZATION_TYPE_NAME
+        from scc_base_organization_user ou
+        inner join scc_base_organization o on ou.ORGANIZATION_ID = o.ORGANIZATION_ID
+        inner join scc_base_organization_type t  on t.ORGANIZATION_TYPE_CODE = o.ORGANIZATION_TYPE_CODE
+        where ou.USER_ID=#{userId}
+    </select>
+</mapper>

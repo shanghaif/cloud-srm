@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.rbac.permission.mapper.PermissionMapper">
+
+    <select id="selectByParam" resultType="com.midea.cloud.srm.model.rbac.permission.entity.Permission">
+        SELECT
+        p.PERMISSION_ID,
+        p.PARENT_PERMISSION_ID,
+        p.FUNCTION_ID,
+        f.FUNCTION_NAME,
+        f.FUNCTION_CODE,
+        p.PERMISSION_TYPE,
+        p.PERMISSION_CODE,
+        p.PERMISSION,
+        p.ICON_PATH,
+        p.SORT,
+        p.ORG_CONTROL_DIM,
+        p.ENABLE_CATEGORY_DIVISION,
+        p.ENABLE_ATTACH_MANAGE,
+        p.ENABLE_BUSI_STATE_CONTROL,
+        p.ENABLE_WORK_FLOW,
+        p.START_DATE,
+        p.END_DATE,
+        p.CREATED_BY,
+        p.CREATION_DATE,
+        p.CREATED_BY_IP,
+        p.LAST_UPDATED_BY,
+        p.LAST_UPDATE_DATE,
+        p.LAST_UPDATED_BY_IP,
+        p.VERSION,
+        p.TENANT_ID,
+        CASE
+        WHEN pl.PERMISSION_NAME IS NULL THEN
+        p.PERMISSION_NAME ELSE pl.PERMISSION_NAME
+        END PERMISSION_NAME,
+        CASE
+        WHEN ppl.PERMISSION_NAME IS NULL THEN
+        p.PERMISSION_NAME ELSE ppl.PERMISSION_NAME
+        END PARENT_PERMISSION_NAME
+        FROM
+        SCC_RBAC_PERMISSION p
+        LEFT JOIN ( SELECT PERMISSION_ID, LANGUAGE, MAX( PERMISSION_NAME ) PERMISSION_NAME FROM
+        SCC_RBAC_PERMISSION_LANGUAGE
+        <where>
+            <if test="language != null">
+                AND (LANGUAGE = #{language} OR LANGUAGE IS NULL)
+            </if>
+        </where>
+        GROUP BY PERMISSION_ID, LANGUAGE
+        ) pl ON p.PERMISSION_ID = pl.PERMISSION_ID
+        LEFT JOIN SCC_RBAC_FUNCTION f ON p.FUNCTION_ID = f.FUNCTION_ID
+        LEFT JOIN ( SELECT PERMISSION_ID, LANGUAGE, MAX( PERMISSION_NAME ) PERMISSION_NAME FROM
+        SCC_RBAC_PERMISSION_LANGUAGE
+        <where>
+            <if test="language != null">
+                AND (LANGUAGE = #{language} OR LANGUAGE IS NULL)
+            </if>
+        </where>
+        GROUP BY PERMISSION_ID, LANGUAGE
+        ) ppl ON p.PARENT_PERMISSION_ID = ppl.PERMISSION_ID
+        <where>
+            <if test="permission.permissionId != null">
+                AND p.PERMISSION_ID = #{permission.permissionId}
+            </if>
+            <if test="permission.parentPermissionId != null">
+                AND p.PARENT_PERMISSION_ID = #{permission.parentPermissionId}
+            </if>
+            <if test="permission.permissionName != null and permission.permissionName != ''">
+                AND pl.PERMISSION_NAME LIKE CONCAT("%",#{permission.permissionName},"%")
+            </if>
+            <if test="permission.permissionType != null and permission.permissionType != ''">
+                AND p.PERMISSION_TYPE = #{permission.permissionType}
+            </if>
+            <if test="permission.permissionCode != null and permission.permissionCode != ''">
+                AND p.PERMISSION_CODE like concat('%', #{permission.permissionCode}, '%')
+            </if>
+            <if test="permission.enableWorkFlow != null and permission.enableWorkFlow != ''">
+                AND p.ENABLE_WORK_FLOW = #{permission.enableWorkFlow}
+            </if>
+            <if test="permission.functionId != null and permission.functionId != ''">
+                AND p.FUNCTION_ID = #{permission.functionId}
+            </if>
+            <if test='permission.endDate != null'>
+            	<![CDATA[
+                AND (p.end_date is null or p.end_date >= #{permission.endDate})
+                ]]>
+            </if>
+        </where>
+        ORDER BY p.SORT is null,p.SORT
+    </select>
+
+    <select id="selectByAuthButton" resultType="com.midea.cloud.srm.model.rbac.permission.entity.Permission">
+        SELECT p.PERMISSION_ID, p.PERMISSION_NAME, P.PERMISSION_CODE, p.PERMISSION
+        FROM SCC_RBAC_ROLE_USER ru
+        LEFT JOIN SCC_RBAC_ROLE_PERMISSION rp ON ru.ROLE_ID = rp.ROLE_ID
+        RIGHT JOIN SCC_RBAC_PERMISSION p ON rp.PERMISSION_ID = p.PERMISSION_ID
+        <where>
+            <if test="permission.permissionType != null and permission.permissionType != ''">
+                AND p.PERMISSION_TYPE = #{permission.permissionType}
+            </if>
+            <if test="userId != null">
+                AND ru.USER_ID = #{userId}
+            </if>
+            <if test="currentDate != null">
+                <![CDATA[ AND ru.START_DATE <= #{currentDate} ]]>
+                <![CDATA[ AND (ru.END_DATE IS NULL OR ru.END_DATE >= #{currentDate}) ]]>
+            </if>
+        </where>
+        GROUP BY p.PERMISSION_ID
+    </select>
+
+    <select id="selectByMenuButton" resultType="com.midea.cloud.srm.model.rbac.permission.entity.Permission">
+        SELECT
+        p.PERMISSION_ID,
+        p.PARENT_PERMISSION_ID,
+        p.FUNCTION_ID,
+        f.FUNCTION_CODE,
+        f.FUNCTION_NAME,
+        f.FUNCTION_ADDRESS,
+        f.FUNCTION_DESC,
+        f.FUNCTION_ICON,
+        p.PERMISSION_TYPE,
+        p.PERMISSION_CODE,
+        p.PERMISSION,
+        p.ICON_PATH,
+        p.SORT,
+        p.ORG_CONTROL_DIM,
+        p.ENABLE_CATEGORY_DIVISION,
+        p.ENABLE_ATTACH_MANAGE,
+        p.ENABLE_BUSI_STATE_CONTROL,
+        p.ENABLE_WORK_FLOW,
+        p.START_DATE,
+        p.END_DATE,
+        p.CREATED_BY,
+        p.CREATION_DATE,
+        p.CREATED_BY_IP,
+        p.LAST_UPDATED_BY,
+        p.LAST_UPDATE_DATE,
+        p.LAST_UPDATED_BY_IP,
+        p.VERSION,
+        p.TENANT_ID,
+        CASE
+        WHEN pl.PERMISSION_NAME IS NULL THEN
+        p.PERMISSION_NAME ELSE pl.PERMISSION_NAME
+        END PERMISSION_NAME
+        FROM SCC_RBAC_ROLE_USER ru
+        LEFT JOIN SCC_RBAC_ROLE_PERMISSION rp ON ru.ROLE_ID = rp.ROLE_ID
+        LEFT JOIN SCC_RBAC_PERMISSION p ON rp.PERMISSION_ID = p.PERMISSION_ID
+        LEFT JOIN ( SELECT PERMISSION_ID, LANGUAGE, MAX( PERMISSION_NAME ) PERMISSION_NAME FROM
+        SCC_RBAC_PERMISSION_LANGUAGE
+        <where>
+            <if test="language != null">
+                AND (LANGUAGE = #{language} OR LANGUAGE IS NULL)
+            </if>
+        </where>
+        GROUP BY PERMISSION_ID, LANGUAGE
+        ) pl ON p.PERMISSION_ID = pl.PERMISSION_ID
+        LEFT JOIN SCC_RBAC_FUNCTION f ON p.FUNCTION_ID = f.FUNCTION_ID
+        <where>
+            <if test="userId != null">
+                AND ru.USER_ID = #{userId}
+            </if>
+            <if test="currentDate != null">
+                <![CDATA[ AND ru.START_DATE <= #{currentDate} ]]>
+                <![CDATA[ AND (ru.END_DATE IS NULL OR ru.END_DATE >= #{currentDate}) ]]>
+                <![CDATA[ AND p.START_DATE <= #{currentDate} ]]>
+                <![CDATA[ AND (p.END_DATE IS NULL OR p.END_DATE >= #{currentDate}) ]]>
+                <![CDATA[ AND (f.START_DATE IS NULL OR f.START_DATE <= #{currentDate}) ]]>
+                <![CDATA[ AND (f.END_DATE IS NULL OR f.END_DATE >= #{currentDate}) ]]>
+            </if>
+            <if test="permission.permissionId != null">
+                AND p.PERMISSION_ID = #{permission.permissionId}
+            </if>
+            <if test="permission.parentPermissionId != null">
+                AND p.PARENT_PERMISSION_ID = #{permission.parentPermissionId}
+            </if>
+            <if test="permission.permissionName != null and permission.permissionName != ''">
+                AND p.PERMISSION_NAME = #{permission.permissionName}
+            </if>
+            <if test="permission.permissionType != null and permission.permissionType != ''">
+                AND p.PERMISSION_TYPE = #{permission.permissionType}
+            </if>
+            <if test="permission.permissionCode != null and permission.permissionCode != ''">
+                AND p.PERMISSION_CODE like concat('%', #{permission.permissionCode}, '%')
+            </if>
+            <if test="permission.enableWorkFlow != null and permission.enableWorkFlow != ''">
+                AND p.ENABLE_WORK_FLOW = #{permission.enableWorkFlow}
+            </if>
+            <if test="permission.functionId != null and permission.functionId != ''">
+                AND p.FUNCTION_ID = #{permission.functionId}
+            </if>
+        </where>
+        GROUP BY p.PERMISSION_ID
+    </select>
+
+</mapper>

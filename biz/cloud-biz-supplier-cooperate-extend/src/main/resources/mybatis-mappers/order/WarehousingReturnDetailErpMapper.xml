@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.WarehousingReturnDetailErpMapper">
+
+    <select id="countWarehousingReturnDetailErp" resultType="java.lang.Integer">
+        select count(1) from (
+            select TXN_ID from ceea_storage_return_erp
+            where IF_HANDLE = 'N'
+            and (
+                TXN_TYPE = 'RECEIVE' OR
+	            TXN_TYPE = 'RECEIVE_STANDARD' OR
+	            TXN_TYPE = 'RETURN TO VENDOR' OR
+	            TXN_TYPE = 'RETRUN_TO_VENDOR'
+            )
+            group by TXN_ID
+        ) d
+    </select>
+
+    <select id="listWarehousingReturnDetailErp" parameterType="java.lang.Integer" resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.WarehousingReturnDetailErp">
+        select *
+        from ceea_storage_return_erp
+        where IF_HANDLE = 'N'
+        and (
+            TXN_TYPE = 'RECEIVE' OR
+            TXN_TYPE = 'RECEIVE_STANDARD' OR
+            TXN_TYPE = 'RETURN TO VENDOR' OR
+            TXN_TYPE = 'RETRUN_TO_VENDOR'
+        )
+        group by TXN_ID
+        limit #{page},1000
+    </select>
+
+</mapper>

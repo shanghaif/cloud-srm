@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.DeliveryAppointMapper" >
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.deliveryappoint.entry.DeliveryAppoint" >
+    <id column="DELIVERY_APPOINT_ID" property="deliveryAppointId" jdbcType="BIGINT" />
+    <result column="DELIVERY_APPOINT_NUMBER" property="deliveryAppointNumber" jdbcType="VARCHAR" />
+    <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT" />
+    <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR" />
+    <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR" />
+    <result column="ORGANIZATION_ID" property="organizationId" jdbcType="VARCHAR" />
+    <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR" />
+    <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+    <result column="CAR_INFO_ID" property="carInfoId" jdbcType="BIGINT" />
+    <result column="CAR_TYPE" property="carType" jdbcType="VARCHAR" />
+    <result column="LICENSE_PLATE" property="licensePlate" jdbcType="VARCHAR" />
+    <result column="ENTRY_TIME" property="entryTime" jdbcType="TIMESTAMP" />
+    <result column="ENTRY_PLACE" property="entryPlace" jdbcType="VARCHAR" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="RESPONDENTS" property="respondents" jdbcType="VARCHAR" />
+    <result column="RESPONDENTS_NO" property="respondentsNo" jdbcType="VARCHAR" />
+    <result column="RESPONDENTS_GOUND" property="respondentsGound" jdbcType="VARCHAR" />
+    <result column="RESPONDENTS_GOUND_NUMBER" property="respondentsGoundNumber" jdbcType="VARCHAR" />
+    <result column="DELIVERY_APPOINT_STATUS" property="deliveryAppointStatus" jdbcType="VARCHAR" />
+    <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+    <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+    <result column="VERSION" property="version" jdbcType="BIGINT" />
+    <result column="RECEIVED_FACTORY" property="receivedFactory"/>
+
+    <result column="ORG_ID" property="orgId"/>
+    <result column="ORG_NAME" property="orgName"/>
+    <result column="ORG_CODE" property="orgCode"/>
+    <result column="RECEIVE_ADDRESS" property="receiveAddress"/>
+    <result column="RECEIVE_ORDER_ADDRESS" property="receiveOrderAddress"/>
+    <result column="RESPONDENTS_PHONE" property="respondentsPhone"/>
+    <result column="DELIVERY_LOCATION" property="deliveryLocation"/>
+  </resultMap>
+
+  <resultMap id="DetailResultMap" extends="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.deliveryappoint.dto.DeliveryAppointDetailDTO">
+    <collection property="visitors" column="DELIVERY_APPOINT_ID" javaType="java.util.List" ofType="com.midea.cloud.srm.model.suppliercooperate.deliveryappoint.entry.DeliveryAppointVisitor">
+      <id column="DELIVERY_APPOINT_VISITOR_ID" property="deliveryAppointVisitorId" jdbcType="BIGINT" />
+      <result column="DELIVERY_APPOINT_ID" property="deliveryAppointId" jdbcType="BIGINT" />
+      <result column="VISITOR_NAME" property="visitorName" jdbcType="VARCHAR" />
+      <result column="ID_TYPE" property="idType" jdbcType="VARCHAR" />
+      <result column="ID_NO" property="idNo" jdbcType="VARCHAR" />
+      <result column="LINK_PHONE" property="linkPhone" jdbcType="VARCHAR" />
+      <result column="VISITOR_COMMENTS" property="comments" jdbcType="VARCHAR" />
+    </collection>
+    <collection property="deliveryNotes" column="DELIVERY_APPOINT_ID" javaType="java.util.List" ofType="com.midea.cloud.srm.model.suppliercooperate.deliverynote.entry.DeliveryNote">
+      <id column="DELIVERY_NOTE_ID" property="deliveryNoteId" jdbcType="BIGINT" />
+      <result column="DELIVERY_NUMBER" property="deliveryNumber" jdbcType="VARCHAR" />
+      <result column="NOTE_COMMENTS" property="comments" jdbcType="VARCHAR" />
+      <result column="DELIVERY_DATE" property="deliveryDate" jdbcType="DATE" />
+    </collection>
+  </resultMap>
+
+  <select parameterType="com.midea.cloud.srm.model.suppliercooperate.deliveryappoint.dto.DeliveryAppointRequestDTO"
+          id="findList" resultMap="BaseResultMap">
+    SELECT
+    da.*
+    FROM scc_sc_delivery_appoint da
+    <where>
+        <if test="vendorId != null">
+            and da.VENDOR_ID = #{vendorId}
+        </if>
+        <if test="orgId != null">
+            and da.ORG_ID = #{orgId}
+        </if>
+        <if test="receiveAddress != null and receiveAddress != ''">
+            and da.RECEIVE_ADDRESS = #{receiveAddress}
+        </if>
+        <if test="receiveOrderAddress != null and receiveOrderAddress != ''">
+            and da.RECEIVE_ORDER_ADDRESS = #{receiveOrderAddress}
+        </if>
+        <if test="deliveryAppointNumber != null and deliveryAppointNumber != ''">
+            and da.DELIVERY_APPOINT_NUMBER like concat('%',#{deliveryAppointNumber},'%')
+        </if>
+        <if test="deliveryAppointStatus != null and deliveryAppointStatus != ''">
+            and da.DELIVERY_APPOINT_STATUS = #{deliveryAppointStatus}
+        </if>
+        <if test="deliveryNumber != null and deliveryNumber != ''">
+            and exists (
+                select count(1)
+                from scc_sc_appoint_delivery_note adn
+                left join scc_sc_delivery_note dn on dn.DELIVERY_NOTE_ID = adn.DELIVERY_NOTE_ID
+                where dn.DELIVERY_NUMBER like concat('%',#{deliveryNumber},'%')
+            )
+        </if>
+        <if test="orderNumber != null and orderNumber != ''">
+            and exists (
+                select count(1)
+                from scc_sc_appoint_delivery_note adn
+                left join scc_sc_delivery_note_detail dnd on dnd.DELIVERY_NOTE_ID = adn.DELIVERY_NOTE_ID
+                left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dnd.ORDER_DETAIL_ID
+                left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+                where o.ORDER_NUMBER like concat('%',#{orderNumber},'%')
+            )
+        </if>
+    </where>
+    ORDER BY da.LAST_UPDATE_DATE DESC
+  </select>
+
+  <select id="getDeliveryAppointById" parameterType="com.midea.cloud.srm.model.suppliercooperate.deliveryappoint.entry.DeliveryAppoint"
+          resultMap="DetailResultMap">
+    SELECT
+    da.*,
+    dav.DELIVERY_APPOINT_VISITOR_ID,
+    dav.VISITOR_NAME,
+    dav.ID_TYPE,
+    dav.ID_NO,
+    dav.LINK_PHONE,
+    dav.COMMENTS AS 'VISITOR_COMMENTS',
+    dn.DELIVERY_NOTE_ID,
+    dn.DELIVERY_NUMBER,
+    dn.EXPECTED_ARRIVAL_DATE,
+    dn.DELIVERY_DATE,
+    dn.OLD_DELIVERY_NOTE_ID,
+    dn.DELIVERY_NOTE_STATUS,
+    dn.COMMENTS AS 'NOTE_COMMENTS'
+    FROM scc_sc_delivery_appoint da
+    LEFT JOIN scc_sc_delivery_appoint_visitor dav ON dav.DELIVERY_APPOINT_ID = da.DELIVERY_APPOINT_ID
+    LEFT JOIN scc_sc_appoint_delivery_note adn on adn.DELIVERY_APPOINT_ID = da.DELIVERY_APPOINT_ID
+    LEFT JOIN scc_sc_delivery_note dn ON dn.DELIVERY_NOTE_ID = adn.DELIVERY_NOTE_ID
+    WHERE da.DELIVERY_APPOINT_ID = #{deliveryAppointId}
+  </select>
+</mapper>

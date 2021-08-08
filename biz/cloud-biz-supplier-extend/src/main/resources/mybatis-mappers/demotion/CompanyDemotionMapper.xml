@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.demotion.mapper.CompanyDemotionMapper">
+
+    <select id="listPageByParam" parameterType="com.midea.cloud.srm.model.supplier.demotion.dto.CompanyDemotionQueryDTO"
+            resultType="com.midea.cloud.srm.model.supplier.demotion.entity.CompanyDemotion">
+        select h.*
+        from ceea_sup_company_demotion h
+        <where>
+            <if test="demotionNumber != null and demotionNumber != ''">
+                and h.DEMOTION_NUMBER = #{demotionNumber}
+            </if>
+            <if test="demotionName != null and demotionName != ''">
+                and h.DEMOTION_NAME like concat('%',#{demotionName},'%')
+            </if>
+            <if test="status != null and status != ''">
+                and h.STATUS = #{status}
+            </if>
+            <if test="companyId != null">
+                and h.COMPANY_ID = #{companyId}
+            </if>
+            <if test="demotionType != null and demotionType != ''">
+                and h.DEMOTION_TYPE = #{demotionType}
+            </if>
+            <if test="categoryId != null">
+                and h.COMPANY_DEMOTION_ID in(
+                SELECT l.COMPANY_DEMOTION_ID FROM ceea_sup_company_demotion_category l
+                <where>
+                    and l.CATEGORY_ID = #{categoryId}
+                </where>
+                )
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                and (h.CREATED_BY like concat('%', #{createdBy}, '%') or h.CREATED_FULL_NAME like concat('%', #{createdBy}, '%'))
+            </if>
+        </where>
+        order by h.LAST_UPDATE_DATE desc
+    </select>
+</mapper>

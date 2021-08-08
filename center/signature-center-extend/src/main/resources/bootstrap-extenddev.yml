@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: signature-center
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-center
+      profile: dev
+server:
+  port: 8810
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://10.16.87.99:8761/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-expiration-duration-in-seconds: 15
+    lease-renewal-interval-in-seconds: 5
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.hostname}:${spring.cloud.client.ip-address}:${server.port}
+    metadata-map:
+      routingTag: dev
+ribbon:
+  rule: tag
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /
+##日志
+#logging:
+#  config: classpath:logback-${spring.profiles.active}.xml
+#  logstashhost: 10.17.149.192 #logstash服务器
+##实例
+#instance:
+#  id: STANDARD #多租户实例id
+#  monitorid: cloud_srm #监控平台标识

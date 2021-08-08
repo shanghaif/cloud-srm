@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.reconciliation.mapper.UnsettledDetailMapper">
+    <resultMap id="BaseResultMap"
+               type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.UnsettledDetail">
+        <id column="UNSETTLED_DETAIL_ID" property="unsettledDetailId" jdbcType="BIGINT"/>
+        <result column="UNSETTLED_ORDER_ID" property="unsettledOrderId" jdbcType="BIGINT"/>
+        <result column="BILL_TYPE" property="billType" jdbcType="VARCHAR"/>
+        <result column="BILL_ID" property="billId" jdbcType="BIGINT"/>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT" />
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT"/>
+        <result column="BILL_NUMBER" property="billNumber" jdbcType="VARCHAR"/>
+        <result column="BUSINESS_DATE" property="businessDate" jdbcType="DATE"/>
+        <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR"/>
+        <result column="MATERIAL_CODE" property="materialCode" jdbcType="VARCHAR"/>
+        <result column="MATERIAL_NAME" property="materialName" jdbcType="VARCHAR"/>
+        <result column="UNIT" property="unit" jdbcType="VARCHAR"/>
+        <result column="UNIT_PRICE_EXCLUDING_TAX" property="unitPriceExcludingTax" jdbcType="DECIMAL"/>
+        <result column="UNSETTLED_NUM" property="unsettledNum" jdbcType="DECIMAL"/>
+        <result column="PRICE" property="price" jdbcType="DECIMAL"/>
+        <result column="UNRECONCILED" property="unreconciled" jdbcType="VARCHAR"/>
+        <result column="NOT_INVOICED" property="notInvoiced" jdbcType="VARCHAR"/>
+        <result column="CREATED_ID" property="createdId" jdbcType="BIGINT"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR"/>
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT"/>
+        <result column="VERSION" property="version" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <select id="findList" resultMap="BaseResultMap"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.dto.UnsettledOrderRequestDTO">
+        SELECT ud.* FROM scc_sc_unsettled_detail ud
+        LEFT JOIN scc_sc_unsettled_order uo ON uo.UNSETTLED_ORDER_ID = ud.UNSETTLED_ORDER_ID
+        <where>
+            <choose>
+                <when test="unsettledOrderId != null">
+                    AND ud.UNSETTLED_ORDER_ID = #{unsettledOrderId}
+                </when>
+                <otherwise>
+                    AND ud.UNSETTLED_ORDER_ID IS NULL
+                </otherwise>
+            </choose>
+            <if test="unsettledOrderNumber != null and unsettledOrderNumber !=''">
+                AND uo.UNSETTLED_ORDER_NUMBER LIKE CONCAT('%',#{unsettledOrderNumber},'%')
+            </if>
+            <if test="organizationId != null">
+                AND ud.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <choose>
+                <when test="vendorId != null">
+                    AND ud.VENDOR_ID = #{vendorId}
+                </when>
+                <otherwise>
+                    AND uo.STATUS &lt;&gt; 'CREATE'
+                </otherwise>
+            </choose>
+            <if test="status != null and status !=''">
+                AND uo.STATUS = #{status}
+            </if>
+            <if test="rfqSettlementCurrency != null">
+                AND uo.RFQ_SETTLEMENT_CURRENCY = #{rfqSettlementCurrency}
+            </if>
+            <if test="startDateStr != null and startDateStr != ''">
+                and ud.BUSINESS_DATE &gt;= STR_TO_DATE(#{startDateStr}, '%Y-%m-%d')
+            </if>
+            <if test="endDateStr != null and endDateStr != ''">
+                and ud.BUSINESS_DATE &lt;= STR_TO_DATE(#{endDateStr}, '%Y-%m-%d')
+            </if>
+        </where>
+        ORDER BY ud.CREATION_DATE DESC
+    </select>
+
+    <select id="materialCountList" resultMap="BaseResultMap"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.dto.UnsettledOrderRequestDTO">
+        SELECT * FROM (
+        SELECT ud.MATERIAL_CODE ,ud.MATERIAL_NAME ,ud.UNIT , SUM(ud.UNSETTLED_NUM) AS 'UNSETTLED_NUM'
+        FROM scc_sc_unsettled_detail ud
+        LEFT JOIN scc_sc_unsettled_order uo ON uo.UNSETTLED_ORDER_ID = ud.UNSETTLED_ORDER_ID
+        <where>
+            <choose>
+                <when test="unsettledOrderId != null">
+                    AND ud.UNSETTLED_ORDER_ID = #{unsettledOrderId}
+                </when>
+                <otherwise>
+                    AND ud.UNSETTLED_ORDER_ID IS NULL
+                </otherwise>
+            </choose>
+            <if test="unsettledOrderNumber != null and unsettledOrderNumber !=''">
+                AND uo.UNSETTLED_ORDER_NUMBER LIKE CONCAT('%',#{unsettledOrderNumber},'%')
+            </if>
+            <if test="organizationId != null">
+                AND ud.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <choose>
+                <when test="vendorId != null">
+                    AND ud.VENDOR_ID = #{vendorId}
+                </when>
+                <otherwise>
+                    AND uo.STATUS &lt;&gt; 'CREATE'
+                </otherwise>
+            </choose>
+            <if test="status != null and status !=''">
+                AND uo.STATUS = #{status}
+            </if>
+            <if test="rfqSettlementCurrency != null">
+                AND uo.RFQ_SETTLEMENT_CURRENCY = #{rfqSettlementCurrency}
+            </if>
+            <if test="startDateStr != null and startDateStr != ''">
+                and ud.BUSINESS_DATE &gt;= STR_TO_DATE(#{startDateStr}, '%Y-%m-%d')
+            </if>
+            <if test="endDateStr != null and endDateStr != ''">
+                and ud.BUSINESS_DATE &lt;= STR_TO_DATE(#{endDateStr}, '%Y-%m-%d')
+            </if>
+        </where>
+        ORDER BY ud.MATERIAL_CODE
+        )ud
+        WHERE ud.MATERIAL_CODE IS NOT NULL
+    </select>
+</mapper>

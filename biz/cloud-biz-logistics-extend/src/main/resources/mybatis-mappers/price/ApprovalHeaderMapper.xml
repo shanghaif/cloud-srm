@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.inq.price.mapper.ApprovalHeaderMapper">
+
+    <select id="queryQuoteSelected" resultType="com.midea.cloud.srm.model.inq.price.domain.QuoteSelectedResult">
+        SELECT
+            item.QUOTE_ITEM_ID AS quoteItemId,
+            header.INQUIRY_TYPE AS inquiryType,
+            header.INQUIRY_ID AS inquiryId,
+            header.INQUIRY_NO AS inquiryNo,
+            header.INQUIRY_TITLE AS inquiryTitle,
+            vendor.VENDOR_ID AS vendorId,
+            vendor.VENDOR_CODE AS vendorCode,
+            vendor.VENDOR_NAME AS vendorName,
+            qheader.ORGANIZATION_ID AS organizationId,
+            qheader.ORGANIZATION_NAME AS organizationName,
+            item.ITEM_ID AS itemId,
+            item.ITEM_CODE AS itemCode,
+            item.ITEM_DESC AS itemDesc,
+            item.ITEM_TYPE AS itemType,
+            item.CATEGORY_ID AS categoryId,
+            item.CATEGORY_NAME AS categoryName,
+            item.UNIT AS unit,
+            item.NOTAX_PRICE AS notaxPrice,
+            item.TAX_PRICE AS taxPrice,
+            selection.CURRENT_PRICE AS currentPrice,
+            item.TAX_KEY AS taxKey,
+            item.TAX_RATE AS taxRate,
+            item.CURRENCY AS currency,
+            item.FIXED_PRICE_BEGIN AS fixedPriceBegin,
+            item.FIXED_PRICE_END AS fixedPriceEnd,
+            header.PRICE_NUM AS priceNum,
+            item.IS_LADDER AS isLadder,
+            item.LADDER_TYPE AS ladderType
+        FROM
+            scc_quote_selection selection,
+            scc_inquiry_header header,
+            scc_quote_header qheader,
+            scc_quote_item item,
+            scc_inquiry_vendor vendor
+        WHERE selection.QUOTE_ITEM_ID = item.QUOTE_ITEM_ID
+            AND selection.IS_SELECTED = 'SELECTED'
+            AND header.INQUIRY_ID = selection.INQUIRY_ID
+            AND header.INQUIRY_ID = selection.INQUIRY_ID
+            AND qheader.INQUIRY_ID = header.INQUIRY_ID
+            AND qheader.QUOTE_ID = item.QUOTE_ID
+            AND vendor.INQUIRY_ID = header.INQUIRY_ID
+            AND vendor.VENDOR_ID = qheader.VENDOR_ID
+            AND selection.INQUIRY_ID = #{inquiryId}
+    </select>
+
+    <select id="queryByParam"
+            parameterType="com.midea.cloud.srm.model.inq.price.domain.ApprovalHeaderParam"
+            resultType="com.midea.cloud.srm.model.inq.price.domain.ApprovalHeaderResult">
+        SELECT
+        approval.APPROVAL_HEADER_ID AS approvalHeaderId,
+        approval.APPROVAL_NO AS approvalNo,
+        approval.BUSINESS_ID AS businessId,
+        approval.BUSINESS_NO AS businessNo,
+        approval.BUSINESS_TITLE AS businessTitle,
+        approval.SOURCE_TYPE AS sourceType,
+        approval.`STATUS` AS status,
+        approval.CREATED_BY AS createdBy,
+        approval.CREATION_DATE AS creationDate,
+        approval.LAST_UPDATE_DATE AS lastUpdateDate
+        FROM
+        scc_price_approval_header approval
+        <where>
+            <if test="param.approvalNo != null and param.approvalNo != ''">
+                AND approval.APPROVAL_NO LIKE CONCAT('%',#{param.approvalNo},'%')
+            </if>
+            <if test="param.businessNo != null and param.businessNo != ''">
+                AND approval.BUSINESS_NO LIKE CONCAT('%',#{param.businessNo},'%')
+            </if>
+            <if test="param.status != null and param.status != ''">
+                AND approval.`STATUS` = #{param.status}
+            </if>
+        </where>
+        ORDER BY approval.CREATION_DATE DESC
+    </select>
+
+    <select id="ceeaFindList"
+            parameterType="com.midea.cloud.srm.model.inq.price.dto.ApprovalHeaderQueryRequestDTO"
+            resultType="com.midea.cloud.srm.model.inq.price.entity.ApprovalHeader">
+        SELECT
+        approval.*
+        FROM
+        scc_price_approval_header approval
+        <if test="itemCode != null and itemCode != '' or (vendorName != null and vendorName != '')">
+            left join ceea_price_approval_bidding_item item on item.APPROVAL_HEADER_ID = approval.APPROVAL_HEADER_ID
+        </if>
+        <where>
+            <if test="approvalNo != null and approvalNo != ''">
+                AND approval.APPROVAL_NO = #{approvalNo}
+            </if>
+            <if test="status != null and status != ''">
+                AND approval.`STATUS` = #{status}
+            </if>
+            <if test="ceeaTitle != null and ceeaTitle != ''">
+                AND approval.CEEA_TITLE = #{ceeaTitle}
+            </if>
+            <if test="businessNo != null and businessNo != ''">
+                AND approval.CEEA_SOURCE_NO = #{businessNo}
+            </if>
+            <if test="creationDate != null and creationDate != ''">
+                AND approval.CREATION_DATE &gt;= #{creationDate}
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                and approval.CREATED_BY LIKE CONCAT('%',#{createdBy},'%')
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                AND item.ITEM_CODE = #{itemCode}
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                and item.VENDOR_NAME = #{vendorName}
+            </if>
+
+        </where>
+        <if test="itemCode != null and itemCode != '' or (vendorName != null and vendorName != '')">
+            GROUP BY approval.APPROVAL_HEADER_ID
+        </if>
+        ORDER BY approval.CREATION_DATE DESC
+    </select>
+
+    <select id="ceeaQueryByCm" parameterType="com.midea.cloud.srm.model.inq.price.dto.ApprovalBiddingItemDto"
+            resultType="com.midea.cloud.srm.model.inq.price.entity.ApprovalBiddingItem">
+        SELECT b.CEEA_SOURCE_NO , b.SOURCE_TYPE, a.*
+        FROM ceea_price_approval_bidding_item a
+        JOIN scc_price_approval_header b ON a.APPROVAL_HEADER_ID = b.APPROVAL_HEADER_ID
+        WHERE 1 = 1
+        AND VENDOR_ID = #{vendorId}
+        AND b.STATUS = 'RESULT_PASSED'
+        AND b.CEEA_SOURCE_NO IS NOT NULL
+        AND b.CEEA_SOURCE_NO != ''
+        AND (a.CEEA_FROM_CONTRACT_ID IS NULL or a.CEEA_FROM_CONTRACT_ID = '')
+        <if test="null != orgId and orgId != ''">
+            AND ORG_ID = #{orgId}
+        </if>
+        <if test="null != ceeaSourceNo and ceeaSourceNo != ''">
+            AND b.CEEA_SOURCE_NO LIKE CONCAT('%',#{ceeaSourceNo},'%')
+        </if>
+    </select>
+</mapper>

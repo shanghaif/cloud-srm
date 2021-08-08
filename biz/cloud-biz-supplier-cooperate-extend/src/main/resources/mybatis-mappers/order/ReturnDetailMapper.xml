@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.ReturnDetailMapper">
+
+  	<select id="getReturnDetailListByReturnOrderId" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.ReturnDetailDTO">
+		SELECT
+		    rd.RETURN_DETAIL_ID,
+		    rd.LINE_NUM,
+		    od.CATEGORY_NAME,
+		    od.MATERIAL_CODE,
+		    od.MATERIAL_NAME,
+		    nd.DELIVERY_QUANTITY,
+		    wr.WAREHOUSE_RECEIPT_QUANTITY,
+		    rd.RETURN_NUM,
+		    wr.WAREHOUSE_RECEIPT_ID,
+		    wr.WAREHOUSE_RECEIPT_NUMBER,
+		    wr.WAREHOUSE_RECEIPT_ROW_NUM,
+		    ro.CONFIRM_TIME,
+		    so.ORDER_NUMBER,
+		    od.LINE_NUM ORDER_LINE_NUM,
+		    dn.DELIVERY_DATE,
+		    dn.DELIVERY_NUMBER,
+		    dn.CONTACT_PEOPLE,
+		    dn.CONTACT_NUMBER,
+		    od.RECEIVED_FACTORY,
+		    od.INVENTORY_PLACE,
+		    nd.DELIVERY_NOTE_DETAIL_ID,
+		    od.ORDER_DETAIL_ID
+		FROM
+		    scc_sc_return_order ro,
+		    scc_sc_return_detail rd,
+		    scc_sc_delivery_note_detail nd,
+		    scc_sc_delivery_note dn,
+		    scc_sc_order so,
+		    scc_sc_order_detail od,
+		    scc_sc_warehouse_receipt wr
+		WHERE
+		    1 = 1
+	        AND ro.RETURN_ORDER_ID = rd.RETURN_ORDER_ID
+	        AND rd.DELIVERY_NOTE_DETAIL_ID = nd.DELIVERY_NOTE_DETAIL_ID
+	        AND nd.DELIVERY_NOTE_ID = dn.DELIVERY_NOTE_ID
+	        AND nd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+	        AND so.ORDER_ID = od.ORDER_ID
+	        AND wr.DELIVERY_NOTE_ID = dn.DELIVERY_NOTE_ID
+	        AND wr.DELIVERY_NOTE_DETAIL_ID = nd.DELIVERY_NOTE_DETAIL_ID
+	        AND rd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+			AND ro.RETURN_ORDER_ID = #{returnOrderId}
+		ORDER BY rd.LINE_NUM ASC
+  	</select>
+
+  	<select id="listStatementReturnDTOPage" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.ReturnOrderRequestDTO" resultType="com.midea.cloud.srm.model.pm.ps.statement.dto.StatementReturnDTO">
+		SELECT
+		    rd.RETURN_ORDER_ID,
+		    ro.RETURN_ORDER_NUMBER,
+		    rd.RETURN_DETAIL_ID,
+		    rd.LINE_NUM RETURN_LINE_NUM,
+		    ro.CONFIRM_TIME HAPPEN_DATE,
+		    so.ORDER_ID,
+		    od.ORDER_DETAIL_ID,
+		    od.MATERIAL_ID,
+		    od.MATERIAL_NAME,
+		    od.MATERIAL_CODE,
+		    od.UNIT,
+		    so.ORDER_NUMBER,
+		    od.LINE_NUM ORDER_LINE_NUM,
+		    rd.RETURN_NUM,
+		    od.UNIT_PRICE_EXCLUDING_TAX UNIT_PRICE_NO_TAX,
+		    od.UNIT_PRICE_EXCLUDING_TAX * rd.RETURN_NUM TOTAL_AMOUNT_NO_TAX
+		FROM
+		    scc_sc_return_order ro,
+		    scc_sc_return_detail rd,
+		    scc_sc_order so,
+		    scc_sc_order_detail od
+		WHERE
+		    1 = 1
+        AND ro.RETURN_ORDER_ID = rd.RETURN_ORDER_ID
+        AND rd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+        AND so.ORDER_ID = od.ORDER_ID
+        AND ro.RETURN_STATUS = 'CONFIRM'
+        AND (rd.STATEMENT_REFER IS NULL OR rd.STATEMENT_REFER = 'N')
+        <if test="returnOrderNumber != null and '' != returnOrderNumber">AND ro.RETURN_ORDER_NUMBER LIKE CONCAT('%',#{returnOrderNumber},'%')</if>
+		<if test="materialId != null and '' != materialId">AND od.MATERIAL_ID = #{materialId}</if>
+		<if test="materialCode != null and '' != materialCode">AND od.MATERIAL_CODE LIKE CONCAT('%',#{materialCode},'%')</if>
+		<if test="materialName != null and '' != materialName">AND od.MATERIAL_NAME LIKE CONCAT('%',#{materialName},'%')</if>
+		<if test="vendorId != null and '' != vendorId">AND ro.VENDOR_ID = #{vendorId}</if>
+		<if test="vendorCode != null and '' != vendorCode">AND ro.VENDOR_CODE LIKE CONCAT('%',#{vendorCode},'%')</if>
+		<if test="vendorName != null and '' != vendorName">AND ro.VENDOR_NAME LIKE CONCAT('%',#{vendorName},'%')</if>
+		<if test="organizationId != null and '' != organizationId">AND ro.ORGANIZATION_ID = #{organizationId}</if>
+		<if test="organizationCode != null and '' != organizationCode">AND ro.ORGANIZATION_CODE LIKE CONCAT('%',#{organizationCode},'%')</if>
+		<if test="organizationName != null and '' != organizationName">AND ro.ORGANIZATION_NAME LIKE CONCAT('%',#{organizationName},'%')</if>
+		<if test="deliveryNumber != null and '' != deliveryNumber">AND dn.DELIVERY_NUMBER LIKE CONCAT('%',#{deliveryNumber},'%')</if>
+  		<if test="orderNumber != null and '' != orderNumber">AND so.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')</if>
+  		<if test="startReturnDate != null and startReturnDate != ''">AND ro.RETURN_DATE &gt;= STR_TO_DATE(CONCAT(#{startReturnDate},' 00:00:00'), '%Y-%m-%d %H:%i:%s')</if>
+        <if test="endReturnDate != null and endReturnDate != ''">AND ro.RETURN_DATE &lt;= STR_TO_DATE(CONCAT(#{endReturnDate},' 23:59:59'), '%Y-%m-%d %H:%i:%s')</if>
+  		<if test="happenDateBegin != null and happenDateBegin != ''">AND ro.CONFIRM_TIME &gt;= STR_TO_DATE(CONCAT(#{happenDateBegin},' 00:00:00'), '%Y-%m-%d %H:%i:%s')</if>
+        <if test="happenDateEnd != null and happenDateEnd != ''">AND ro.CONFIRM_TIME &lt;= STR_TO_DATE(CONCAT(#{happenDateEnd},' 23:59:59'), '%Y-%m-%d %H:%i:%s')</if>
+        <if test="returnStatus != null and '' != returnStatus">AND ro.RETURN_STATUS = #{returnStatus}</if>
+  	</select>
+
+	<select id="list"
+			resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.ReturnDetail"
+			parameterType="java.lang.Long">
+        select
+        rd.*,
+        dn.DELIVERY_NUMBER,
+        dnd.LINE_NUM deliveryNoteLineNum,
+        dnd.DELIVERY_QUANTITY,
+        o.ORDER_NUMBER,
+        od.LINE_NUM as orderLineNum,
+        od.CATEGORY_ID,
+        od.CATEGORY_CODE,
+        od.CATEGORY_NAME,
+        od.MATERIAL_ID,
+        od.MATERIAL_NAME,
+        od.MATERIAL_CODE
+        from scc_sc_return_detail rd
+        left join scc_sc_delivery_note_detail dnd on dnd.DELIVERY_NOTE_DETAIL_ID = rd.DELIVERY_NOTE_DETAIL_ID
+        left join scc_sc_delivery_note dn on dn.DELIVERY_NOTE_ID = dnd.DELIVERY_NOTE_ID
+        left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dnd.ORDER_DETAIL_ID
+        left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+        where rd.RETURN_ORDER_ID = #{id}
+    </select>
+
+</mapper>

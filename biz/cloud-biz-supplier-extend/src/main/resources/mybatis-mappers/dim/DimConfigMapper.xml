@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.dim.mapper.DimConfigMapper">
+
+    <resultMap id="resultDimMap" type="com.midea.cloud.srm.model.supplier.dim.dto.DimConfigDTO">
+        <id column="DIM_CONFIG_ID" property="dimConfigId"/>
+        <result column="TENANT_ID" property="tenantId"/>
+        <result column="TEMPLATE_ID" property="templateId"/>
+        <result column="DIM_ID" property="dimId"/>
+        <result column="DIM_NICK_NAME" property="dimNickName"/>
+        <result column="DIM_NAME" property="dimName"/>
+        <result column="DIM_CODE" property="dimCode"/>
+        <result column="ORDER_NUM" property="orderNum"/>
+        <result column="VERSION" property="version"/>
+        <result column="CREATED_BY" property="createdBy"/>
+        <result column="CREATION_DATE" property="creationDate"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate"/>
+
+        <collection property="dimFieldConfigS" ofType="com.midea.cloud.srm.model.supplier.dim.dto.DimFieldConfigDTO">
+            <id column="FIELD_CONFIG_ID" property="fieldConfigId"/>
+            <result column="TENANT_ID" property="tenantId"/>
+            <result column="DIM_CONFIG_ID" property="dimConfigId"/>
+            <result column="FIELD_ID" property="fieldId"/>
+            <result column="FIELD_NAME" property="fieldName"/>
+            <result column="FIELD_CODE" property="fieldCode"/>
+            <result column="FIELD_TYPE_CODE" property="fieldTypeCode"/>
+            <result column="FIELD_TYPE_NAME" property="fieldTypeName"/>
+            <result column="IS_FIELD" property="isField"/>
+            <result column="FILE_SIZE" property="fileSize"/>
+            <result column="FILE_TYPE" property="fileType"/>
+            <result column="FIELD_LENGTH" property="fieldLength"/>
+            <result column="FIELD_NICK_NAME" property="fieldNickName"/>
+            <result column="IS_CHECK" property="isCheck"/>
+            <result column="IS_USE" property="isUse"/>
+            <result column="FIELD_ORDER_NUM" property="fieldOrderNum"/>
+            <result column="VERSION" property="version"/>
+            <result column="CREATED_BY" property="createdBy"/>
+            <result column="CREATION_DATE" property="creationDate"/>
+            <result column="LAST_UPDATED_BY" property="lastUpdatedBy"/>
+            <result column="LAST_UPDATE_DATE" property="lastUpdateDate"/>
+        </collection>
+    </resultMap>
+
+    <select id="getByTemplateId" resultMap="resultDimMap">
+            SELECT
+            dc.*,
+            fc.*,
+            df.FIELD_CODE,
+            df.FIELD_NAME,
+            df.FIELD_TYPE_CODE,
+            df.FIELD_TYPE_NAME,
+            df.IS_FIELD,
+            df.FILE_SIZE,
+            df.FILE_TYPE,
+            df.FIELD_LENGTH
+        FROM
+            scc_sup_dim_config dc,
+            scc_sup_dim_field_config fc,
+            scc_sup_dim_field df
+        WHERE
+            dc.DIM_CONFIG_ID = fc.DIM_CONFIG_ID
+            AND df.FIELD_ID = fc.FIELD_ID
+            AND dc.TEMPLATE_ID = #{templateId}
+            AND IFNULL(fc.IS_USE,'N')='Y'
+    </select>
+
+    <select id="getDtoByParam" parameterType="com.midea.cloud.srm.model.supplier.dim.entity.DimConfig" resultMap="resultDimMap">
+        SELECT sdf.*,fc.*
+        FROM (
+        SELECT sd.DIM_NAME,
+        sd.DIM_CODE,sdf.*
+        FROM scc_sup_dim_field sdf
+        LEFT JOIN scc_sup_dim sd ON sd.DIM_ID = sdf.DIM_ID
+        WHERE sd.DIM_CODE = #{dimCode}
+        )sdf
+        LEFT JOIN (
+        SELECT fc.*
+        FROM scc_sup_dim_config dc
+        INNER JOIN scc_sup_dim_field_config fc ON dc.DIM_CONFIG_ID = fc.DIM_CONFIG_ID
+        WHERE 1=1
+        <if test="templateId != null">
+            AND dc.TEMPLATE_ID = #{templateId}
+        </if>
+        <if test="dimCode != null and dimCode != ''">
+            AND dc.DIM_CODE = #{dimCode}
+        </if>
+        <if test="templateId != null">
+            AND dc.TEMPLATE_ID = #{templateId}
+        </if>
+        <if test="dimId != null">
+            AND dc.DIM_ID = #{dimId}
+        </if>
+        ) fc ON fc.FIELD_ID = sdf.FIELD_ID
+
+    </select>
+
+
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.price.model.mapper.ModelHeadMapper">
+
+    <select id="listPage" resultType="com.midea.cloud.srm.model.price.model.entity.ModelHead"
+            parameterType="com.midea.cloud.srm.model.price.model.entity.ModelHead">
+        select a.*
+        from SCC_PRICE_MODEL_HEAD a
+        where 1=1
+        <if test="null != priceModelCode and priceModelCode != ''">
+            AND a.PRICE_MODEL_CODE LIKE CONCAT('%', #{priceModelCode}, '%')
+        </if>
+        <if test="null != orgId ">
+            AND a.ORG_ID = #{orgId}
+        </if>
+        <if test="null != fullPathId and fullPathId != ''">
+            AND a.FULL_PATH_ID = #{fullPathId}
+        </if>
+        <if test="null != categoryId">
+            AND exists(select 1 from SCC_PRICE_MODEL_CATEGORY b
+            where a.PRICE_MODEL_HEAD_ID = b.PRICE_MODEL_HEAD_ID
+            AND b.CATEGORY_ID = #{categoryId})
+        </if>
+        <if test="null != creationDate">
+            AND a.CREATION_DATE = #{creationDate}
+        </if>
+        <if test="null != status and status != ''">
+            AND a.STATUS = #{status}
+        </if>
+        order by a.LAST_UPDATE_DATE desc
+    </select>
+</mapper>

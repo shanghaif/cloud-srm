@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.change.mapper.InfoChangeMapper">
+
+    <select id="listPageByParam" resultType="com.midea.cloud.srm.model.supplier.change.dto.InfoChangeDTO">
+        select sic.*,
+        cic.COMPANY_CODE,
+        cic.COMPANY_NAME,
+        cic.OVERSEAS_RELATION,
+        cic.LC_CODE,
+        cic.COMPANY_TYPE,
+        cic.LEGAL_PERSON
+        from scc_sup_info_change sic,scc_sup_company_info_change cic
+        where
+        sic.CHANGE_ID = cic.CHANGE_ID
+        <if test="changeApplyNo != null and changeApplyNo != ''">
+            and   sic.CHANGE_APPLY_NO LIKE CONCAT('%',#{changeApplyNo},'%')
+        </if>
+        <if test="companyName != null and companyName !='' ">
+            and   cic.COMPANY_NAME LIKE CONCAT('%',#{companyName},'%')
+        </if>
+        <if test="companyCode != null and companyCode !='' ">
+            and   cic.COMPANY_CODE LIKE CONCAT('%',#{companyCode},'%')
+        </if>
+        <if test="companyId != null">
+            and   sic.COMPANY_ID =#{companyId}
+        </if>
+        <if test="lcCode != null and lcCode != ''">
+            and cic.LC_CODE LIKE CONCAT('%',#{lcCode},'%')
+        </if>
+        <if test="legalPerson != null and legalPerson != ''">
+            and cic.LEGAL_PERSON LIKE CONCAT('%',#{legalPerson},'%')
+        </if>
+        <if test="changeStatus != null and changeStatus !=''">
+            and sic.CHANGE_STATUS = #{changeStatus}
+        </if>
+        <if test="startDate != null ">
+            and sic.CREATION_DATE &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and sic.CREATION_DATE &lt;= #{endDate}
+        </if>
+        order by sic.LAST_UPDATE_DATE desc
+    </select>
+
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bid.mapper.LgtBidingMapper">
+    <select id="queryLgtBidingDto"
+            parameterType="com.midea.cloud.srm.model.logistics.bid.dto.LgtBidingDto"
+            resultType="com.midea.cloud.srm.model.logistics.bid.dto.LgtBidingDto">
+        select a.*,c.WITHDRAW_REASON,c.STATUS from scc_lgt_biding a
+        JOIN scc_lgt_vendor b on a.BIDING_ID = b.BIDING_ID
+        JOIN scc_lgt_vendor_quoted_head c on a.BIDING_ID = c.BIDING_ID AND a.CURRENT_ROUND = c.ROUND AND
+        c.VENDOR_ID = b.VENDOR_ID
+        where 1=1
+        AND a.AUDIT_STATUS = 'APPROVED'
+        <if test="null != vendorId">
+            AND b.VENDOR_ID = #{vendorId}
+        </if>
+        <if test="null != bidingNum and bidingNum != ''">
+            AND a.BIDING_NUM like CONCAT('%',#{bidingNum},'%')
+        </if>
+        <if test="null != bidingName and bidingName != ''">
+            AND a.BIDING_NAME like CONCAT('%',#{bidingName},'%')
+        </if>
+        <if test="null != businessModeCode and businessModeCode != ''">
+            AND a.BUSINESS_MODE_CODE = #{businessModeCode}
+        </if>
+        <if test="null != transportModeCode and transportModeCode != ''">
+            AND a.TRANSPORT_MODE_CODE = #{transportModeCode}
+        </if>
+        <if test="null != status and status != ''">
+            AND c.STATUS = #{status}
+        </if>
+        order by a.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="listPageByBuyers" resultType="com.midea.cloud.srm.model.logistics.bid.entity.LgtBiding"
+            parameterType="com.midea.cloud.srm.model.logistics.bid.entity.LgtBiding">
+        select lb.* from scc_lgt_biding lb where 1=1
+        <if test="null != bidingNum and bidingNum != ''">
+            AND lb.BIDING_NUM like CONCAT('%',#{bidingNum},'%')
+        </if>
+        <if test="null != bidingName and bidingName != ''">
+            AND lb.BIDING_NAME like CONCAT('%',#{bidingName},'%')
+        </if>
+        <if test="null != requirementHeadNum and requirementHeadNum != ''">
+            AND lb.REQUIREMENT_HEAD_NUM like CONCAT('%',#{requirementHeadNum},'%')
+        </if>
+        <if test="null != serviceProjectCode and serviceProjectCode != ''">
+            AND lb.SERVICE_PROJECT_CODE like CONCAT('%',#{serviceProjectCode},'%')
+        </if>
+        <if test="null != serviceProjectName and serviceProjectName != ''">
+            AND lb.SERVICE_PROJECT_NAME like CONCAT('%',#{serviceProjectName},'%')
+        </if>
+        <if test="null != businessModeCode and businessModeCode != ''">
+            AND lb.BUSINESS_MODE_CODE = #{businessModeCode}
+        </if>
+        <if test="null != transportModeCode and transportModeCode != ''">
+            AND lb.TRANSPORT_MODE_CODE = #{transportModeCode}
+        </if>
+        <if test="null != businessType and businessType != ''">
+            AND lb.BUSINESS_TYPE = #{businessType}
+        </if>
+        <if test="null != currentRound and currentRound != ''">
+            AND lb.CURRENT_ROUND = #{currentRound}
+        </if>
+        <if test="null != requirementHeadNum and requirementHeadNum != ''">
+            AND lb.REQUIREMENT_HEAD_NUM like CONCAT('%',#{requirementHeadNum},'%')
+        </if>
+        <if test="null != createdByName and createdByName != ''">
+            AND lb.CREATED_BY_NAME like CONCAT('%',#{createdByName},'%')
+        </if>
+        <if test="null != bidingStatus and bidingStatus != ''">
+            AND lb.BIDING_STATUS = #{bidingStatus}
+        </if>
+        <if test="null != createdBy and createdBy != ''">
+            AND lb.CREATED_BY like CONCAT('%',#{createdBy},'%')
+        </if>
+        AND (lb.CREATED_ID = #{currentUserId}
+            or EXISTS(select 1 from scc_lgt_group c where c.BIDING_ID = lb.BIDING_ID AND c.USER_NAME = #{currentUserName})
+            <if test="null != categoryIds and categoryIds.size() > 0">
+            or
+            EXISTS(select 1 from scc_lgt_bid_requirement_line b where lb.BIDING_ID = b.BIDING_ID AND b.LOGISTICS_CATEGORY_ID in
+                <foreach item="item" collection="categoryIds" separator="," open="(" close=")" index="">
+                    #{item}
+                </foreach>
+            )
+            </if>
+            )
+        order by lb.LAST_UPDATE_DATE desc
+    </select>
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.info.mapper.OrgCategoryMapper">
+    <select id="listPageOrgCategoryByParam" resultType="com.midea.cloud.srm.model.supplier.info.entity.OrgCategory">
+        SELECT
+        ssoc.*,
+        ssci.COMPANY_CODE,
+        ssci.COMPANY_NAME
+        FROM scc_sup_org_category ssoc
+        LEFT JOIN scc_sup_company_info ssci ON ssoc.COMPANY_ID = ssci.COMPANY_ID
+        <where>
+            <if test="query.companyCode != null and query.companyCode != ''">
+                and ssci.COMPANY_CODE LIKE concat('%', #{query.companyCode}, '%')
+            </if>
+            <if test="query.companyName != null and query.companyName != ''">
+                and ssci.COMPANY_NAME LIKE concat('%', #{query.companyName}, '%')
+            </if>
+            <if test="query.orgName != null and query.orgName != ''">
+                and ssoc.ORG_NAME LIKE concat('%', #{query.orgName}, '%')
+            </if>
+            <if test="query.serviceStatus != null and query.serviceStatus != ''">
+                and ssoc.SERVICE_STATUS LIKE concat('%', #{query.serviceStatus}, '%')
+            </if>
+            <if test="query.categoryName != null and query.categoryName != ''">
+                and ssoc.CATEGORY_NAME LIKE concat('%', #{query.categoryName}, '%')
+            </if>
+            <if test="query.orgIds!=null and query.orgIds.size()>0">
+                and ssoc.ORG_ID IN
+                <foreach collection="query.orgIds" item="orgId" open="(" close=")" separator=",">#{orgId}</foreach>
+            </if>
+        </where>
+        order by ssoc.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="querySingleSourceList" resultType="com.midea.cloud.srm.model.supplier.info.entity.OrgCategory">
+        select *
+        from scc_sup_org_category
+        where ORG_CATEGORY_ID in (select a.ORG_CATEGORY_ID
+                                  FROM scc_sup_org_category a
+                                  GROUP BY a.ORG_ID, a.CATEGORY_ID
+                                  HAVING COUNT(1) = 1)
+          AND COMPANY_ID = #{vendorId}
+    </select>
+
+    <select id="listForCheck" resultType="com.midea.cloud.srm.model.supplier.info.entity.OrgCategory">
+        select *
+        from scc_sup_org_category
+        <where>
+            <if test="orgIds != null and orgIds.size() > 0">
+                and ORG_ID in
+                <foreach collection="orgIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="companyId != null">
+                and COMPANY_ID = #{companyId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findValidVendorOrgCate"
+            parameterType="java.util.List"
+            resultType="com.midea.cloud.srm.model.supplier.info.dto.VendorDto">
+        SELECT DISTINCT
+        SSCI.COMPANY_ID,
+        SSCI.COMPANY_CODE,
+        SSCI.COMPANY_NAME
+        FROM SCC_SUP_COMPANY_INFO SSCI
+        INNER JOIN SCC_SUP_ORG_CATEGORY SSOC ON (
+        SSOC.COMPANY_ID = SSCI.COMPANY_ID AND (SSOC.SERVICE_STATUS = 'GREEN' OR SSOC.SERVICE_STATUS = 'VERIFY' OR
+        SSOC.SERVICE_STATUS = 'YELLOW' OR SSOC.SERVICE_STATUS = 'ONE_TIME'
+        OR SSOC.SERVICE_STATUS = 'REGISTERED'
+        )
+        )
+        WHERE 1 = 1
+        <if test="categoryIds != null and categoryIds.size() > 0">
+            AND SSOC.CATEGORY_ID IN
+            <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        ORDER BY
+        CASE SSOC.SERVICE_STATUS WHEN 'GREEN' THEN 1 ELSE 2 END ASC
+
+    </select>
+</mapper>

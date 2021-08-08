@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.template.mapper.PerfTemplateCategoryMapper">
+
+    <!-- 根据条件获绩效模型采购分类表结果集Map-->
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateCategory">
+        <id column="TEMPLATE_CATEGORY_ID" property="templateCategoryId" jdbcType="BIGINT" />
+        <id column="TEMPLATE_HEAD_ID" property="templateHeadId" jdbcType="BIGINT" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="VERSION" property="version" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- 根据条件获取绩效模型采购分类表-->
+    <select id="findTemplateCateGoryByParam" resultMap="BaseResultMap"
+            parameterType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateCategory">
+        SELECT TEMPLATE_CATEGORY_ID, TEMPLATE_HEAD_ID,CATEGORY_ID,CATEGORY_CODE,CATEGORY_NAME,CATEGORY_FULL_NAME
+        FROM scc_perf_template_category
+        <include refid="findOrgCateGorySql"  />
+    </select>
+
+    <!-- 采购分类表组合Sql -->
+    <sql id="findOrgCateGorySql" >
+        <where>
+            <if test="null != deleteFlag and '' != deleteFlag">
+                AND DELETE_FLAG = #{deleteFlag}
+            </if>
+            <if test="null != categoryId ">
+                AND CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="null != categoryCode and '' != categoryCode">
+                AND CATEGORY_CODE = #{categoryCode}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

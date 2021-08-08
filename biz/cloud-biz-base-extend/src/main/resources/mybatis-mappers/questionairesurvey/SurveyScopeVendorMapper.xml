@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.questionairesurvey.mapper.SurveyScopeVendorMapper">
+    <select id="listFeedbackVendor" resultType="com.midea.cloud.srm.model.base.questionairesurvey.dto.FeedbackSupplierDTO">
+        SELECT SURVEY_TITLE,VENDOR_CODE,VENDOR_NAME,RESULT_FLAG,vendor.LAST_UPDATE_DATE AS FEEDBACK_TIME
+        FROM scc_base_survey_header header,scc_base_survey_scope_vendor vendor
+        WHERE header.SURVEY_ID = vendor.SURVEY_ID AND vendor.SURVEY_ID = #{feedbackSupplierDTO.surveyId}
+        <if test="feedbackSupplierDTO.vendorCode != null and feedbackSupplierDTO.vendorCode != ''">
+            AND VENDOR_CODE = #{feedbackSupplierDTO.vendorCode}
+        </if>
+        <if test="feedbackSupplierDTO.vendorName != null and feedbackSupplierDTO.vendorName != ''">
+            AND VENDOR_NAME LIKE concat('%', #{feedbackSupplierDTO.vendorName}, '%')
+        </if>
+        <if test="feedbackSupplierDTO.resultFlag != null and feedbackSupplierDTO.resultFlag != ''">
+            AND RESULT_FLAG = #{feedbackSupplierDTO.resultFlag}
+        </if>
+    </select>
+    <select id="queryFeedbackResult" resultType="com.midea.cloud.srm.model.base.questionairesurvey.dto.FeedbackCountDTO">
+        SELECT COUNT(RESULT_FLAG='Y' OR NULL) AS BACK_COUNT,COUNT(RESULT_FLAG) AS TOTAL_COUNT
+        FROM scc_base_survey_scope_vendor
+        <where>
+            <if test="id != null and id != ''">
+                survey_id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryVendorScopeFeedBack" resultType="com.midea.cloud.srm.model.base.questionairesurvey.dto.ExcelFeedBackResultDto">
+        SELECT SURVEY_TITLE,SURVEY_NUM,VENDOR_NAME,VENDOR_CODE,RESULT_FLAG,vendor.LAST_UPDATE_DATE AS FEEDBACK_TIME
+        FROM scc_base_survey_header header,scc_base_survey_scope_vendor vendor
+        WHERE header.SURVEY_ID = vendor.SURVEY_ID AND vendor.SURVEY_ID = #{surveyId}
+    </select>
+</mapper>

@@ -1,0 +1,172 @@
+package com.midea.cloud.srm.model.logistics.bid.purchaser.bidexpert.entity;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.midea.cloud.srm.model.common.BaseEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+import java.time.LocalDate;
+import java.util.Date;
+
+/**
+*  <pre>
+ *  专家库表 模型
+ * </pre>
+*
+* @author fengdc3@meiCloud.com
+* @version 1.00.00
+*
+*  <pre>
+ *  修改记录
+ *  修改后版本:
+ *  修改人:
+ *  修改日期: 2020-04-19 20:42:21
+ *  修改内容:
+ * </pre>
+*/
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+@TableName("scc_lgt_expert")
+public class BidExpert extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键ID
+     */
+    @TableId("EXPERT_ID")
+    private Long expertId;
+
+    /**
+     * 系统账号/专家用户账号
+     */
+    @TableField("EXPERT_ACCOUNT")
+    private String expertAccount;
+
+    /**
+     * 专家姓名
+     */
+    @TableField("EXPERT_NAME")
+    private String expertName;
+
+    /**
+     * 专家类型:1内部专家/2外部专家
+     */
+    @TableField("EXPERT_TYPE")
+    private String expertType;
+
+    /**
+     * 电话
+     */
+    @TableField("PHONE")
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    @TableField("EMAIL")
+    private String email;
+
+    /**
+     * 状态
+     */
+    @TableField("STATUS")
+    private String status;
+
+    /**
+     * 登记日期/开始日期
+     */
+    @TableField("START_DATE")
+    private LocalDate startDate;
+
+    /**
+     * 失效日期/结束日期
+     */
+    @TableField("END_DATE")
+    private LocalDate endDate;
+
+    /**
+     * 备注
+     */
+    @TableField("COMMENTS")
+    private String comments;
+
+    /**
+     * 企业编码
+     */
+    @TableField("COMPANY_CODE")
+    private String companyCode;
+
+    /**
+     * 组织编码
+     */
+    @TableField("ORGANIZATION_CODE")
+    private String organizationCode;
+
+    /**
+     * 创建人ID
+     */
+    @TableField(value = "CREATED_ID", fill = FieldFill.INSERT)
+    private Long createdId;
+
+    /**
+     * 创建人
+     */
+    @TableField(value = "CREATED_BY", fill = FieldFill.INSERT)
+    private String createdBy;
+
+    /**
+     * 创建时间
+     */
+    @TableField(value = "CREATION_DATE", fill = FieldFill.INSERT)
+    private Date creationDate;
+
+    /**
+     * 创建人IP
+     */
+    @TableField(value = "CREATED_BY_IP", fill = FieldFill.INSERT)
+    private String createdByIp;
+
+    /**
+     * 最后更新人ID
+     */
+    @TableField(value = "LAST_UPDATED_ID", fill = FieldFill.UPDATE)
+    private Long lastUpdatedId;
+
+    /**
+     * 更新人
+     */
+    @TableField(value = "LAST_UPDATED_BY", fill = FieldFill.UPDATE)
+    private String lastUpdatedBy;
+
+    /**
+     * 最后更新时间
+     */
+    @TableField(value = "LAST_UPDATE_DATE", fill = FieldFill.INSERT_UPDATE)
+    private Date lastUpdateDate;
+
+    /**
+     * 最后更新人IP
+     */
+    @TableField(value = "LAST_UPDATED_BY_IP", fill = FieldFill.UPDATE)
+    private String lastUpdatedByIp;
+
+    /**
+     * 租户ID
+     */
+    @TableField("TENANT_ID")
+    private String tenantId;
+
+    /**
+     * 版本号
+     */
+    @TableField("VERSION")
+    private Long version;
+
+
+}

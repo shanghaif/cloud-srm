@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.material.mapper.MaterialItemMapper">
+    <update id="updateSchTotalQuantity" >
+        UPDATE ceea_scc_sc_material_item a
+        SET SCH_TOTAL_QUANTITY = (SELECT sum(REQUIREMENT_QUANTITY) sum
+                                  FROM ceea_scc_sc_material_detail b
+                                  WHERE a.MATERIAL_ITEM_ID = b.MATERIAL_ITEM_ID)
+        WHERE MATERIAL_ITEM_ID = #{materialItemId}
+    </update>
+</mapper>

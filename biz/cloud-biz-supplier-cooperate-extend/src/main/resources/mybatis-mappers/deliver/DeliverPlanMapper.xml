@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.deliver.mapper.DeliverPlanMapper">
+    <update id="updateSchTotalQuantity">
+        update ceea_sc_deliver_plan a set SCH_TOTAL_QUANTITY =
+                                              (select sum(REQUIREMENT_QUANTITY) from ceea_sc_deliver_plan_detail b where b.DELIVER_PLAN_ID = a.DELIVER_PLAN_ID)
+        where DELIVER_PLAN_ID = #{deliverPlanId}
+    </update>
+    <select id="getDeliverPlanList" resultType="com.midea.cloud.srm.model.suppliercooperate.deliver.entity.DeliverPlanDetail" parameterType="com.midea.cloud.srm.model.suppliercooperate.deliver.dto.DeliverPlanDTO">
+        select b.* from  ceea_sc_deliver_plan a
+        inner join ceea_sc_deliver_plan_detail b on b.DELIVER_PLAN_ID = a.DELIVER_PLAN_ID
+        where
+        b.DELIVER_PLAN_STATUS = "COMFIRM"
+        AND b.DELIVER_PLAN_LOCK &lt;&gt; "1"
+        and (a.CATEGORY_ID,b.SCH_MONTHLY_DATE) in
+        <foreach collection="stringList" item="empId" separator="," open="(" close=")">
+            (#{empId.id},#{empId.dates})
+        </foreach>
+    </select>
+</mapper>

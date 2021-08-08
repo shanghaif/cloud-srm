@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.invoice.mapper.InvoiceNoticeMapper">
+    <select id="listPageByParm" resultType="com.midea.cloud.srm.model.suppliercooperate.invoice.dto.InvoiceNoticeDTO"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.invoice.dto.InvoiceNoticeQueryDTO">
+        SELECT
+          SSIN.INVOICE_NOTICE_ID,
+          SSIN.ORG_ID,
+          SSIN.ORG_CODE,
+          SSIN.ORG_NAME,
+          SSIN.INVOICE_NOTICE_NUMBER,
+          SSIN.INVOICE_NOTICE_STATUS,
+          SSIN.VENDOR_ID,
+          SSIN.VENDOR_NAME,
+          SSIN.VENDOR_CODE,
+          SSIN.CEEA_COST_TYPE,
+          SSIN.CEEA_COST_TYPE_CODE,
+          SSIN.CEEA_INVOICE_DATE,
+          SSIN.CEEA_RECEIVE_START_DATE,
+          SSIN.CEEA_RECEIVE_END_DATE,
+          SSIN.CEEA_NO_TAX_TOTAL_AMOUNT,
+          SSIN.CEEA_TAX_TOTAL_AMOUNT,
+          SSIN.CEEA_TOTAL_TAX,
+          SSIN.CEEA_EXCHANGE_RATE,
+          SSIN.CEEA_IF_SUPPLIER_CONFIRM,
+          SSIN.STATEMENT_TOTAL_AMOUNT,
+          SSIN.INVOICE_TOTAL_AMOUNT,
+          SSIN.CURRENCY_CODE,
+          SSIN.CURRENCY_ID,
+          SSIN.CURRENCY_NAME,
+          SSIN.SOURCE_NUMBER,
+          SSIN.REMARK,
+          SSIN.REJECT_REASON,
+          SSIN.CREATED_ID,
+          SSIN.CREATED_BY,
+          SSIN.CREATED_BY_IP,
+          SSIN.CREATION_DATE,
+          SSIN.LAST_UPDATE_DATE,
+          SSIN.LAST_UPDATED_BY
+        <if test="onlineOrNotice == 'ONLINE_INVOICE' or orderNumber != null">
+          ,CSID.INVOICE_DETAIL_ID,
+          CSID.TYPE,
+          CSID.RECEIVE_ORDER_NO,
+          CSID.RECEIVE_ORDER_LINE_NO,
+          CSID.DEAL_DATE,
+          CSID.ORGANIZATION_ID,
+          CSID.ORGANIZATION_CODE,
+          CSID.ORGANIZATION_NAME,
+          CSID.ORGANIZATION_SITE,
+          CSID.CEEA_ORGANIZATION_SITE_ID,
+          CSID.CATEGORY_ID,
+          CSID.CATEGORY_NAME,
+          CSID.CATEGORY_CODE,
+          CSID.ITEM_ID,
+          CSID.ITEM_CODE,
+          CSID.ITEM_NAME,
+          CSID.UNIT,
+          CSID.UNIT_PRICE_CONTAINING_TAX,
+          CSID.UNIT_PRICE_EXCLUDING_TAX,
+          CSID.RECEIVE_NUM,
+          CSID.RECEIVE_DATE,
+          CSID.ORDER_NUMBER,
+          CSID.LINE_NUM,
+          CSID.CONTRACT_NO,
+          CSID.NO_TAX_AMOUNT,
+          CSID.TAX,
+          CSID.TAX_AMOUNT,
+          CSID.PROJECT_NUM,
+          CSID.PROJECT_NAME,
+          CSID.TASK_NUM,
+          CSID.TASK_NAME,
+          CSID.NOT_INVOICE_QUANTITY,
+          CSID.INVOICE_QUANTITY,
+          CSID.TAX_KEY,
+          CSID.TAX_RATE,
+          CSID.TXN_ID,
+          CSID.SHIP_LINE_NUM,
+          CSID.PARENT_TXN_ID
+        </if>
+        FROM scc_sc_invoice_notice SSIN
+        <if test="onlineOrNotice == 'ONLINE_INVOICE' or orderNumber != null">
+            LEFT JOIN ceea_sc_invoice_detail CSID ON SSIN.INVOICE_NOTICE_ID = CSID.INVOICE_NOTICE_ID
+        </if>
+        <where>
+          <if test="invoiceNoticeNumber != null">
+              AND SSIN.INVOICE_NOTICE_NUMBER LIKE CONCAT('%', #{invoiceNoticeNumber},'%')
+          </if>
+          <if test="startInvoiceDate != null and endInvoiceDate != null">
+              AND (SSIN.CEEA_INVOICE_DATE &gt;= #{startInvoiceDate} AND SSIN.CEEA_INVOICE_DATE &lt;= #{endInvoiceDate})
+          </if>
+          <if test="startInvoiceDate != null and endInvoiceDate == null">
+              AND SSIN.CEEA_INVOICE_DATE &gt;= #{startInvoiceDate}
+          </if>
+          <if test="startInvoiceDate == null and endInvoiceDate != null">
+              AND SSIN.CEEA_INVOICE_DATE &lt;= #{endInvoiceDate}
+          </if>
+          <if test="orgIds != null">
+              AND SSIN.ORG_ID IN
+              <foreach collection="orgIds" index="0" item="item" open="(" close=")" separator=",">
+                  <if test="item != null">
+                      #{item}
+                  </if>
+              </foreach>
+          </if>
+          <if test="vendorParam != null">
+              AND (SSIN.VENDOR_NAME LIKE CONCAT('%', #{vendorParam}, '%') OR SSIN.VENDOR_CODE LIKE CONCAT('%', #{vendorParam}, '%'))
+          </if>
+          <if test="vendorName != null and vendorName != ''">
+              AND SSIN.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+          </if>
+          <if test="ceeaCostType != null">
+              AND SSIN.CEEA_COST_TYPE LIKE CONCAT('%', #{ceeaCostType}, '%')
+          </if>
+          <if test="ceeaCostTypeCode != null">
+              AND SSIN.CEEA_COST_TYPE_CODE LIKE CONCAT('%', #{ceeaCostTypeCode}, '%')
+          </if>
+          <if test="invoiceNoticeStatus != null">
+              AND SSIN.INVOICE_NOTICE_STATUS LIKE CONCAT('%', #{invoiceNoticeStatus}, '%')
+          </if>
+          <if test="orderNumber != null">
+              AND CSID.ORDER_NUMBER LIKE CONCAT('%', #{orderNumber}, '%')
+          </if>
+          <if test="receiveOrderNo != null">
+              AND CSID.RECEIVE_ORDER_NO LIKE CONCAT('%', #{receiveOrderNo}, '%')
+          </if>
+          <if test="vendorId != null">
+              AND SSIN.VENDOR_ID = #{vendorId}
+          </if>
+          <if test="userType != null and userType == 'VENDOR'">
+              AND SSIN.INVOICE_NOTICE_STATUS != 'DRAFT'
+          </if>
+          <if test="contractNo != null">
+              AND CSID.CONTRACT_NO LIKE CONCAT('%', #{contractNo}, '%')
+          </if>
+          <if test="materialParam != null">
+              AND (CSID.ITEM_CODE LIKE CONCAT('%', #{materialParam}, '%') OR CSID.ITEM_NAME LIKE CONCAT('%', #{materialParam}, '%'))
+          </if>
+          <if test="orgParam != null and orgParam != ''">
+              AND (SSIN.ORG_CODE LIKE CONCAT('%', #{orgParam}, '%') OR SSIN.ORG_NAME LIKE CONCAT('%', #{orgParam}, '%'))
+          </if>
+          <if test="categoryName != null">
+              AND CSID.CATEGORY_NAME LIKE CONCAT('%', #{categoryName}, '%')
+          </if>
+          <if test="projectNum != null">
+              AND CSID.PROJECT_NUM LIKE CONCAT('%', #{projectNum}, '%')
+          </if>
+          <if test="projectName != null">
+              AND CSID.PROJECT_NAME LIKE CONCAT('%', #{projectName}, '%')
+          </if>
+          <if test="organizationCode != null and organizationCode != ''">
+              AND CSID.ORGANIZATION_CODE LIKE CONCAT('%', #{organizationCode}, '%')
+          </if>
+          <if test="orgId != null">
+              AND SSIN.ORG_ID = #{orgId}
+          </if>
+          <if test="organizationId != null">
+              AND CSID.ORGANIZATION_ID = #{organizationId}
+          </if>
+          <if test="onlineOrNotice == 'ONLINE_INVOICE'">
+              AND CSID.NOT_INVOICE_QUANTITY != 0
+          </if>
+        </where>
+        <if test="onlineOrNotice == 'INVOICE_NOTICE' and orderNumber != null">
+            group by SSIN.INVOICE_NOTICE_ID
+        </if>
+        order by SSIN.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="orderListPageByParam" resultType="com.midea.cloud.srm.model.suppliercooperate.invoice.dto.InvoiceNoticeDTO"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.invoice.dto.InvoiceNoticeQueryDTO">
+        SELECT
+            SSO.ORDER_ID,
+            SSO.VENDOR_ID,
+            SSO.VENDOR_CODE,
+            SSO.VENDOR_NAME,
+            SSO.ORDER_NUMBER,
+            SSO.CEEA_ORG_ID as orgId,
+            SSO.CEEA_ORG_CODE as orgCode,
+            SSO.CEEA_ORG_NAME as orgName,
+            SSO.CEEA_COST_TYPE,
+            SSO.CEEA_COST_TYPE_CODE,
+            SSOD.ORDER_DETAIL_ID,
+            SSOD.LINE_NUM,
+            SSOD.CATEGORY_ID,
+            SSOD.CATEGORY_CODE,
+            SSOD.CATEGORY_NAME,
+            SSOD.MATERIAL_ID as itemId,
+            SSOD.MATERIAL_CODE as itemCode,
+            SSOD.MATERIAL_NAME as itemName,
+            SSOD.RECEIPT_PLACE as organizationSite,
+            SSOD.RECEIPT_PLACE_ID as ceeaOrganizationSiteId,
+            SSOD.UNIT,
+            SSOD.UNIT_CODE,
+            SSOD.ORDER_NUM,
+            SSOD.RECEIVE_NUM,
+            SSOD.CEEA_UNIT_TAX_PRICE as unitPriceContainingTax,
+            SSOD.CEEA_UNIT_NO_TAX_PRICE as unitPriceExcludingTax,
+            SSOD.CEEA_TAX_KEY as taxKey,
+            SSOD.CEEA_TAX_RATE as taxRate,
+            SSOD.CURRENCY_ID,
+            SSOD.CURRENCY_CODE,
+            SSOD.CURRENCY_NAME,
+            SSOD.CEEA_CONTRACT_NO as contractNo,
+            SSOD.CEEA_ORGANIZATION_ID as organizationId,
+            SSOD.CEEA_ORGANIZATION_NAME as organizationName,
+            SSOD.CEEA_ORGANIZATION_CODE as organizationCode,
+            SSOD.CEEA_REQUIREMENT_HEAD_NUM,
+            SSOD.CEEA_BUSINESS_SMALL,
+            SSOD.CEEA_BUSINESS_SMALL_CODE,
+            SSOD.CEEA_PROJECT_NAME as projectName,
+            SSOD.CEEA_PROJECT_NUM as projectNum,
+            SSOD.NOT_INVOICE_QUANTITY
+        FROM scc_sc_order SSO
+        LEFT JOIN scc_sc_order_detail SSOD ON SSO.ORDER_ID = SSOD.ORDER_ID
+        <where>
+            <if test="orgIds != null">
+                AND SSO.CEEA_ORG_ID IN
+                <foreach collection="orgIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="vendorParam != null">
+                AND (SSO.VENDOR_NAME LIKE CONCAT('%', #{vendorParam}, '%') OR SSO.VENDOR_CODE LIKE CONCAT('%', #{vendorParam}, '%'))
+            </if>
+            <if test="ceeaCostType != null">
+                AND SSO.CEEA_COST_TYPE LIKE CONCAT('%', #{ceeaCostType}, '%')
+            </if>
+            <if test="ceeaCostTypeCode != null">
+                AND SSO.CEEA_COST_TYPE_CODE LIKE CONCAT('%', #{ceeaCostTypeCode}, '%')
+            </if>
+            <if test="orderStatus != null">
+                AND SSO.ORDER_STATUS = #{orderStatus}
+            </if>
+            <if test="orderDetailStatus != null">
+                AND SSOD.ORDER_DETAIL_STATUS = #{orderDetailStatus}
+            </if>
+            <if test="orderNumber != null">
+                AND SSO.ORDER_NUMBER LIKE CONCAT('%', #{orderNumber}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND SSO.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="contractNo != null">
+                AND SSOD.CEEA_CONTRACT_NO LIKE CONCAT('%', #{contractNo}, '%')
+            </if>
+            <if test="materialParam != null">
+                AND (SSOD.MATERIAL_CODE LIKE CONCAT('%', #{materialParam}, '%') OR SSOD.MATERIAL_NAME LIKE CONCAT('%', #{materialParam}, '%'))
+            </if>
+            <if test="orgParam != null and orgParam != ''">
+                AND (SSO.CEEA_ORG_CODE LIKE CONCAT('%', #{orgParam}, '%') OR SSO.CEEA_ORG_NAME LIKE CONCAT('%', #{orgParam}, '%'))
+            </if>
+            <if test="categoryName != null">
+                AND SSOD.CATEGORY_NAME LIKE CONCAT('%', #{categoryName}, '%')
+            </if>
+            <if test="projectNum != null">
+                AND SSOD.CEEA_PROJECT_NUM LIKE CONCAT('%', #{projectNum}, '%')
+            </if>
+            <if test="projectName != null">
+                AND SSOD.CEEA_PROJECT_NAME LIKE CONCAT('%', #{projectName}, '%')
+            </if>
+            <if test="organizationCode != null and organizationCode != ''">
+                AND SSOD.CEEA_ORGANIZATION_CODE LIKE CONCAT('%', #{organizationCode}, '%')
+            </if>
+            <if test="businessSmallCodes != null and businessSmallCodes.size() > 0">
+                and SSOD.CEEA_BUSINESS_SMALL_CODE not in
+                <foreach collection="businessSmallCodes" item="item" index="index" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            AND SSOD.CEEA_BUSINESS_SMALL != '' and SSOD.CEEA_BUSINESS_SMALL_CODE != '' and SSOD.NOT_INVOICE_QUANTITY &gt; 0
+        </where>
+        order by SSO.LAST_UPDATE_DATE desc
+    </select>
+</mapper>

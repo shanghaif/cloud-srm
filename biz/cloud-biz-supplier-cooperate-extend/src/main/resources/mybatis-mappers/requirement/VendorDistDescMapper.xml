@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.pr.vendordistdesc.mapper.VendorDistDescMapper">
+    <select id="queryRequirementLinebyOrgs" resultType="java.lang.Long">
+        select REQUIREMENT_LINE_ID
+        from scc_pr_requirement_line
+        where 1=1
+        AND IF_DISTRIBUTION_VENDOR = 'Y'
+        AND REQUIREMENT_QUANTITY = ORDER_QUANTITY
+        <if test="null != orgIds and orgIds.size() > 0">
+            AND ORG_ID in
+            <foreach collection="orgIds" index="0" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+
+    <select id="queryRequirementLine"
+            resultType="com.midea.cloud.srm.model.pm.pr.requirement.entity.RequirementLine">
+        select a.*
+        from scc_pr_requirement_line a
+                 JOIN scc_pr_requirement_head b on a.REQUIREMENT_HEAD_ID = b.REQUIREMENT_HEAD_ID
+        where (a.IF_DISTRIBUTION_VENDOR = 'N' OR a.IF_DISTRIBUTION_VENDOR = 'ALLOCATING_FAILED')
+          AND a.REQUIREMENT_QUANTITY = a.ORDER_QUANTITY
+          AND b.AUDIT_STATUS = 'APPROVED'
+            AND a.ORG_ID in
+            <foreach collection="orgIds" index="0" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+    </select>
+
+</mapper>

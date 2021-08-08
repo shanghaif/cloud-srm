@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.quest.mapper.QuestResultMapper">
+    <resultMap id="fieldInfoMap" type="com.midea.cloud.srm.model.supplier.quest.vo.QuestResultVo$GroupInfo$FieldInfo">
+        <result column="QUEST_TEMPLATE_ID" property="questTemplatePropId" jdbcType="VARCHAR" />
+        <result column="QUEST_TEMPLATE_PROP_SORT" property="questTemplatePropSort" jdbcType="INTEGER" />
+        <result column="QUEST_TEMPLATE_PROP_FIELD" property="questTemplatePropField" jdbcType="VARCHAR" />
+        <result column="QUEST_TEMPLATE_PROP_FIELD_DATA" property="questTemplatePropFieldData" jdbcType="VARCHAR" />
+        <result column="QUEST_TEMPLATE_PROP_FIELD_LABLE" property="questTemplatePropFieldLable" jdbcType="VARCHAR" />
+        <result column="QUEST_TEMPLATE_PROP_TYPE" property="questTemplatePropType" jdbcType="VARCHAR" />
+        <result column="QUEST_TEMPLATE_PROP_DICT" property="questTemplatePropDict" jdbcType="VARCHAR" />
+    </resultMap>
+    <select id="queryByQuestSupId"
+            resultMap="fieldInfoMap">
+        SELECT
+        r.QUEST_TEMPLATE_ID,
+        p.QUEST_TEMPLATE_PROP_SORT,
+        r.QUEST_TEMPLATE_PROP_FIELD,
+        r.QUEST_TEMPLATE_PROP_FIELD_DATA,
+        r.QUEST_TEMPLATE_PROP_FIELD_LABLE,
+        p.QUEST_TEMPLATE_PROP_TYPE,
+        p.QUEST_TEMPLATE_PROP_DICT
+        FROM scc_sup_quest_result r left join scc_sup_quest_template_prop p
+        on r.QUEST_TEMPLATE_PROP_ID= p.QUEST_TEMPLATE_PROP_ID
+        and r.QUEST_TEMPLATE_PROP_FIELD=p.QUEST_TEMPLATE_PROP_FIELD
+        where r.QUEST_SUP_ID=#{questSupId}
+        and r.QUEST_TEMPLATE_PROP_GROUP_ID=#{questTemplatePropGroupId}
+        order by p.QUEST_TEMPLATE_PROP_SORT
+    </select>
+</mapper>

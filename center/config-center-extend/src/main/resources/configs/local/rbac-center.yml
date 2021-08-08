@@ -1,0 +1,88 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-local.xml
+  logstashhost: 10.0.10.50 #logstash服务器
+spring:
+  redis:
+    host: 10.17.145.83
+    port: 6379
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.17.149.182:3306/nsrm_cloud_rbac?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: cdc_base_new
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 0
+      min-idle: 0 #回收空闲连接时，将保证至少有minIdle个连接
+      max-active: 100
+      max-wait: 10000 #程序向连接池中请求连接时,超过maxWait的值后，认为本次请求失败
+      time-between-eviction-runs-millis: 60000 #检查空闲连接的频率，单位毫秒
+      remove-abandoned: true #要求程序从池中get到连接后, N 秒后必须close,否则druid 会强制回收
+      remove-abandoned-timeout: 7200 #设置druid 强制回收连接的时限，当程序从池中get到连接开始算起，超过此  应大于业务运行最长时间值后，druid将强制回收该连接，单位秒
+      test-while-idle: true #当程序请求连接，池在分配连接时，是否先检查该连接是否有效
+      validation-query: select 1 #检查池中的连接是否仍可用的 SQL 语句,drui会连接到数据库执行该SQL mysql:select 1,oracle:select 1 from dual
+      filter:
+        stat:
+          enabled: true #默认值为true，监控sql,慢sql等功能
+          log-slow-sql: true
+          slow-sql-millis: 5000
+        wall:
+          enabled: false #默认值为false，sql防火墙，支持过滤sql，如禁止使用delete *等操作。
+      stat-view-servlet:
+        enabled: true
+        login-username: admin
+        login-password: admin@123456
+        allow: 10.1.1.1/8,172.1.1.1/8,192.1.1.1/8 #配置允许访问监控页面的IP地址
+      web-stat-filter:
+        enabled: false #默认值为true，统计web关联的监控信息如session/url等，建议修改为false
+        session-stat-enable: false #该功能模块代码不完善，特定场景下会诱发异常，非特别需求，建议修改为false
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  aop:
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+mybatis-plus:
+  type-aliases-package: com.midea.cloud.srm.model.rbac
+  mapper-locations: classpath*:/mybatis-mappers/**/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+security:
+  oauth2:
+    resource:
+      prefer-token-info: false
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000
+#elasticsearch
+es:
+  host: 10.17.145.110
+  port: 9200
+  scheme: http
+## IDM系统设置
+IDM_USER:
+  ####创建主账号接口 da771ee2653e41f3b2c90d6dc9445c2e NSrm 602cf51c-1de4-4e4a-b2d5-a1158185c0b7
+  idmUserName: longi_xasrm01
+  ####IMD接口访问密码(创建主账号和同步密码到IDM)
+  idmPassword: da771ee2653e41f3b2c90d6dc9445c2e
+  #### 创建主账号接口
+  createIdmUserUrl: http://soatest.longi.com:8011/IDMSB/ESB/MainUser/ProxyServices/BpmSendmainUsersSoapProxy?wsdl
+  #### 修改密码接口
+  changePasswordForIdmUser: http://soatest.longi.com:8011/IDMSB/IDM/UpdatePassWord/ProxyServices/IdmAcceptUpdatePassWordSoapProxy?wsdl

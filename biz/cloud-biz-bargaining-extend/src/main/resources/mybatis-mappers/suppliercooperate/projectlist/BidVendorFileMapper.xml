@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bargaining.suppliercooperate.projectlist.mapper.BidVendorFileMapper">
+
+    <select id="getVendorFileListForSignUp" resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.BidVendorFileVO">
+        SELECT
+        '' vendorFileId,
+        config.BIDING_ID bidingId,
+        '' vendorId,
+        config.REQUIRE_ID requireId,
+        '' fileType,
+        '' businessId,
+        '' fileName,
+        '' fileSize,
+        '' docId,
+        '' comnents,
+        config.COMPANY_CODE companyCode,
+        config.ORGANIZATION_CODE organizationCode,
+        config.FILE_NAME reqFileName
+        FROM
+        scc_brg_file_config config
+        where config.BIDING_ID =  #{vendorFileVO.bidingId}
+        and BIDING_ID not in
+        (select BIDING_ID from scc_brg_vendor_file where VENDOR_ID = #{vendorFileVO.vendorId} and FILE_TYPE=#{vendorFileVO.fileType})
+        union
+        SELECT
+        file.VENDOR_FILE_ID vendorFileId,
+        file.BIDING_ID bidingId,
+        file.VENDOR_ID vendorId,
+        REQUIRE_ID requireId,
+        file.FILE_TYPE fileType,
+        file.business_id businessId,
+        file.FILE_NAME fileName,
+        file.FILE_SIZE fileSize,
+        file.DOC_ID docId,
+        file.COMMENTS comnents,
+        file.COMPANY_CODE companyCode,
+        file.ORGANIZATION_CODE organizationCode,
+        file.REQ_FILE_NAME reqFileName from scc_brg_vendor_file file
+        WHERE file.business_id=#{vendorFileVO.businessId}  and FILE_TYPE=#{vendorFileVO.fileType}
+    </select>
+
+
+
+    <select id="getVendorFileList" resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.BidVendorFileVO">
+        SELECT
+        file.VENDOR_FILE_ID vendorFileId,
+        file.BIDING_ID bidingId,
+        file.VENDOR_ID vendorId,
+        REQUIRE_ID requireId,
+        file.FILE_TYPE fileType,
+        file.business_id businessId,
+        file.FILE_NAME fileName,
+        file.FILE_SIZE fileSize,
+        file.DOC_ID docId,
+        file.COMMENTS comments,
+        file.COMPANY_CODE companyCode,
+        file.ORGANIZATION_CODE organizationCode,
+        file.REQ_FILE_NAME reqFileName from scc_brg_vendor_file file
+        WHERE FILE_TYPE=#{vendorFileVO.fileType}
+
+        <if test="vendorFileVO.businessId != null and vendorFileVO.businessId != ''">
+            AND file.business_id=#{vendorFileVO.businessId}
+        </if>
+        <if test="vendorFileVO.bidingId != null and vendorFileVO.bidingId != ''">
+            AND biding_Id = #{vendorFileVO.bidingId}
+        </if>
+        <if test="vendorFileVO.vendorId != null and vendorFileVO.vendorId != ''">
+            AND vendor_Id = #{vendorFileVO.vendorId}
+        </if>
+
+    </select>
+</mapper>

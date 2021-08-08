@@ -1,0 +1,23 @@
+cloud:
+  scc:
+    # srm系统路径
+    srmSourceUrl: http://10.17.149.191:9002/cloud-srm
+    # 文件下载路径
+    srmDownloadUrl: /api-file/files-anon/file/fileupload/download?fileuploadId=
+    url: https://fenqitest.midea.com/msignsit
+    appId: srm
+    appKey: c8d2e03a-bcce-43c7-8818-4f1572d4
+    #新增智慧签合同接口
+    addSigning: /foreign/addSigning
+    #撤回智慧签合同接口
+    rejectSigning: /foreign/rejectSigning
+    #下载签署合同文件
+    contractUrl: /foreign/contractUrl
+    #source下载智慧签合同文件
+    sourceByContract: /foreign/sourceByContract
+    #签署状态查询
+    signStatus: /foreign/signStatus
+    #签署状态查询页面
+    signStatusPage: /foreign/signStatusPage
+    #同步授权信息
+    getUserAuthorizationList: /userManagementPrivilege/getUserAuthorizationList

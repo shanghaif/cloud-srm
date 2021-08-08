@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.info.mapper.CategoryRelMapper">
+    <select id="listPageByParam" resultType="com.midea.cloud.srm.model.supplier.info.entity.CategoryRel">
+        SELECT
+        sscr.*,
+        ssci.companyCode,
+        ssci.companyName
+        FROM scc_sup_category_rel sscr
+        LEFT JOIN scc_sup_company_info ssci ON sscr.COMPANY_ID = ssci.COMPANY_ID
+        <where>
+            <if test="categoryRelQueryDTO.vendorCode != null and categoryRelQueryDTO.vendorCode != ''">
+                and ssci.COMPANY_CODE LIKE concat('%', #{categoryRelQueryDTO.vendorCode}, '%')
+            </if>
+            <if test="categoryRelQueryDTO.vendorName != null and categoryRelQueryDTO.vendorName != ''">
+                and ssci.COMPANY_NAME LIKE concat('%', #{categoryRelQueryDTO.vendorName}, '%')
+            </if>
+            <if test="categoryRelQueryDTO.orgName != null and categoryRelQueryDTO.orgName != ''">
+                and sscr.ORG_NAME LIKE concat('%', #{categoryRelQueryDTO.orgName}, '%')
+            </if>
+            <if test="categoryRelQueryDTO.serviceStatus != null and categoryRelQueryDTO.serviceStatus != ''">
+                and sscr.SERVICE_STATUS LIKE concat('%', #{categoryRelQueryDTO.serviceStatus}, '%')
+            </if>
+            <if test="longs != null and longs.size() > 0">
+                and sscr.CATEGORY_ID in
+                <foreach collection="longs" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by sscr.LAST_UPDATE_DATE
+    </select>
+
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.cm.template.mapper.TemplHeadMapper">
+    <select id="listPageByParm" resultType="com.midea.cloud.srm.model.cm.template.entity.TemplHead">
+        SELECT * FROM scc_contract_templ_head
+        <where>
+            <if test="templType != null and templType != ''">
+                AND TEMPL_TYPE = #{templType}
+            </if>
+            <if test="templStatus != null and templStatus != ''">
+                AND TEMPL_STATUS = #{templStatus}
+            </if>
+            <if test="startDate != null">
+                AND START_DATE = #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND END_DATE = #{endDate}
+            </if>
+            <if test="templName != null and templName != ''">
+                AND TEMPL_NAME like concat('%', #{templName}, '%')
+            </if>
+            <if test="templDescription != null and templDescription != ''">
+                AND TEMPL_DESCRIPTION like concat('%', #{templDescription}, '%')
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                AND CREATED_BY like concat('%', #{createdBy}, '%')
+            </if>
+            <if test="creationDate != null">
+                AND DATE_FORMAT(CREATION_DATE,'%Y-%m-%d') = #{creationDate}
+            </if>
+        </where>
+        order by case
+        when TEMPL_STATUS = 'EFFECTIVE' then 0
+        when TEMPL_STATUS = 'DRAFT' then 1
+        when TEMPL_STATUS = 'INVALID' then 2
+        else TEMPL_STATUS end,
+        CREATION_DATE desc
+    </select>
+</mapper>

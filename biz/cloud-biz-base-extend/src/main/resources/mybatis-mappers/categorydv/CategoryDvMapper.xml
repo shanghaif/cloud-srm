@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.categorydv.mapper.CategoryDvMapper">
+
+    <select id="listByParam" resultType="com.midea.cloud.srm.model.base.categorydv.dto.CategoryDvDTO">
+       select dv.*,ca.CATEGORY_CODE from  scc_base_category_dv dv left join scc_base_purchase_category ca on  dv.CATEGORY_ID = ca.CATEGORY_ID
+        <where>
+            <if test="categoryId != null">
+                AND dv.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="categoryName != null and categoryName !='' ">
+                AND dv.CATEGORY_NAME LIKE CONCAT("%",#{categoryName},"%")
+            </if>
+            <if test="categoryCode != null and categoryCode !='' ">
+                AND ca.CATEGORY_CODE LIKE CONCAT("%",#{categoryCode},"%")
+            </if>
+            <if test="userId != null ">
+                AND dv.USER_ID = #{userId}
+            </if>
+            <if test="fullName != null and fullName != '' ">
+                AND dv.FULL_NAME LIKE CONCAT("%",#{fullName},"%")
+            </if>
+            <if test='isActive =="Y" '>
+                    AND dv.START_DATE  &lt;= now()
+                    AND IFNULL(dv.END_DATE,NOW()) &gt;= now()
+            </if>
+        </where>
+    </select>
+</mapper>

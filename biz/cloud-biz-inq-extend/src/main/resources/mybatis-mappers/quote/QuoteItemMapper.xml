@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.inq.quote.mapper.QuoteItemMapper">
+
+    <resultMap id="effectiveQuoteItemsResult" type="com.midea.cloud.srm.model.inq.quote.domain.EffectiveQuoteItemsResult">
+        <id column="QUOTE_ITEM_ID" property="quoteItemId" jdbcType="BIGINT"></id>
+        <result column="INQUIRY_NO" property="inquiryNo" jdbcType="VARCHAR"></result>
+        <result column="INQUIRY_TITLE" property="inquiryTitle" jdbcType="VARCHAR"></result>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT"></result>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT"></result>
+        <result column="INQUIRY_VENDOR_ID" property="inquiryVendorId" jdbcType="BIGINT"></result>
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT"></result>
+        <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR"></result>
+        <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR"></result>
+        <result column="INQUIRY_ITEM_ID" property="inquiryItemId" jdbcType="BIGINT"></result>
+        <result column="ITEM_ID" property="itemId" jdbcType="BIGINT"></result>
+        <result column="ITEM_CODE" property="itemCode" jdbcType="VARCHAR"></result>
+        <result column="ITEM_DESC" property="itemDesc" jdbcType="VARCHAR"></result>
+        <result column="NOTAX_TARGRT_PRICE" property="notaxTargrtPrice" jdbcType="VARCHAR"></result>
+        <result column="TAX_KEY" property="taxKey" jdbcType="VARCHAR"></result>
+        <result column="TAX_RATE" property="taxRate" jdbcType="VARCHAR"></result>
+        <result column="CURRENCY" property="currency" jdbcType="VARCHAR"></result>
+        <result column="NOTAX_PRICE" property="notaxPrice" jdbcType="DECIMAL"></result>
+        <result column="TAX_PRICE" property="taxPrice" jdbcType="DECIMAL"></result>
+        <result column="UNIT" property="unit" jdbcType="VARCHAR"></result>
+        <result column="DEMAND_QUANTITY" property="demandQuantity" jdbcType="DECIMAL"></result>
+        <result column="IS_LADDER" property="isLadder" jdbcType="VARCHAR"></result>
+        <result column="LADDER_TYPE" property="ladderType" jdbcType="VARCHAR"></result>
+        <result column="CATEGORY_NAME" property="categoryName" jdbcType="VARCHAR"></result>
+        <result column="PUBLISH_DATE" property="publishDate" jdbcType="TIMESTAMP"></result>
+        <result column="DEADLINE" property="deadline" jdbcType="TIMESTAMP"></result>
+        <result column="FIXED_PRICE_BEGIN" property="fixedPriceBegin" jdbcType="TIMESTAMP"></result>
+        <result column="FIXED_PRICE_END" property="fixedPriceEnd" jdbcType="TIMESTAMP"></result>
+        <result column="REMARK" property="remark" jdbcType="VARCHAR"></result>
+    </resultMap>
+    <select id="effrcticeQuoteItems" resultMap="effectiveQuoteItemsResult">
+        SELECT
+            item.QUOTE_ITEM_ID,
+            inheader.INQUIRY_NO,
+            inheader.INQUIRY_TITLE,
+	        quheader.ORGANIZATION_ID,
+	        vendor.INQUIRY_VENDOR_ID,
+	        vendor.VENDOR_ID,
+            vendor.VENDOR_CODE,
+            vendor.VENDOR_NAME,
+            item.INQUIRY_ITEM_ID,
+            item.ITEM_ID,
+            item.ITEM_CODE,
+            item.ITEM_DESC,
+            initem.NOTAX_TARGRT_PRICE,
+            initem.TAX_KEY,
+            initem.TAX_RATE,
+            initem.CURRENCY,
+            initem.FIXED_PRICE_BEGIN,
+            initem.FIXED_PRICE_END,
+            initem.CATEGORY_NAME,
+            item.NOTAX_PRICE,
+            item.TAX_PRICE,
+            item.UNIT,
+            item.DEMAND_QUANTITY,
+            item.IS_LADDER,
+            item.LADDER_TYPE,
+            quheader.PUBLISH_DATE,
+            quheader.DEADLINE,
+            item.REMARK
+        FROM
+            scc_inquiry_header inheader,
+            scc_inquiry_item initem,
+            scc_inquiry_vendor vendor,
+            scc_quote_header quheader,
+            scc_quote_item item
+        where inheader.INQUIRY_ID = quheader.INQUIRY_ID
+          AND vendor.INQUIRY_ID = inheader.INQUIRY_ID
+		  AND vendor.VENDOR_ID = quheader.VENDOR_ID
+          AND item.QUOTE_ID = quheader.QUOTE_ID
+          AND item.INQUIRY_ITEM_ID = initem.INQUIRY_ITEM_ID
+          AND quheader.STATUS = 'SUBMIT'
+          AND inheader.INQUIRY_ID = #{inquiryId}
+    </select>
+</mapper>

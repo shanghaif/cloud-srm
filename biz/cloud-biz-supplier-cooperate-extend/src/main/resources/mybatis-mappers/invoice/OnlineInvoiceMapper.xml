@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.invoice.mapper.OnlineInvoiceMapper">
+    <update id="updateDealineAndPeriod">
+        UPDATE ceea_sc_online_invoice t
+        SET t.ACCOUNT_PAYABLE_DEALINE = null,
+            t.PAY_ACCOUNT_PERIOD_CODE =null ,
+            t.PAY_ACCOUNT_PERIOD_NAME = null
+        where t.ONLINE_INVOICE_ID = #{onlineInvoiceId};
+    </update>
+    <update id="updateChangeFlag">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.PO_UNIT_PRICE_CHANGE_FLAG =''
+        where t.ONLINE_INVOICE_ID = #{onlineInvoiceId};
+    </update>
+    <update id="updateUnitPrice">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.UNIT_PRICE_EXCLUDING_TAX = IFNULL(t.ORDER_UNIT_PRICE_TAX_N,0),
+            t.UNIT_PRICE_CONTAINING_TAX = IFNULL(t.ORDER_UNIT_PRICE_TAX_N,0)*(1+t.TAX_RATE/100)
+        where t.ONLINE_INVOICE_ID = #{onlineInvoiceId};
+    </update>
+    <update id="updateAmount">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.NO_TAX_AMOUNT =IFNULL(t.INVOICE_QUANTITY,0) * IFNULL(t.UNIT_PRICE_EXCLUDING_TAX,0) ,
+            t.TAX_AMOUNT = IFNULL(t.INVOICE_QUANTITY,0)*IFNULL(t.UNIT_PRICE_CONTAINING_TAX,0)
+        where t.ONLINE_INVOICE_ID = #{onlineInvoiceId};
+    </update>
+    <update id="updateTax">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.TAX = IFNULL(t.TAX_AMOUNT,0) - IFNULL(t.NO_TAX_AMOUNT,0)
+        where t.ONLINE_INVOICE_ID = #{onlineInvoiceId};
+    </update>
+    <update id="updateCompareResult">
+        update cloud_biz_supplier_cooperate.ceea_sc_online_invoice_detail t
+        set t.COMPARE_RESULT = NULL
+        where t.ONLINE_INVOICE_ID = #{onlineInvoiceId};
+    </update>
+
+
+    <select id="findList"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.invoice.dto.OnlineInvoiceQueryDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.invoice.entity.OnlineInvoice">
+        select * from (select
+               i.*,
+               d.PROJECT_NAME,
+               d.PROJECT_NUM,
+               d.TASK_NAME,
+               d.TASK_NUM
+        from ceea_sc_online_invoice i
+        left join ceea_sc_online_invoice_detail d on i.ONLINE_INVOICE_ID = d.ONLINE_INVOICE_ID
+        <where>
+            i.UN_PAID_AMOUNT != 0
+            <if test="orgId != null">
+                and i.ORG_ID = #{orgId}
+            </if>
+            <if test="vendorKey != null and vendorKey != ''">
+                and (i.VENDOR_CODE like CONCAT('%',#{vendorKey},'%') or i.VENDOR_NAME like CONCAT('%',#{vendorKey},'%'))
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                and i.VENDOR_NAME like CONCAT('%',#{vendorName},'%')
+            </if>
+            <if test="costTypeName != null and costTypeName != ''">
+                and i.COST_TYPE_NAME = #{costTypeName}
+            </if>
+            <if test="costTypeCode != null and costTypeCode != ''">
+                and i.COST_TYPE_CODE = #{costTypeCode}
+            </if>
+            <if test="contractCode != null and contractCode != ''">
+                and i.CONTRACT_CODE like CONCAT('%',#{contractCode},'%')
+            </if>
+            <if test="onlineInvoiceNum != null and onlineInvoiceNum != ''">
+                and i.ONLINE_INVOICE_NUM like CONCAT('%',#{onlineInvoiceNum},'%')
+            </if>
+            <if test="invoiceStatus != null and invoiceStatus != ''">
+                and i.INVOICE_STATUS = #{invoiceStatus}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                and i.ACCOUNT_PAYABLE_DEALINE &gt;= STR_TO_DATE(CONCAT(#{startDate},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and i.ACCOUNT_PAYABLE_DEALINE &lt;= STR_TO_DATE(CONCAT(#{endDate},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="importStatus != null and importStatus != ''">
+                and i.IMPORT_STATUS = #{importStatus}
+            </if>
+            <if test="projectCode != null and projectCode != ''">
+                and d.PROJECT_NUM like CONCAT('%',#{projectCode},'%')
+            </if>
+            <if test="orgIds != null">
+                AND i.ORG_ID IN
+                <foreach collection="orgIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="businessType != null">
+                and i.BUSINESS_TYPE like CONCAT('%', #{businessType}, '%')
+            </if>
+            <if test="taxInvoiceNum != null">
+                and i.TAX_INVOICE_NUM like CONCAT('%', #{taxInvoiceNum}, '%')
+            </if>
+            <if test="fsscNo != null">
+                and i.FSSC_NO like CONCAT('%', #{fsscNo}, '%')
+            </if>
+            <if test="payMethod != null">
+                and i.PAY_METHOD like CONCAT('%', #{payMethod}, '%')
+            </if>
+            <if test="onlineInvoiceType != null and onlineInvoiceType != ''">
+                and i.ONLINE_INVOICE_TYPE = #{onlineInvoiceType}
+            </if>
+            <if test="vendorId != null">
+                and i.VENDOR_ID = #{vendorId}
+            </if>
+            <if test='onlineInvoiceType == "VENDOR_INVOICE" and userType == "BUYER"'>
+                and i.INVOICE_STATUS != 'DRAFT'
+            </if>
+            <if test='onlineInvoiceType == "VENDOR_INVOICE" and userType == "VENDOR"'>
+                and i.INVOICE_STATUS != 'REJECTED'
+            </if>
+        </where>
+        order by i.LAST_UPDATE_DATE desc) a GROUP BY a.ONLINE_INVOICE_ID
+    </select>
+
+    <select id="findListNew"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.invoice.dto.OnlineInvoiceQueryDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.invoice.entity.OnlineInvoice">
+        select
+        i.*
+        from ceea_sc_online_invoice i
+        <where>
+            <if test="orgId != null">
+                and i.ORG_ID = #{orgId}
+            </if>
+            <if test="vendorKey != null and vendorKey != ''">
+                and (i.VENDOR_CODE like CONCAT('%',#{vendorKey},'%') or i.VENDOR_NAME like CONCAT('%',#{vendorKey},'%'))
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                and i.VENDOR_NAME like CONCAT('%',#{vendorName},'%')
+            </if>
+            <if test="costTypeName != null and costTypeName != ''">
+                and i.COST_TYPE_NAME = #{costTypeName}
+            </if>
+            <if test="costTypeCode != null and costTypeCode != ''">
+                and i.COST_TYPE_CODE = #{costTypeCode}
+            </if>
+            <if test="contractCode != null and contractCode != ''">
+                and i.CONTRACT_CODE like CONCAT('%',#{contractCode},'%')
+            </if>
+            <if test="onlineInvoiceNum != null and onlineInvoiceNum != ''">
+                and i.ONLINE_INVOICE_NUM like CONCAT('%',#{onlineInvoiceNum},'%')
+            </if>
+            <if test="invoiceStatus != null and invoiceStatus != ''">
+                and i.INVOICE_STATUS = #{invoiceStatus}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                and i.ACCOUNT_PAYABLE_DEALINE &gt;= STR_TO_DATE(CONCAT(#{startDate},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and i.ACCOUNT_PAYABLE_DEALINE &lt;= STR_TO_DATE(CONCAT(#{endDate},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="importStatus != null and importStatus != ''">
+                and i.IMPORT_STATUS = #{importStatus}
+            </if>
+            <if test="orgIds != null">
+                AND i.ORG_ID IN
+                <foreach collection="orgIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="businessType != null">
+                and i.BUSINESS_TYPE like CONCAT('%', #{businessType}, '%')
+            </if>
+            <if test="taxInvoiceNum != null">
+                and i.TAX_INVOICE_NUM like CONCAT('%', #{taxInvoiceNum}, '%')
+            </if>
+            <if test="fsscNo != null">
+                and i.FSSC_NO like CONCAT('%', #{fsscNo}, '%')
+            </if>
+            <if test="payMethod != null">
+                and i.PAY_METHOD like CONCAT('%', #{payMethod}, '%')
+            </if>
+            <if test="onlineInvoiceType != null and onlineInvoiceType != ''">
+                and i.ONLINE_INVOICE_TYPE = #{onlineInvoiceType}
+            </if>
+            <if test="vendorId != null">
+                and i.VENDOR_ID = #{vendorId}
+            </if>
+            <if test='onlineInvoiceType == "VENDOR_INVOICE" and userType == "BUYER"'>
+                and i.INVOICE_STATUS != 'DRAFT'
+            </if>
+            <if test='onlineInvoiceType == "VENDOR_INVOICE" and userType == "VENDOR"'>
+                and i.INVOICE_STATUS != 'REJECTED'
+            </if>
+        </where>
+        order by i.LAST_UPDATE_DATE desc
+    </select>
+</mapper>
+

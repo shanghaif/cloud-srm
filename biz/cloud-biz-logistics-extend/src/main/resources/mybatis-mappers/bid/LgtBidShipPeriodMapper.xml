@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bid.mapper.LgtBidShipPeriodMapper">
+    <select id="listCurrency"
+            parameterType="com.midea.cloud.srm.model.logistics.bid.entity.LgtBidShipPeriod"
+            resultType="com.midea.cloud.srm.model.logistics.bid.entity.LgtBidShipPeriod">
+        select
+        s.*,
+        h.VENDOR_NAME
+        from scc_lgt_bid_ship_period s
+        left join scc_lgt_vendor_quoted_head h on h.BIDING_ID = s.BIDING_ID
+        left join scc_lgt_biding b on s.BIDING_ID = b.BIDING_ID
+        <where>
+            <if test="bidingId != null">
+                and s.BIDING_ID = #{bidingId}
+            </if>
+            and s.ROUND = b.CURRENT_ROUND
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: cloud-biz-base
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-center
+      profile: uat
+  #springbootadmin资源监控
+  boot:
+    admin:
+      client:
+        url: http://10.17.145.121:10062/sccspringbootadmin
+        username: admin # 这个username与password用于注册到管理端，使其通过认证
+        password: admin@123456
+        instance:
+          prefer-ip: true
+server:
+  port: 8831
+  max-http-header-size: 102400
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://10.16.81.59:8761/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-expiration-duration-in-seconds: 15
+    lease-renewal-interval-in-SECONDS: 5
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.hostname}:${spring.cloud.client.ip-address}:${server.port}
+#springbootadmin资源监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+        exclude: env,beans
+      base-path: /monitor/
+  health:
+    db:
+      enabled: false
+    mail:
+      enabled: false
+    redis:
+      enabled: false
+    elasticsearch: 
+      enabled: false

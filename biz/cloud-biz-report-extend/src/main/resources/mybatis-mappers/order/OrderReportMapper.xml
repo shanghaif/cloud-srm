@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.report.order.mapper.OrderReportMapper">
+    
+     <select id="getPurApplyCount" resultType="java.lang.Integer">
+        select count(od.ORDER_DETAIL_ID) num from scc_sc_order o
+        inner join scc_sc_order_detail od on o.ORDER_ID = od.ORDER_ID
+        <where>
+            o.ORDER_STATUS = 'ACCEPT'
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND o.COMFIRM_TIME between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+            </if>
+        </where>
+    </select>
+    <select id="getPurchaseTotalPrice" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        select od.*  from scc_sc_order o
+        inner join scc_sc_order_detail od on o.ORDER_ID = od.ORDER_ID
+        <where>
+            o.ORDER_STATUS = 'ACCEPT'
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND o.COMFIRM_TIME between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+            </if>
+        </where>
+    </select>
+    
+    <select id="getDeliveryTotalPrice" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+       	select
+		(wr.WAREHOUSE_RECEIPT_QUANTITY- IFNULL(RETURN_QUANTITY,0) )WAREHOUSE_RECEIPT_QUANTITY
+		,od.UNIT_PRICE_CONTAINING_TAX
+		,od.CURRENCY
+		from scc_sc_warehouse_receipt wr
+		inner join scc_sc_order_detail od on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		inner join scc_sc_order o on od.ORDER_ID = o.ORDER_ID
+		left  join (
+		select srd.WAREHOUSE_RECEIPT_ID ,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join  scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id where return_status='CONFIRMED'
+		group by WAREHOUSE_RECEIPT_ID
+		) rd on rd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+        <where>
+            o.ORDER_STATUS = 'ACCEPT'
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND wr.CONFIRM_TIME between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+            </if>
+        </where>
+    </select>
+    
+    
+    <select id="getOrderRate" resultType="com.midea.cloud.srm.model.report.purchase.dto.PurchaseDetailDTO">
+       	select 
+       	sum(case when o.ORDER_STATUS = 'ACCEPT' then 1 else 0 end) CONFIRM_NUMBER
+       	,count(o.ORDER_ID)  ORDER_NUMBER
+		,sum(case when o.ORDER_STATUS = 'ACCEPT' then 1 else 0 end)/count(o.ORDER_ID) * 100 RATE
+		from scc_sc_order o
+        <where>
+        	
+            <if test="list != null and list.size()>0">
+            	exists (select 1 from scc_sc_order_detail od where od.ORDER_ID = o.ORDER_ID and 
+             	o.order_status not in ('UNISSUED')
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND o.CREATION_DATE between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+            </if>
+        </where>
+    </select>
+    
+    <select id="getOrderRateMap" resultType="com.midea.cloud.srm.model.report.purchase.dto.PurchaseDetailDTO">
+       	select 
+       	sum(case when o.ORDER_STATUS = 'ACCEPT' then 1 else 0 end) CONFIRM_NUMBER
+       	,count(o.ORDER_ID)  ORDER_NUMBER,
+		o.FULL_PATH_ID
+		
+		from scc_sc_order o
+        <where>
+        	
+            <if test="list != null and list.size()>0">
+            	exists (select 1 from scc_sc_order_detail od where od.ORDER_ID = o.ORDER_ID and 
+             	o.order_status not in ('UNISSUED')
+               
+                )
+            </if>
+            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND o.CREATION_DATE between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+            </if>
+        </where>
+        group BY o.FULL_PATH_ID
+    </select>
+    
+    <select id="getExecution" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+       	select 
+		wr.WAREHOUSE_RECEIPT_QUANTITY
+		,RETURN_QUANTITY 
+		,od.UNIT_PRICE_CONTAINING_TAX    
+		,od.CURRENCY   
+		,od.ORDER_NUM   
+		,od.REQUIREMENT_DATE
+		from scc_sc_order o 
+		inner join scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+		left join 
+		(
+		select ORDER_DETAIL_ID , sum(WAREHOUSE_RECEIPT_QUANTITY) WAREHOUSE_RECEIPT_QUANTITY from scc_sc_warehouse_receipt where WAREHOUSE_RECEIPT_STATUS= 'CONFIRMED'  group by ORDER_DETAIL_ID
+		) wr  on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		left join (
+		select srd.ORDER_DETAIL_ID,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join  scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id where return_status='CONFIRMED'
+		group by ORDER_DETAIL_ID
+		) rd  on rd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+        <where>
+             o.ORDER_STATUS = 'ACCEPT'
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND od.REQUIREMENT_DATE between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+            </if>
+        </where>
+    </select>
+    
+     <select id="getExecutionList" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+       	select 
+		wr.WAREHOUSE_RECEIPT_QUANTITY
+		,RETURN_QUANTITY 
+		,od.UNIT_PRICE_CONTAINING_TAX    
+		,od.CURRENCY   
+		,od.ORDER_NUM   
+		,od.REQUIREMENT_DATE
+		,od.full_path_id
+		from scc_sc_order o 
+		inner join scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+		left join 
+		(
+		select ORDER_DETAIL_ID , sum(WAREHOUSE_RECEIPT_QUANTITY) WAREHOUSE_RECEIPT_QUANTITY from scc_sc_warehouse_receipt where WAREHOUSE_RECEIPT_STATUS= 'CONFIRMED'  group by ORDER_DETAIL_ID
+		) wr  on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		left join (
+		select srd.ORDER_DETAIL_ID,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join  scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id where return_status='CONFIRMED'
+		group by ORDER_DETAIL_ID
+		) rd  on rd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+        <where>
+             o.ORDER_STATUS = 'ACCEPT'
+            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND od.REQUIREMENT_DATE between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+            </if>
+        </where>
+    </select>
+    
+     <select id="punctuality" resultType="java.math.BigDecimal">
+       	select
+		sum(case when a.ORDER_NUM = quantity then 1 else 0 end ) / count(ORDER_DETAIL_ID) *100
+		from (
+		select 
+		od.ORDER_NUM
+		,sum(IFNULL(wr.WAREHOUSE_RECEIPT_QUANTITY,0)) - sum(IFNULL(rd.RETURN_NUM,0))  quantity
+		,od.ORDER_DETAIL_ID
+		from scc_sc_order o 
+		inner join scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+		left join scc_sc_warehouse_receipt wr on od.ORDER_DETAIL_ID = wr.ORDER_DETAIL_ID and od.REQUIREMENT_DATE>= wr.CONFIRM_TIME
+		left join  scc_sc_return_detail rd on rd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID 
+		left join scc_sc_return_order ro on ro.RETURN_ORDER_ID = rd.RETURN_ORDER_ID 
+        <where>
+             o.ORDER_STATUS = 'ACCEPT'
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND od.REQUIREMENT_DATE between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+            </if>
+        </where>
+        group by od.ORDER_DETAIL_ID
+		) a
+    </select>
+    
+    
+    <select id="punctualityYear" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+    	select * from (
+       	select 
+		wr.WAREHOUSE_RECEIPT_QUANTITY
+		,RETURN_QUANTITY 
+		,od.UNIT_PRICE_CONTAINING_TAX    
+		,od.CURRENCY   
+		,od.ORDER_NUM   
+		,(case when pc.TYPE is not null and pc.TYPE = 'ADVANCE' then DATE_SUB(od.REQUIREMENT_DATE,INTERVAL pc.DAYS DAY)
+			when pc.TYPE is not null and pc.TYPE = 'DELAY' then DATE_ADD(od.REQUIREMENT_DATE,INTERVAL pc.DAYS DAY)
+			else od.REQUIREMENT_DATE end 
+		) REQUIREMENT_DATE
+		from scc_sc_order o 
+		inner join scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+		left join 
+		(
+		select swr.ORDER_DETAIL_ID , sum(swr.WAREHOUSE_RECEIPT_QUANTITY) WAREHOUSE_RECEIPT_QUANTITY from scc_sc_warehouse_receipt swr
+		where swr.WAREHOUSE_RECEIPT_STATUS= 'CONFIRMED' 
+			and exists (
+				select 1 from scc_sc_order_detail temp where temp.ORDER_DETAIL_ID = swr.ORDER_DETAIL_ID and temp.REQUIREMENT_DATE >= swr.CONFIRM_TIME
+			) 
+		
+		group by swr.ORDER_DETAIL_ID
+		) wr  on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		left join (
+		select srd.ORDER_DETAIL_ID,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id 
+		where return_status='CONFIRMED'
+			and exists (
+				select 1 from scc_sc_order_detail temp where temp.ORDER_DETAIL_ID = srd.ORDER_DETAIL_ID 
+			) 
+		
+		group by ORDER_DETAIL_ID
+		) rd  on rd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		left join scc_rep_purchase_detail pd on pd.FULL_PATH_ID = o.FULL_PATH_ID
+		left join scc_rep_purchase_config pc on pd.CONFIG_ID = pc.CONFIG_ID
+        <where>
+             o.ORDER_STATUS = 'ACCEPT'
+             and od.REQUIREMENT_DATE is not null
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            
+        </where>
+        ) a where 1= 1 
+        <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND a.REQUIREMENT_DATE between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+        </if>
+    </select>
+    
+    
+    <select id="punctualityYearList" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+    	select * from (
+       	select 
+		wr.WAREHOUSE_RECEIPT_QUANTITY
+		,RETURN_QUANTITY 
+		,od.UNIT_PRICE_CONTAINING_TAX    
+		,od.CURRENCY   
+		,od.ORDER_NUM
+		,od.full_path_id
+		,(case when pc.TYPE is not null and pc.TYPE = 'ADVANCE' then DATE_SUB(od.REQUIREMENT_DATE,INTERVAL pc.DAYS DAY)
+			when pc.TYPE is not null and pc.TYPE = 'DELAY' then DATE_ADD(od.REQUIREMENT_DATE,INTERVAL pc.DAYS DAY)
+			else od.REQUIREMENT_DATE end 
+		) REQUIREMENT_DATE
+		from scc_sc_order o 
+		inner join scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+		left join 
+		(
+		select swr.ORDER_DETAIL_ID , sum(swr.WAREHOUSE_RECEIPT_QUANTITY) WAREHOUSE_RECEIPT_QUANTITY from scc_sc_warehouse_receipt swr
+		where swr.WAREHOUSE_RECEIPT_STATUS= 'CONFIRMED' 
+			and exists (
+				select 1 from scc_sc_order_detail temp where temp.ORDER_DETAIL_ID = swr.ORDER_DETAIL_ID and temp.REQUIREMENT_DATE >= swr.CONFIRM_TIME
+			) 
+		
+		group by swr.ORDER_DETAIL_ID
+		) wr  on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		left join (
+		select srd.ORDER_DETAIL_ID,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id 
+		where return_status='CONFIRMED'
+			and exists (
+				select 1 from scc_sc_order_detail temp where temp.ORDER_DETAIL_ID = srd.ORDER_DETAIL_ID 
+			) 
+		
+		group by ORDER_DETAIL_ID
+		) rd  on rd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		left join scc_rep_purchase_detail pd on pd.FULL_PATH_ID = o.FULL_PATH_ID
+		left join scc_rep_purchase_config pc on pd.CONFIG_ID = pc.CONFIG_ID
+        <where>
+             o.ORDER_STATUS = 'ACCEPT'
+             and od.REQUIREMENT_DATE is not null
+        </where>
+        ) a where 1= 1 
+        <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+                AND a.REQUIREMENT_DATE between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+        </if>
+    </select>
+    
+    <select id="queryPurchaseCategory" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+	    select wr.order_detail_id,
+		wr.WAREHOUSE_RECEIPT_QUANTITY
+		,od.CURRENCY
+		,od.UNIT_PRICE_CONTAINING_TAX
+		,od.CATEGORY_ID
+		from scc_sc_warehouse_receipt wr 
+		inner join scc_sc_order_detail od on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		inner join scc_sc_order o on o.order_id = od.order_id
+			<where>
+				CATEGORY_ID is not NULL
+				and wr.WAREHOUSE_RECEIPT_STATUS = 'CONFIRMED'
+		    	<if test="list != null and list.size()>0">
+	                and od.full_path_id in
+	                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+	                    #{item}
+	                </foreach>
+	            </if>
+	            <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+	                AND wr.CONFIRM_TIME between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+	            </if>
+	    </where>
+    </select>
+
+	<select id="queryReturnDetailByOrderDetailId" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.ReturnDetailDTO">
+		select *
+		from scc_sc_return_detail
+		<where>
+			1=1
+			<if test="orderDetailId != null">
+				and order_Detail_Id = #{orderDetailId}
+			</if>
+		</where>
+	</select>
+
+
+    <select id="queryPurchaseDetailList" resultType="com.midea.cloud.srm.model.report.purchase.dto.PurchaseDetailInfoDTO">
+    	select
+		o.ORDER_STATUS 
+		,od.ORGANIZATION_NAME 
+		,o.ORDER_NUMBER
+		,o.BUYER_NAME 
+		,od.CURRENCY
+		,o.TAX_RATE 
+		,o.CREATION_DATE 
+		,o.JIT_ORDER 
+		,o.ORDER_TYPE 
+		,od.UNIT_PRICE_CONTAINING_TAX 
+		,od.REQUIREMENT_DATE 
+		,od.CATEGORY_NAME
+		,pc.LEVEL
+		,od.MATERIAL_CODE  
+		,od.MATERIAL_NAME 
+		,od.UNIT 
+		,o.COMFIRM_TIME
+		,(case when wr.WAREHOUSE_RECEIPT_NUMBER is null then '未入库' else wr.WAREHOUSE_RECEIPT_STATUS end ) WAREHOUSE_RECEIPT_STATUS  
+		,wr.WAREHOUSE_RECEIPT_NUMBER 
+		,wr.WAREHOUSE_RECEIPT_QUANTITY
+		,wr.CONFIRM_TIME WAREHOUSE_RECEIPT_TIME 
+		,od.RECEIVED_FACTORY 
+		,od.INVENTORY_PLACE 
+		,o.COMMENTS
+		from scc_sc_order o
+		inner join scc_sc_order_detail od on o.ORDER_ID = od.ORDER_ID
+		inner join scc_base_purchase_category pc on od.CATEGORY_ID = pc.CATEGORY_ID
+		LEFT join scc_sc_warehouse_receipt wr on od.order_detail_id = wr.order_detail_id
+		<where>
+			<if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            
+            <if test="startMonth != null and endMonth != null">
+             	<if test='null != type and type == "1"' >
+            		and od.REQUIREMENT_DATE between #{startMonth} AND #{endMonth}
+            	</if>
+            	<if test='null != type and type == "2"' >
+            		and od.REQUIREMENT_DATE between #{startMonth} AND #{endMonth}
+            	</if>
+            	<if test='null != type and type == "3"' >
+            		and o.creation_date between #{startMonth} AND #{endMonth}
+            	</if>
+            	<if test='null != type and type == "4"' >
+            		and od.REQUIREMENT_DATE between #{startMonth} AND #{endMonth}
+            	</if>
+            	<if test='null != type and type == "5"' >
+            		and wr.CONFIRM_TIME between #{startMonth} AND #{endMonth}
+            	</if>
+                
+            </if>
+            
+            <if test="null != orderStatus and orderStatus != ''">
+            	and o.ORDER_STATUS = #{orderStatus}
+            </if>
+            
+            <if test="null != orderType and orderType != ''">
+            	and o.ORDER_TYPE = #{orderType}
+            </if>
+            
+            <if test="null != warehouseReceiptStatus and warehouseReceiptStatus != ''">
+            	and wr.WAREHOUSE_RECEIPT_STATUS = #{warehouseReceiptStatus}
+            </if>
+            
+            <if test="null != categoryId and categoryId != ''">
+            	and exists (
+            		select 1 from scc_base_purchase_category c 
+            		where c.category_id = #{categoryId}
+            		and pc.struct like concat(c.struct,'-','%')
+            	)
+            </if>
+		
+		</where>
+		
+    </select>
+    
+    
+</mapper>

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.DeliveryNoticeMapper" >
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.order.entry.DeliveryNotice" >
+    <id column="DELIVERY_NOTICE_ID" property="deliveryNoticeId" jdbcType="BIGINT" />
+    <result column="ORDER_ID" property="orderId" jdbcType="BIGINT" />
+    <result column="ORDER_DETAIL_ID" property="orderDetailId" jdbcType="BIGINT" />
+    <result column="DELIVERY_NOTICE_NUM" property="deliveryNoticeNum" jdbcType="VARCHAR" />
+    <result column="DELIVERY_NOTICE_STATUS" property="deliveryNoticeStatus" jdbcType="VARCHAR" />
+    <result column="DELIVERY_TIME" property="deliveryTime" jdbcType="TIMESTAMP" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="COMPANY_CODE" property="companyCode" jdbcType="VARCHAR" />
+    <result column="LINE_NUM" property="lineNum"/>
+    <result column="ORDER_LINE_NUM" property="orderLineNum"/>
+    <result column="RECEIVE_SUM" property="receiveSum"/>
+    <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+    <result column="TENANT_ID" property="tenantId" jdbcType="VARCHAR" />
+    <result column="VERSION" property="version" jdbcType="BIGINT" />
+    <result column="NOTICE_SUM" property="noticeSum" jdbcType="DECIMAL" />
+  </resultMap>
+
+  <select id="getWarehouseReceiptQuantity" resultType="java.math.BigDecimal">
+      SELECT SUM(wr.WAREHOUSE_RECEIPT_QUANTITY)
+      FROM scc_sc_delivery_notice dn
+      INNER JOIN scc_sc_delivery_note_detail dnd ON dnd.DELIVERY_NOTICE_ID AND dnd.ORDER_DETAIL_ID = dn.ORDER_DETAIL_ID
+      INNER JOIN scc_sc_warehouse_receipt wr ON wr.DELIVERY_NOTE_DETAIL_ID = dnd.DELIVERY_NOTE_DETAIL_ID
+      WHERE dn.DELIVERY_NOTICE_ID = #{deliveryNoticeId} AND wr.WAREHOUSE_RECEIPT_STATUS ='CONFIRMED'
+  </select>
+
+  <resultMap id="ListResultMap" extends="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.order.dto.DeliveryNoticeDTO">
+    <!-- 来自订单表 scc_sc_order -->
+    <result column="ORDER_NUMBER" jdbcType="VARCHAR" property="orderNumber" />
+    <result column="VENDOR_ID" jdbcType="BIGINT" property="vendorId" />
+    <result column="VENDOR_CODE" jdbcType="VARCHAR" property="vendorCode" />
+    <result column="VENDOR_NAME" jdbcType="VARCHAR" property="vendorName" />
+    <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT" />
+    <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR" />
+    <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+
+    <!-- 来自订单明细表 scc_sc_order_detail -->
+    <result column="ORDER_LINE_NUM" property="orderLineNum"/>
+    <result column="ORDER_NUM" property="orderNum"/>
+    <result column="ORDER_RECEIVE_SUM" property="orderReceiveSum"/>
+    <result column="CATEGORY_NAME" property="categoryName"/>
+    <result column="MATERIAL_ID" property="materialId"/>
+    <result column="MATERIAL_CODE" property="materialCode"/>
+    <result column="MATERIAL_NAME" property="materialName"/>
+    <result column="REQUIREMENT_DATE" property="requirementDate"/>
+    <result column="UNIT" property="unit"/>
+    <result column="RECEIVED_FACTORY" property="receivedFactory" jdbcType="VARCHAR" />
+    <result column="INVENTORY_PLACE" property="inventoryPlace" jdbcType="VARCHAR" />
+
+    <!-- 来自送货单表 scc_sc_delivery_note -->
+    <result column="DELIVERY_NUMBER" property="deliveryNumber" jdbcType="VARCHAR" />
+
+    <!-- 来自送货单明细表 scc_sc_delivery_note_detial -->
+    <result column="DELIVERY_LINE_NUM" property="deliveryLineNum" jdbcType="VARCHAR" />
+
+  </resultMap>
+
+  <select id="listCreateDeliveryNoteDetail" parameterType="java.util.List" resultMap="ListResultMap">
+        SELECT dn.*
+        , o.ORDER_NUMBER, o.VENDOR_ID, o.VENDOR_CODE, o.VENDOR_NAME, o.ORGANIZATION_ID, o.ORGANIZATION_CODE, o.ORGANIZATION_NAME
+        , od.MATERIAL_CODE, od.MATERIAL_NAME, od.UNIT, od.ORDER_NUM, od.RECEIVE_SUM AS 'ORDER_RECEIVE_SUM', od.CATEGORY_NAME, od.MATERIAL_ID, od.REQUIREMENT_DATE, od.RECEIVED_FACTORY, od.INVENTORY_PLACE
+        FROM scc_sc_delivery_notice dn
+        LEFT JOIN scc_sc_order o ON o.ORDER_ID = dn.ORDER_ID
+        LEFT JOIN scc_sc_order_detail od ON od.ORDER_DETAIL_ID = dn.ORDER_DETAIL_ID
+        WHERE dn.DELIVERY_NOTICE_ID IN
+        <foreach collection="list" close=")" index="index" item="item" open="(" separator=",">
+          #{item}
+        </foreach>
+   </select>
+
+  <select id="findList" resultMap="ListResultMap"
+          parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.DeliveryNoticeRequestDTO">
+
+    SELECT
+    dn.*,
+    o.ORDER_NUMBER,
+    o.VENDOR_ID,
+    o.VENDOR_CODE,
+    o.VENDOR_NAME,
+    o.ORGANIZATION_ID,
+    o.ORGANIZATION_CODE,
+    o.ORGANIZATION_NAME,
+    od.ORDER_NUM,
+    od.RECEIVE_SUM AS 'ORDER_RECEIVE_SUM',
+    od.CATEGORY_NAME,
+    od.MATERIAL_ID,
+    od.MATERIAL_CODE,
+    od.MATERIAL_NAME,
+    od.RECEIVED_FACTORY,
+    od.INVENTORY_PLACE,
+    odn.DELIVERY_NUMBER,
+    dnd.LINE_NUM AS 'DELIVERY_LINE_NUM'
+    FROM scc_sc_delivery_notice dn
+    LEFT JOIN scc_sc_order o ON o.ORDER_ID = dn.ORDER_ID
+    LEFT JOIN scc_sc_order_detail od ON od.ORDER_DETAIL_ID = dn.ORDER_DETAIL_ID
+    LEFT JOIN scc_sc_delivery_note_detail dnd ON dnd.DELIVERY_NOTICE_ID = dn.DELIVERY_NOTICE_ID
+    LEFT JOIN scc_sc_delivery_note odn ON odn.DELIVERY_NOTE_ID = dnd.DELIVERY_NOTE_ID
+    <where>
+      <if test="deliveryNoticeStatus != null">
+        AND dn.DELIVERY_NOTICE_STATUS = #{deliveryNoticeStatus}
+      </if>
+      <if test="orderNumber != null and orderNumber !=''">
+        AND o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+      </if>
+      <if test="organizationId != null">
+        AND o.ORGANIZATION_ID = #{organizationId}
+      </if>
+      <if test="deliveryNumber != null and deliveryNumber !=''">
+        AND odn.DELIVERY_NUMBER LIKE CONCAT('%',#{deliveryNumber},'%')
+      </if>
+      <if test="deliveryLineNum != null">
+        AND dnd.LINE_NUM = #{deliveryLineNum}
+      </if>
+      <if test="organizationName != null and organizationName !=''">
+        AND o.ORGANIZATION_NAME LIKE CONCAT('%',#{organizationName},'%')
+      </if>
+      <if test="vendorId != null">
+        AND o.VENDOR_ID = #{vendorId} AND dn.DELIVERY_NOTICE_STATUS != 'EDIT'
+      </if>
+      <if test="vendorName != null and vendorName !=''">
+        AND o.VENDOR_NAME LIKE CONCAT('%',#{vendorName},'%')
+      </if>
+      <if test="materialId != null">
+        AND od.MATERIAL_ID = #{materialId}
+      </if>
+      <if test="materialCode != null and materialCode !=''">
+        AND od.MATERIAL_CODE LIKE CONCAT('%',#{materialCode},'%')
+      </if>
+      <if test="receivedFactory != null and '' != receivedFactory">
+        and od.RECEIVED_FACTORY LIKE CONCAT("%",#{receivedFactory},"%")
+      </if>
+    </where>
+    ORDER BY dn.CREATION_DATE DESC
+  </select>
+
+  <select id="findDetailList" resultMap="ListResultMap"
+          parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.DeliveryNoticeRequestDTO">
+    SELECT dn.*
+    , o.ORDER_NUMBER, o.VENDOR_ID, o.VENDOR_CODE, o.VENDOR_NAME, o.ORGANIZATION_ID, o.ORGANIZATION_CODE, o.ORGANIZATION_NAME
+    , od.ORDER_NUM, od.CATEGORY_NAME, od.MATERIAL_ID, od.MATERIAL_CODE, od.MATERIAL_NAME, od.RECEIVED_FACTORY, od.INVENTORY_PLACE
+    FROM scc_sc_delivery_notice dn
+    LEFT JOIN scc_sc_order o ON o.ORDER_ID = dn.ORDER_ID
+    LEFT JOIN scc_sc_order_detail od ON od.ORDER_DETAIL_ID = dn.ORDER_DETAIL_ID
+    <where>
+      <if test="orderNumber != null and orderNumber !=''">
+        AND o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+      </if>
+      <if test="organizationId != null">
+        AND o.ORGANIZATION_ID = #{organizationId}
+      </if>
+      <if test="organizationName != null and organizationName !=''">
+        AND o.ORGANIZATION_NAME LIKE CONCAT('%',#{organizationName},'%')
+      </if>
+      <if test="vendorId != null">
+        AND o.VENDOR_ID = #{vendorId} AND dn.DELIVERY_NOTICE_STATUS != 'EDIT'
+      </if>
+      <if test="vendorName != null and vendorName !=''">
+        AND o.VENDOR_NAME LIKE CONCAT('%',#{vendorName},'%')
+      </if>
+
+      <if test="materialId != null">
+        AND od.MATERIAL_ID = #{materialId}
+      </if>
+      <if test="materialCode != null and materialCode !=''">
+        AND od.MATERIAL_CODE LIKE CONCAT('%',#{materialCode},'%')
+      </if>
+    </where>
+    ORDER BY dn.CREATION_DATE DESC
+  </select>
+
+
+  <select id="list"
+          parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.DeliveryNoticeRequestDTO"
+          resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.DeliveryNoticeDTO">
+    select
+    dn.*,
+    o.CEEA_ORG_ID,
+    o.CEEA_ORG_NAME,
+    o.CEEA_ORG_CODE,
+    o.VENDOR_ID,
+    o.VENDOR_CODE,
+    o.VENDOR_NAME,
+    o.ORDER_NUMBER,
+    o.CEEA_RECEIVE_ADDRESS,
+    o.CEEA_RECEIVE_ORDER_ADDRESS,
+    od.LINE_NUM as orderLineNum,
+    od.CATEGORY_ID,
+    od.CATEGORY_CODE,
+    od.CATEGORY_NAME,
+    od.MATERIAL_ID,
+    od.MATERIAL_NAME,
+    od.MATERIAL_CODE,
+    od.ORDER_NUM,
+    od.DELIVERY_NOTICE_QUANTITY,
+    od.RECEIPT_PLACE
+    from scc_sc_delivery_notice dn
+    left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dn.ORDER_DETAIL_ID
+    left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+    <where>
+        <if test="orgId != null">
+            and o.CEEA_ORG_ID = #{orgId}
+        </if>
+        <if test="vendorName != null and vendorName != ''">
+            and o.VENDOR_NAME like concat('%',#{vendorName},'%')
+        </if>
+        <if test="orderNumber != null and orderNumber != ''">
+            and o.ORDER_NUMBER like concat('%',#{orderNumber},'%')
+        </if>
+        <if test="materialCode != null and materialCode != ''">
+            and od.MATERIAL_CODE like concat('%',#{materialCode},'%')
+        </if>
+        <if test="materialName != null and materialName != ''">
+            and od.MATERIAL_NAME like concat('%',#{materialName},'%')
+        </if>
+        <if test="deliveryNoticeNum != null and deliveryNoticeNum != ''">
+            and dn.DELIVERY_NOTICE_NUM like concat('%',#{deliveryNoticeNum},'%')
+        </if>
+        <if test="deliveryNoticeStatus != null and deliveryNoticeStatus != ''">
+            and dn.DELIVERY_NOTICE_STATUS like concat('%',#{deliveryNoticeStatus},'%')
+        </if>
+        <if test="vendorId != null">
+            and o.VENDOR_ID = #{vendorId}
+            and dn.DELIVERY_NOTICE_STATUS in ('WAITING_VENDOR_CONFIRM','ACCEPT','REJECT')
+        </if>
+    </where>
+    ORDER BY dn.LAST_UPDATE_DATE DESC
+  </select>
+
+  <select id="listInDeliveryNote"
+          parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"
+          resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+    SELECT
+    od.ORDER_DETAIL_ID,
+    od.REQUIREMENT_DATE,
+    od.UNIT,
+    o.ORDER_NUMBER,
+    od.LINE_NUM,
+    od.CEEA_PLAN_RECEIVE_NUM,
+    od.CEEA_CATEGORY_NAME,
+    od.MATERIAL_ID,
+    od.MATERIAL_CODE,
+    od.MATERIAL_NAME,
+    od.CATEGORY_ID,
+    od.CATEGORY_CODE,
+    od.CATEGORY_NAME,
+    od.CEEA_BATCH_NUM,
+    od.PRICE_UNIT,
+    od.ORDER_NUM,
+    /*2020-12-29号 隆基产品回迁 bugfix 解决返回为科学计数法的bug*/
+    concat('',IFNULL(dn.NOTICE_SUM,0)-IFNULL(dn.DELIVERY_QUANTITY_SUM,0)) as numberRemaining,
+    od.CEEA_PLAN_RECEIVE_DATE,
+    od.CEEA_PROMISE_RECEIVE_DATE,
+    o.VENDOR_CODE,
+    o.SUBMITTED_ID,
+    o.CEEA_ORG_ID,
+    od.CEEA_ORGANIZATION_ID,
+    o.CEEA_RECEIVE_ADDRESS,
+    dn.DELIVERY_NOTICE_ID,
+    dn.DELIVERY_NOTICE_NUM,
+    dn.DELIVERY_QUANTITY_SUM,
+    dn.NOTICE_SUM,
+    dn.DELIVERY_TIME
+    FROM scc_sc_delivery_notice dn
+    left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dn.ORDER_DETAIL_ID
+    left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+    <where>
+      <if test="vendorId != null">
+        and o.VENDOR_ID = #{vendorId}
+      </if>
+      <if test="orderNumber != null and orderNumber != ''">
+        and o.ORDER_NUMBER like concat('%',#{orderNumber},'%')
+      </if>
+      <if test="vendorCode != null and vendorCode != ''">
+        and o.VENDOR_CODE = #{vendorCode}
+      </if>
+      <if test="materialCode != null and materialCode != ''">
+        and od.MATERIAL_CODE = #{materialCode}
+      </if>
+      <if test="ceeaOrgId != null">
+        and o.CEEA_ORG_ID = #{ceeaOrgId}
+      </if>
+      <if test="organizationId != null">
+        and od.CEEA_ORGANIZATION_ID = #{organizationId}
+      </if>
+      <if test="deliverPlanNum != null and deliverPlanNum != ''">
+        and od.CEEA_PLAN_RECEIVE_NUM like concat('%',#{deliverPlanNum},'%')
+      </if>
+      <if test="ceeaReceiveAddress != null and ceeaReceiveAddress != ''">
+        and o.CEEA_RECEIVE_ADDRESS = #{ceeaReceiveAddress}
+      </if>
+      <if test="orderDetailIdList != null and orderDetailIdList.size() > 0">
+        and od.ORDER_DETAIL_ID in
+        <foreach collection="orderDetailIdList" item="orderDetailId" index="index" open="(" close=")" separator=",">
+          #{orderDetailId}
+        </foreach>
+      </if>
+      <if test="purchaseCategoryIds != null and purchaseCategoryIds.size() > 0">
+        and od.CATEGORY_ID not in
+        <foreach collection="purchaseCategoryIds" item="purchaseCategoryId" index="index" open="(" close=")" separator=",">
+          #{purchaseCategoryId}
+        </foreach>
+      </if>
+      and dn.DELIVERY_NOTICE_STATUS = 'ACCEPT'
+    </where>
+    order by od.LAST_UPDATE_DATE desc
+  </select>
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.dept.mapper.DeptMapper">
+    <select id="queryDeptByCompany" resultType="com.midea.cloud.srm.model.base.dept.dto.DeptDto"
+    parameterType="com.midea.cloud.srm.model.base.dept.dto.DeptDto">
+        SELECT a.COMPANY company,
+               a.COMPANY_DESCR companyDescr,
+               a.DEPTID deptid,
+               a.DESCR descr,
+               a.PART_DEPTID_CHN partDeptidChn,
+               (select c.DESCR from ceea_base_dept c where c.DEPTID = a.PART_DEPTID_CHN LIMIT 1) partDescrChn,
+               a.LGI_DEPT_LEVEL lgiDeptLevel,
+               a.EFFDT startDate,
+               a.EFF_STATUS effStatus,
+               a.LAST_UPDATE_DATE lastUpdateDate,
+               a.LAST_UPDATED_BY lastUpdatedBy,
+               'N'  isEdit
+        FROM ceea_base_dept a
+        WHERE a.SRM_COMPANY_ID = #{company}
+        <if test="null != descr and descr != ''">
+            AND a.DESCR like CONCAT('%',#{descr},'%')
+        </if>
+    </select>
+
+    <select id="queryDeptidAll" resultType="java.lang.String">
+        select DEPTID from ceea_base_dept
+    </select>
+</mapper>

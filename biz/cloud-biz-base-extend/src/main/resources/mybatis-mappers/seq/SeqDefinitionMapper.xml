@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.seq.mapper.SeqDefinitionMapper">
+    <select id="getDefinition" parameterType="map" resultType="com.midea.cloud.srm.model.base.seq.entity.SeqDefinition"
+            flushCache="true">
+        select
+        *
+        from
+        SCC_BASE_SEQ_DEFINITION t1
+        where
+        t1.SEQUENCE_CODE = #{sequenceCode}
+        and (t1.END_DATE is null or t1.END_DATE >= #{endDate})
+        <if test="enableFlag != null">
+            <choose>
+                <when test="granular1 != null">
+                    and t1.GRANULAR1 = #{granular1}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR1 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular2 != null">
+                    and t1.GRANULAR2 = #{granular2}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR2 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular3 != null">
+                    and t1.GRANULAR3 = #{granular3}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR3 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular4 != null">
+                    and t1.GRANULAR4 = #{granular4}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR4 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular5 != null">
+                    and t1.GRANULAR5 = #{granular5}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR5 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular6 != null">
+                    and t1.GRANULAR6 = #{granular6}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR6 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular7 != null">
+                    and t1.GRANULAR7 = #{granular7}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR7 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular8 != null">
+                    and t1.GRANULAR8 = #{granular8}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR8 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular9 != null">
+                    and t1.GRANULAR9 = #{granular9}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR9 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular10 != null">
+                    and t1.GRANULAR10 = #{granular10}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR10 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular11 != null">
+                    and t1.GRANULAR11 = #{granular11}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR11 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular12 != null">
+                    and t1.GRANULAR12 = #{granular12}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR12 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular13 != null">
+                    and t1.GRANULAR13 = #{granular13}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR13 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular14 != null">
+                    and t1.GRANULAR14 = #{granular14}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR14 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular15 != null">
+                    and t1.GRANULAR15 = #{granular15}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR15 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular16 != null">
+                    and t1.GRANULAR16 = #{granular16}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR16 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular17 != null">
+                    and t1.GRANULAR17 = #{granular17}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR17 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular18 != null">
+                    and t1.GRANULAR18 = #{granular18}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR18 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular19 != null">
+                    and t1.GRANULAR19 = #{granular19}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR19 is null
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="granular20 != null">
+                    and t1.GRANULAR20 = #{granular20}
+                </when>
+                <otherwise>
+                    and t1.GRANULAR20 is null
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+    <select id="selectForUpdate" parameterType="map"
+            resultType="com.midea.cloud.srm.model.base.seq.entity.SeqDefinition" flushCache="true">
+        select
+        *
+        from
+        SCC_BASE_SEQ_DEFINITION t1
+        where
+        t1.SEQUENCE_CODE = #{sequenceCode}
+        and (t1.END_DATE is null or t1.END_DATE >= #{endDate})
+        <choose>
+            <when test="granular1 != null">
+                and t1.GRANULAR1 = #{granular1}
+            </when>
+            <otherwise>
+                and t1.GRANULAR1 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular2 != null">
+                and t1.GRANULAR2 = #{granular2}
+            </when>
+            <otherwise>
+                and t1.GRANULAR2 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular3 != null">
+                and t1.GRANULAR3 = #{granular3}
+            </when>
+            <otherwise>
+                and t1.GRANULAR3 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular4 != null">
+                and t1.GRANULAR4 = #{granular4}
+            </when>
+            <otherwise>
+                and t1.GRANULAR4 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular5 != null">
+                and t1.GRANULAR5 = #{granular5}
+            </when>
+            <otherwise>
+                and t1.GRANULAR5 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular6 != null">
+                and t1.GRANULAR6 = #{granular6}
+            </when>
+            <otherwise>
+                and t1.GRANULAR6 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular7 != null">
+                and t1.GRANULAR7 = #{granular7}
+            </when>
+            <otherwise>
+                and t1.GRANULAR7 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular8 != null">
+                and t1.GRANULAR8 = #{granular8}
+            </when>
+            <otherwise>
+                and t1.GRANULAR8 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular9 != null">
+                and t1.GRANULAR9 = #{granular9}
+            </when>
+            <otherwise>
+                and t1.GRANULAR9 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular10 != null">
+                and t1.GRANULAR10 = #{granular10}
+            </when>
+            <otherwise>
+                and t1.GRANULAR10 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular11 != null">
+                and t1.GRANULAR11 = #{granular11}
+            </when>
+            <otherwise>
+                and t1.GRANULAR11 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular12 != null">
+                and t1.GRANULAR12 = #{granular12}
+            </when>
+            <otherwise>
+                and t1.GRANULAR12 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular13 != null">
+                and t1.GRANULAR13 = #{granular13}
+            </when>
+            <otherwise>
+                and t1.GRANULAR13 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular14 != null">
+                and t1.GRANULAR14 = #{granular14}
+            </when>
+            <otherwise>
+                and t1.GRANULAR14 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular15 != null">
+                and t1.GRANULAR15 = #{granular15}
+            </when>
+            <otherwise>
+                and t1.GRANULAR15 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular16 != null">
+                and t1.GRANULAR16 = #{granular16}
+            </when>
+            <otherwise>
+                and t1.GRANULAR16 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular17 != null">
+                and t1.GRANULAR17 = #{granular17}
+            </when>
+            <otherwise>
+                and t1.GRANULAR17 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular18 != null">
+                and t1.GRANULAR18 = #{granular18}
+            </when>
+            <otherwise>
+                and t1.GRANULAR18 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular19 != null">
+                and t1.GRANULAR19 = #{granular19}
+            </when>
+            <otherwise>
+                and t1.GRANULAR19 is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="granular20 != null">
+                and t1.GRANULAR20 = #{granular20}
+            </when>
+            <otherwise>
+                and t1.GRANULAR20 is null
+            </otherwise>
+        </choose>
+        <!-- for update wait 20 -->
+    </select>
+
+</mapper>

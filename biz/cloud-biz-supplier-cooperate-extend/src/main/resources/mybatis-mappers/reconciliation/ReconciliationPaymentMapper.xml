@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.reconciliation.mapper.ReconciliationPaymentMapper" >
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.ReconciliationPayment" >
+    <id column="PAYMENT_ID" property="paymentId" jdbcType="BIGINT" />
+    <result column="RECONCILIATION_TRACK_ID" property="reconciliationTrackId" jdbcType="BIGINT" />
+    <result column="PAYMENT_NOTE_NUMBER" property="paymentNoteNumber" jdbcType="VARCHAR" />
+    <result column="PAYMENT_AMOUNTT" property="paymentAmount" jdbcType="DECIMAL" />
+    <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+    <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+    <result column="VERSION" property="version" jdbcType="BIGINT" />
+  </resultMap>
+
+  <select id="findList" resultMap="BaseResultMap"
+          parameterType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.ReconciliationPayment">
+        SELECT rp.* FROM scc_sc_reconciliation_payment rp
+        <where>
+          AND rp.RECONCILIATION_TRACK_ID = #{reconciliationTrackId}
+        </where>
+      ORDER BY rp.CREATION_DATE
+  </select>
+</mapper>

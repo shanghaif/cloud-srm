@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sso</title>
+    <script>
+      var href = window.location.href;
+      var protocol = window.location.protocol;
+      var host = window.location.host;
+      var search = window.location.search;
+      var hash = window.location.hash;
+      var f = false;
+      var str = search + hash;
+      var query = str.replace(/\?|\#/g, function() {
+        return f ? '&' : (f = '?')
+      });
+      var url = protocol + '//' + host + '/cloud-srm/sys/exchangeToken' + query;
+      window.location.replace(url);
+    </script>
+  </head>
+  <body></body>
+</html>

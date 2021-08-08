@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.inq.inquiry.mapper.VendorNMapper">
+
+    <select id="queryVendorN" resultType="com.midea.cloud.srm.model.inq.inquiry.domain.VendorNResult">
+        SELECT
+            n.VENDOR_N_ID AS vendorNId,
+            temp.INQUIRY_VENDOR_ID AS inquiryVendorId,
+            temp.INQUIRY_ID AS inquiryId,
+            temp.ORGANIZATION_ID AS organizationId,
+            temp.VENDOR_ID AS vendorId,
+            temp.VENDOR_CODE AS vendorCode,
+            temp.VENDOR_NAME AS vendorName,
+            n.PAYMENT_TERM AS paymentTerm
+        FROM
+        (SELECT
+            header.INQUIRY_ID,
+            header.ORGANIZATION_ID,
+            vendor.INQUIRY_VENDOR_ID,
+            vendor.VENDOR_ID,
+            vendor.VENDOR_CODE,
+            vendor.VENDOR_NAME
+        FROM
+            scc_inquiry_header header,
+            scc_inquiry_vendor vendor
+        WHERE
+            header.INQUIRY_ID = vendor.INQUIRY_ID
+        AND header.INQUIRY_ID = #{inquiryId}) temp
+        LEFT JOIN scc_inquiry_vendor_n n ON temp.ORGANIZATION_ID = n.ORGANIZATION_ID
+            AND temp.VENDOR_ID = n.VENDOR_ID
+            AND temp.INQUIRY_ID = n.INQUIRY_ID
+    </select>
+</mapper>

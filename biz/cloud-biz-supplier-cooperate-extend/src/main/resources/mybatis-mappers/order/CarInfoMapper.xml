@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.CarInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.deliveryappoint.entry.CarInfo" >
+    <id column="CAR_INFO_ID" property="carInfoId" jdbcType="BIGINT" />
+    <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT" />
+    <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR" />
+    <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+    <result column="LICENSE_PLATE" property="licensePlate" jdbcType="VARCHAR" />
+    <result column="CAR_TYPE" property="carType" jdbcType="VARCHAR" />
+    <result column="SUBMITTED_ID" property="submittedId" jdbcType="BIGINT" />
+    <result column="SUBMITTED_BY" property="submittedBy" jdbcType="VARCHAR" />
+    <result column="SUBMITTED_TIME" property="submittedTime" jdbcType="TIMESTAMP"/>
+    <result column="EFFECTIVE_DATE" property="effectiveDate" jdbcType="DATE" />
+    <result column="EXPIRATION_DATE" property="expirationDate" jdbcType="DATE" />
+    <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+    <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+    <result column="VERSION" property="version" jdbcType="BIGINT" />
+  </resultMap>
+
+  <select id="findList" resultMap="BaseResultMap"
+          parameterType="com.midea.cloud.srm.model.suppliercooperate.deliveryappoint.entry.CarInfo">
+        SELECT * FROM scc_sc_car_info ci
+        <where>
+          <if test="vendorId == null">
+            AND ci.STATUS != 'CREATE'
+            AND ci.VENDOR_ID = #{vendorId}
+          </if>
+          <if test="vendorId != null">
+            AND ci.VENDOR_ID = #{vendorId}
+          </if>
+          <if test="licensePlate != null and licensePlate !=''">
+            AND ci.LICENSE_PLATE LIKE CONCAT("%",#{licensePlate},"%")
+          </if>
+          <if test="carType != null and carType !=''">
+            AND ci.CAR_TYPE = #{carType}
+          </if>
+          <choose>
+            <when test="status != null and status =='INVALID'">
+              AND (
+              ci.EFFECTIVE_DATE > curdate()
+              OR ci.EXPIRATION_DATE &lt;= curdate()
+              )
+              AND ci.STATUS = 'SUBMIT'
+            </when>
+            <when test="status != null and status =='EFFECTIVE'">
+                AND ci.EFFECTIVE_DATE &lt;= curdate()
+                AND ci.EXPIRATION_DATE > curdate()
+                AND ci.STATUS = 'SUBMIT'
+            </when>
+            <otherwise>
+              <if test="status != null and status !=''">
+                AND ci.STATUS = #{status}
+              </if>
+            </otherwise>
+          </choose>
+        </where>
+        ORDER BY ci.CREATION_DATE DESC
+  </select>
+</mapper>

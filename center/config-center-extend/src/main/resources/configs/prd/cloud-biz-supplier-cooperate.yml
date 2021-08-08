@@ -1,0 +1,75 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-prd.xml
+  logstashhost: 10.0.3.184 #logstash服务器
+spring:
+  redis:
+    host: 10.0.3.182
+    port: 6379
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.0.3.172:3306/cloud_biz_supplier_cooperate?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: apprun
+    password: sre5Prd!j4
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 100
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  aop:
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+mybatis-plus:
+  type-aliases-package: com.midea.cloud.srm.model.supcooperate
+  mapper-locations: classpath*:/mybatis-mappers/**/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+security:
+  oauth2:
+    resource:
+      prefer-token-info: false
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000
+bindqserp:
+  erpUrl: http://soa.longi-silicon.com:8011/NSrm/Erp/VendorShipment/ProxyServices/ErpAcceptVendorShipmentSoapProxy?wsdl
+  erpUserName: longi_xansrm01
+  erpPassword: dd2645872ad94af49570c81f342751a3
+acceptsoap:
+  acceptUrl: http://soa.longi-silicon.com:8011/NSrm/Erp/VendorShipment/ProxyServices/ErpAcceptVendorShipmentSoapProxy?wsdl
+
+
+###采购接收退货锁定接收(Erp)
+acceptPoLock:
+  ###锁定接收URL
+  acceptPoLockUrl: http://soa.longi-silicon.com:8011/SRMSB/Erp/PoRcvRtnLock/ProxyServices/ErpAcceptPoRcvRtnLockSoapProxy?wsdl
+  ###锁定接收账号
+  acceptPoLockUsername: longi_xansrm01
+  ###锁定接收密码
+  acceptPoLockPassword: dd2645872ad94af49570c81f342751a3
+  ###调用erp地点接口超时时间（单位：毫秒）
+  cxfClientConnectTimeout: 90000

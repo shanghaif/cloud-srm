@@ -1,0 +1,112 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-prd.xml
+  logstashhost: 10.0.3.184 #logstash服务器
+spring:
+  redis:
+    host: 10.0.3.182
+    port: 6379
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+zuul:
+  semaphore:
+    max-semaphores: 500
+  ignored-services: '*'
+  sensitive-headers: 
+  routes:
+    oauth:
+      path: /api-oauth/**
+      serviceId: oauth-center
+    rbac:
+      path: /api-rbac/**
+      serviceId: rbac-center
+    base:
+      path: /api-base/**
+      serviceId: cloud-biz-base
+    sup:
+      path: /api-sup/**
+      serviceId: cloud-biz-supplier
+    sup-ce:
+      path: /api-sup-ce/**
+      serviceId: cloud-biz-supplier-cooperate
+    log:
+      path: /api-log/**
+      serviceId: log-center
+    file:
+      path: /api-file/**
+      serviceId: file-center
+    flow:
+      path: /api-flow/**
+      serviceId: flow-center
+    bid:
+      path: /api-bid/**
+      serviceId: cloud-biz-bidding
+    inq:
+      path: /api-inq/**
+      serviceId: cloud-biz-inquiry
+    cm:
+      path: /api-cm/**
+      serviceId: cloud-biz-contract
+    pef:
+      path: /api-pef/**
+      serviceId: cloud-biz-performance
+    ac:
+      path: /api-ac/**
+      serviceId: api-center
+    price:
+      path: /api-price/**
+      serviceId: cloud-biz-price
+    brg:
+      path: /api-brg/**
+      serviceId: cloud-biz-bargaining
+    report:      
+      path: /api-report/**      
+      serviceId: cloud-biz-report
+  host:
+    connect-timeout-millis: 10000
+    socket-timeout-millis: 60000
+  add-proxy-headers: true
+  ribbon:
+    eager-load:
+      enabled: true
+hystrix:
+  command:
+    default:
+      circuitBreaker:
+        enabled: false
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 600000
+cron:
+  black-ip: 0 0/5 * * * ?
+cloud:
+  scc:
+    sign:
+      appId: appA,appB,paas,fssc-nsrm
+      appSec: 123,321,1234567,~longi123@
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000
+feign:
+  hystrix:
+    enabled: false   

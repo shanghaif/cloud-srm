@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bid.purchaser.projectmanagement.bidcontrol.mapper.BidControlMapper">
+
+    <select id="listBidControlFirstRound"
+            resultType="com.midea.cloud.srm.model.bid.purchaser.projectmanagement.bidcontrol.vo.BidControlListVO">
+        select sbv.BIDING_ID , sboh.ROUND, sbv.VENDOR_CODE, sbv.VENDOR_NAME, sbv.LINK_MAN_NAME, sbv.PHONE,
+        sbv.EMAIL, sboh.ORDER_STATUS, sboh.CREATED_BY, sboh.CREATION_DATE, sboh.CEEA_IS_PROXY_BIDDING AS IS_PROXY_BIDDING, sboh.LAST_UPDATED_BY, sboh.LAST_UPDATE_DATE
+        from scc_bid_sign_up sbsu left join scc_bid_vendor sbv
+        on sbsu.BIDING_ID = sbv.BIDING_ID and sbsu.VENDOR_ID = sbv.VENDOR_ID
+        left join scc_bid_order_head sboh
+        on sboh.BIDING_ID = sbsu.BIDING_ID and sboh.BID_VENDOR_ID = sbv.BID_VENDOR_ID
+        where sbsu.SIGN_UP_STATUS = #{signUpStatus} and sboh.ORDER_STATUS in ('WITHDRAW','SUBMISSION')
+        and sbsu.BIDING_ID = #{bidingId}
+    </select>
+    <select id="listBidControl"
+            resultType="com.midea.cloud.srm.model.bid.purchaser.projectmanagement.bidcontrol.vo.BidControlListVO">
+    select sbv.BID_VENDOR_ID, sbv.BIDING_ID , sboh.ROUND, sbv.VENDOR_CODE, sbv.VENDOR_NAME, sbv.LINK_MAN_NAME, sbv.PHONE,
+	sbv.EMAIL, sboh.ORDER_STATUS, sboh.CREATED_BY, sboh.CREATION_DATE, sboh.CEEA_IS_PROXY_BIDDING AS IS_PROXY_BIDDING, sboh.LAST_UPDATED_BY, sboh.LAST_UPDATE_DATE
+	from scc_bid_vendor sbv left join scc_bid_order_head sboh
+	on sbv.BID_VENDOR_ID = sboh.BID_VENDOR_ID and sbv.BIDING_ID = sboh.BIDING_ID and sboh.ROUND = #{round}
+    where sbv.BIDING_ID = #{bidingId} and sbv.BID_VENDOR_ID
+    in (
+        select BID_VENDOR_ID from scc_bid_order_line sbol
+        where BIDING_ID = #{bidingId}
+        and WIN = 'Y' and ROUND = #{round} group by BID_VENDOR_ID
+    )
+    </select>
+    <select id="countVendor" resultType="java.lang.Integer">
+        select count(*) from
+            (select sbol.BID_VENDOR_ID from scc_bid_order_line sbol
+            where sbol.BIDING_ID = #{bidingId}
+            and sbol.WIN = 'Y' group by sbol.BID_VENDOR_ID) s
+    </select>
+</mapper>

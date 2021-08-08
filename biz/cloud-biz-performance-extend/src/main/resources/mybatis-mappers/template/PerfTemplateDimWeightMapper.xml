@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.template.mapper.PerfTemplateDimWeightMapper">
+
+    <resultMap id="findPerTemplateDimWeightAndLineMap" type="com.midea.cloud.srm.model.perf.template.dto.PerfTemplateDimWeightDTO">
+        <collection property="perfTemplateDimWeight" ofType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateDimWeight">
+            <id column="DIM_WEIGHT_ID" property="dimWeightId" jdbcType="BIGINT" />
+            <result column="TEMPLATE_HEAD_ID" property="templateHeadId" jdbcType="VARCHAR" />
+            <result column="INDICATOR_DIMENSION_TYPE" property="indicatorDimensionType" jdbcType="VARCHAR" />
+            <result column="INDICATOR_DIMENSION_WEIGHT" property="indicatorDimensionWeight" jdbcType="VARCHAR" />
+            <result column="INDICATOR_TYPE" property="indicatorType" jdbcType="VARCHAR" />
+            <result column="DELETE_FLAG" property="deleteFlag" jdbcType="VARCHAR" />
+            <result column="START_DATE" property="startDate" jdbcType="TIMESTAMP" />
+            <result column="END_DATE" property="endDate" jdbcType="TIMESTAMP" />
+            <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+            <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        </collection>
+
+        <collection property="perfTemplateLineList" ofType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateLine">
+            <id column="TEMPLATE_LINE_ID" property="templateLineId" jdbcType="BIGINT" />
+            <result column="TEMPLATE_DIM_WEIGHT_ID" property="templateDimWeightId" jdbcType="BIGINT" />
+            <result column="INDICATOR_NAME" property="indicatorName" jdbcType="VARCHAR" />
+            <result column="INDICATOR_DIMENSION" property="indicatorDimension" jdbcType="VARCHAR" />
+            <result column="DIMENSION_WEIGHT" property="dimensionWeight" jdbcType="DECIMAL" />
+            <result column="INDICATOR_TYPE" property="indicatorType" jdbcType="VARCHAR" />
+            <result column="LINE_DELETE_FLAG" property="deleteFlag" jdbcType="VARCHAR" />
+            <result column="INDICATOR_LOGIC" property="indicatorLogic" jdbcType="VARCHAR" />
+            <result column="EVALUATION" property="evaluation" jdbcType="VARCHAR" />
+            <result column="MARK_LIMIT" property="markLimit" jdbcType="DECIMAL" />
+            <result column="INDICATOR_LINE_TYPE" property="indicatorLineType" jdbcType="VARCHAR" />
+            <result column="QUOTE_MODE" property="quoteMode" jdbcType="VARCHAR" />
+            <result column="LINE_CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+            <result column="LINE_CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        </collection>
+    </resultMap>
+
+    <!-- 根据条件获取绩效指标维度和指标信息-->
+    <select id="findPerTemplateDimWeightAndLine" resultMap="findPerTemplateDimWeightAndLineMap">
+        SELECT tdw.DIM_WEIGHT_ID,tdw.TEMPLATE_HEAD_ID,tdw.INDICATOR_DIMENSION_TYPE,tdw.INDICATOR_DIMENSION_WEIGHT,tdw.INDICATOR_TYPE
+        ,tdw.DELETE_FLAG,tdw.START_DATE,tdw.END_DATE,tdw.CREATED_BY,tdw.CREATION_DATE,tl.TEMPLATE_LINE_ID,tl.INDICATOR_NAME,tl.INDICATOR_DIMENSION
+        ,tl.INDICATOR_TYPE,tl.DELETE_FLAG LINE_DELETE_FLAG,tl.INDICATOR_LOGIC,tl.EVALUATION,tl.MARK_LIMIT,tl.INDICATOR_LINE_TYPE,
+        tl.QUOTE_MODE,tl.CREATED_BY LINE_CREATED_BY,tl.CREATION_DATE LINE_CREATION_DATE,tl.TEMPLATE_DIM_WEIGHT_ID,tl.DIMENSION_WEIGHT
+        FROM scc_perf_template_dim_weight tdw
+        LEFT JOIN scc_perf_template_line tl ON tdw.DIM_WEIGHT_ID = tl.TEMPLATE_DIM_WEIGHT_ID
+        <where>
+            <if test="null != deleteFlag and '' != deleteFlag">
+                AND tdw.DELETE_FLAG = #{deleteFlag} AND tl.DELETE_FLAG = #{deleteFlag}
+            </if>
+            <if test="null != dimWeightId and '' != dimWeightId">
+                AND tdw.DIM_WEIGHT_ID = #{dimWeightId}
+            </if>
+            <if test="null != templateHeadId and '' != templateHeadId">
+                AND tdw.TEMPLATE_HEAD_ID = #{templateHeadId}
+            </if>
+        </where>
+    </select>
+
+
+    <!-- 根据条件获取绩效指标维度Map(如果有绩效指标和绩效指标行信息就查询) -->
+    <resultMap id="findPerTemplateDimWeightByParamMap" type="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateDimWeight">
+        <id column="DIM_WEIGHT_ID" property="dimWeightId" jdbcType="BIGINT" />
+        <result column="TEMPLATE_HEAD_ID" property="templateHeadId" jdbcType="VARCHAR" />
+        <result column="INDICATOR_DIMENSION_TYPE" property="indicatorDimensionType" jdbcType="VARCHAR" />
+        <result column="INDICATOR_DIMENSION_WEIGHT" property="indicatorDimensionWeight" jdbcType="VARCHAR" />
+        <result column="INDICATOR_TYPE" property="indicatorType" jdbcType="VARCHAR" />
+        <result column="DELETE_FLAG" property="deleteFlag" jdbcType="VARCHAR" />
+        <result column="START_DATE" property="startDate" jdbcType="TIMESTAMP" />
+        <result column="END_DATE" property="endDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+
+        <!-- 绩效模型绩效指标表-->
+        <collection property="perfTemplateLineList" javaType="java.util.List" column="{dimWeightId=DIM_WEIGHT_ID}" fetchType="lazy"
+                    ofType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateLine"
+                    select="com.midea.cloud.srm.perf.template.mapper.PerfTemplateLineMapper.findTempateLineByParam" />
+    </resultMap>
+    <!-- 根据条件获取绩效指标维度(如果有绩效指标和绩效指标行信息就查询) -->
+    <select id="findPerTemplateDimWeightByParam" resultMap="findPerTemplateDimWeightByParamMap"
+            parameterType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateDimWeight">
+        SELECT DIM_WEIGHT_ID,TEMPLATE_HEAD_ID,INDICATOR_DIMENSION_TYPE,INDICATOR_DIMENSION_WEIGHT,INDICATOR_TYPE
+               ,DELETE_FLAG,START_DATE,END_DATE,CREATED_BY,CREATION_DATE
+        FROM scc_perf_template_dim_weight
+        <include refid="templateDimWeightSql" />
+    </select>
+
+    <!-- 取绩效指标维度组合查询Sql -->
+    <sql id="templateDimWeightSql">
+        <where>
+            <if test="null != deleteFlag and '' != deleteFlag">
+                AND DELETE_FLAG = #{deleteFlag}
+            </if>
+            <if test="null != dimWeightId and '' != dimWeightId">
+                AND DIM_WEIGHT_ID = #{dimWeightId}
+            </if>
+            <if test="null != templateHeadId and '' != templateHeadId">
+                AND TEMPLATE_HEAD_ID = #{templateHeadId}
+            </if>
+        </where>
+    </sql>
+</mapper>

@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.material.mapper.MaterialItemMapper">
+
+    <select id="listPageByParam" resultType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO">
+        SELECT
+        MI.*,
+        O1.ORGANIZATION_ID as orgId,
+        O1.ORGANIZATION_CODE as orgCode,
+        O1.ORGANIZATION_NAME as orgName,
+        O2.ORGANIZATION_ID,
+        O2.ORGANIZATION_CODE,
+        O2.ORGANIZATION_NAME,
+        PC3.CATEGORY_ID ,
+        PC3.CATEGORY_CODE,
+        PC3.CATEGORY_NAME
+        FROM
+        scc_base_material_item MI
+        LEFT JOIN ceea_base_material_org MO ON MI.MATERIAL_ID = MO.MATERIAL_ID
+        LEFT JOIN scc_base_organization O1 ON MO.ORG_ID = O1.ORGANIZATION_ID
+        LEFT JOIN scc_base_organization O2 ON MO.ORGANIZATION_ID = O2.ORGANIZATION_ID
+        LEFT JOIN scc_base_purchase_category PC3 ON PC3.CATEGORY_ID = MI.CATEGORY_ID
+        <where>
+            <if test="materialCode != null and materialCode != ''">
+                AND MI.MATERIAL_CODE LIKE concat('%', #{materialCode}, '%')
+            </if>
+            <if test="materialName != null and materialName != ''">
+                AND MI.MATERIAL_NAME LIKE concat('%', #{materialName}, '%')
+            </if>
+            <if test="orgId != null">
+                AND O1.ORGANIZATION_ID = #{orgId}
+            </if>
+            <if test="orgName != null">
+                AND O1.ORGANIZATION_NAME = #{orgName}
+            </if>
+            <if test="organizationId != null">
+                AND O2.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <if test="organizationName != null and organizationName != ''">
+                AND O2.ORGANIZATION_NAME LIKE concat('%', #{organizationName}, '%')
+            </if>
+            <if test="categoryId != null">
+                AND PC3.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                AND PC3.CATEGORY_NAME LIKE concat('%', #{categoryName}, '%')
+            </if>
+        </where>
+        order by MI.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="listByParam" resultType="com.midea.cloud.srm.model.base.material.vo.MaterialItemVo">
+        SELECT
+        MI.*,
+        O1.ORGANIZATION_ID as orgId,
+        O1.ORGANIZATION_CODE as orgCode,
+        O1.ORGANIZATION_NAME as orgName,
+        O2.ORGANIZATION_ID,
+        O2.ORGANIZATION_CODE,
+        O2.ORGANIZATION_NAME,
+        PC3.CATEGORY_ID ,
+        PC3.CATEGORY_CODE,
+        PC3.CATEGORY_NAME
+        FROM
+        scc_base_material_item MI
+        LEFT JOIN ceea_base_material_org MO ON MI.MATERIAL_ID = MO.MATERIAL_ID
+        LEFT JOIN scc_base_organization O1 ON MO.ORG_ID = O1.ORGANIZATION_ID
+        LEFT JOIN scc_base_organization O2 ON MO.ORGANIZATION_ID = O2.ORGANIZATION_ID
+        LEFT JOIN scc_base_purchase_category PC3 ON PC3.CATEGORY_ID = MI.CATEGORY_ID
+        <where>
+            <if test="materialQueryDTO.materialCode != null and materialQueryDTO.materialCode != ''">
+                AND MI.MATERIAL_CODE LIKE concat('%', #{materialQueryDTO.materialCode}, '%')
+            </if>
+            <if test="materialQueryDTO.materialName != null and materialQueryDTO.materialName != ''">
+                AND MI.MATERIAL_NAME LIKE concat('%', #{materialQueryDTO.materialName}, '%')
+            </if>
+            <if test="materialQueryDTO.orgId != null">
+                AND O1.ORGANIZATION_ID = #{materialQueryDTO.orgId}
+            </if>
+            <if test="materialQueryDTO.organizationId != null">
+                AND O2.ORGANIZATION_ID = #{materialQueryDTO.organizationId}
+            </if>
+            <if test="materialQueryDTO.categoryName != null and materialQueryDTO.categoryName != ''">
+                AND PC3.CATEGORY_NAME LIKE concat('%', #{materialQueryDTO.categoryName}, '%')
+            </if>
+            <if test="longs != null and longs.size() > 0">
+                and MI.CATEGORY_ID in
+                <foreach collection="longs" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            and MI.CATEGORY_ID is not null
+        </where>
+
+        order by MI.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="listPageByWrapper" resultType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO">
+        SELECT
+        MI.*,
+        <!--O1.ORGANIZATION_ID as orgId,
+        O1.ORGANIZATION_CODE as orgCode,
+        O1.ORGANIZATION_NAME as orgName,-->
+        O2.ORGANIZATION_ID,
+        O2.ORGANIZATION_CODE,
+        O2.ORGANIZATION_NAME
+        <!--PC3.CATEGORY_CODE,
+        PC3.CATEGORY_NAME-->
+        FROM
+        scc_base_material_item MI
+        LEFT JOIN ceea_base_material_org MO ON MI.MATERIAL_ID = MO.MATERIAL_ID AND MO.ORGANIZATION_ID = #{materialQueryDTO.organizationId}
+        LEFT JOIN scc_base_organization O2 ON MO.ORGANIZATION_ID = O2.ORGANIZATION_ID
+        <if test="null != materialQueryDTO.ceeaPurchaseType and '' != materialQueryDTO.ceeaPurchaseType">
+            LEFT JOIN ceea_base_category_purchase_type cbcpt on MI.CATEGORY_ID = cbcpt.CATEGORY_ID
+        </if>
+        <!--LEFT JOIN scc_base_purchase_category PC3 ON PC3.CATEGORY_ID = MI.CATEGORY_ID-->
+        <where>
+            <if test="materialQueryDTO.materialCode != null and materialQueryDTO.materialCode != ''">
+                and MI.MATERIAL_CODE like concat('%', #{materialQueryDTO.materialCode}, '%')
+            </if>
+            <if test="materialQueryDTO.materialName != null and materialQueryDTO.materialName != ''">
+                and MI.MATERIAL_NAME like concat('%', #{materialQueryDTO.materialName}, '%')
+            </if>
+            <if test="materialQueryDTO.organizationName != null and materialQueryDTO.organizationName != ''">
+                and O2.ORGANIZATION_NAME like concat('%', #{materialQueryDTO.organizationName}, '%')
+            </if>
+            <if test="materialQueryDTO.categoryId != null">
+                and MI.STRUCT Like concat('%', #{materialQueryDTO.categoryId}, '%')
+            </if>
+            <!--<if test="longs != null and longs.size() > 0">
+                and MI.CATEGORY_ID in
+                <foreach collection="longs" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>-->
+            <if test="null != materialQueryDTO.ceeaPurchaseType and '' != materialQueryDTO.ceeaPurchaseType">
+                and cbcpt.PURCHASE_TYPE_CODE = #{materialQueryDTO.ceeaPurchaseType}
+            </if>
+            <if test="materialQueryDTO.categoryFilter == 'showIT'" >
+                and MI.CATEGORY_ID IN
+                <foreach collection="materialQueryDTO.categoryIds" item="categoryId" open="(" close=")" separator=",">
+                    #{categoryId}
+                </foreach>
+            </if>
+            <if test="materialQueryDTO.categoryFilter == 'notShowIT'" >
+                and MI.CATEGORY_ID NOT IN
+                <foreach collection="materialQueryDTO.categoryIds" item="categoryId" open="(" close=")" separator=",">
+                    #{categoryId}
+                </foreach>
+            </if>
+            and MO.ITEM_STATUS = 'Y'
+            AND MO.USER_PURCHASE = 'Y'
+        </where>
+        <!--group by MI.MATERIAL_ID-->
+        order by MI.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="ceeaListPurchaseCatalogPage"
+            parameterType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO"
+            resultType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO">
+        select mi2.*,
+        mo.ORG_ID,
+        mo.ORG_NAME,          <!-- 业务实体 -->
+        mo.ORGANIZATION_ID,
+        mo.ORGANIZATION_NAME, <!-- 库存组织 -->
+        pl.EFFECTIVE_DATE,    <!-- 有效开始时间 -->
+        pl.EXPIRATION_DATE,
+        pl.TAX_PRICE,
+        pl.CURRENCY_ID,
+        pl.CURRENCY_CODE,
+        pl.CURRENCY_NAME,
+        pl.CEEA_IF_USE,
+        pl.VENDOR_NAME as ceeaSupplierName,
+        pl.VENDOR_ID as ceeaSupplierId,
+        pl.VENDOR_CODE as ceeaSupplierCode,
+        pl.PRICE_LIBRARY_ID
+        from cloud_biz_base.scc_base_material_item mi2
+        left join (select p.EFFECTIVE_DATE,
+        p.EXPIRATION_DATE,
+        p.TAX_PRICE,
+        p.CURRENCY_ID,
+        p.CURRENCY_CODE,
+        p.CURRENCY_NAME,
+        p.CEEA_IF_USE,
+        p.ITEM_ID,
+        p.ITEM_DESC,
+        p.ITEM_CODE,
+        p.VENDOR_ID,
+        p.VENDOR_NAME,
+        p.VENDOR_CODE,
+        p.CEEA_ORG_ID,
+        p.CEEA_ORGANIZATION_ID,
+        p.PRICE_LIBRARY_ID
+        from cloud_biz_inquiry.scc_price_library p
+        where current_date >= DATE_FORMAT(p.EFFECTIVE_DATE,'%Y-%m-%d')
+        and current_date &lt;= DATE_FORMAT(p.EXPIRATION_DATE,'%Y-%m-%d')
+        and p.CEEA_IF_USE = 'Y') pl
+        on mi2.MATERIAL_NAME = pl.ITEM_DESC and mi2.MATERIAL_CODE = pl.ITEM_CODE
+        left join ceea_base_material_org mo on mi2.MATERIAL_ID = mo.MATERIAL_ID
+        <where>
+            and mo.USER_PURCHASE = 'Y'
+            <if test="materialId != null">
+                and mi2.MATERIAL_ID = #{materialId}
+            </if>
+            <if test="materialName != null and materialName != ''">
+                and mi2.MATERIAL_NAME LIKE CONCAT('%',#{materialName},'%')
+            </if>
+            <if test="categoryId != null">
+                and mi2.categoryId = #{categoryId}
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                and mi2.CATEGORY_FULL_NAME LIKE CONCAT('%',#{categoryName},'%')
+            </if>
+            and mo.ORG_ID = #{ceeaOrgId}
+            and mo.ORGANIZATION_ID = #{ceeaOrganizationId}
+            and pl.PRICE_LIBRARY_ID is null
+            <if test="ifCatalogMaterial == 'Y'.toString()">
+                and pl.CEEA_IF_USE = 'Y'
+            </if>
+            <if test="smallCategoryIds != null and smallCategoryIds.size() > 0">
+                and mi2.CATEGORY_ID in
+                <foreach collection="smallCategoryIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryMaterialQueryDTOByCatalogingN"
+            parameterType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO"
+            resultType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO">
+        select a.*,b.ORG_ID,b.ORG_NAME,b.ORGANIZATION_ID,b.ORGANIZATION_NAME
+        from cloud_biz_base.scc_base_material_item a
+        JOIN cloud_biz_base.ceea_base_material_org b ON a.MATERIAL_ID = b.MATERIAL_ID
+        where 1=1
+        AND b.ORG_ID = #{ceeaOrgId}
+        AND b.ORGANIZATION_ID = #{ceeaOrganizationId}
+        AND b.USER_PURCHASE = 'Y'
+        <if test="null != materialId and materialId != ''">
+            AND a.MATERIAL_ID = #{materialId}
+        </if>
+        <if test="materialCode != null and materialCode !=''">
+            and a.material_code = #{materialCode}
+        </if>
+        <if test="null != categoryId3 and categoryId3 != ''">
+            AND a.CATEGORY_ID = #{categoryId3}
+        </if>
+        <if test="null != materialName and materialName != ''">
+            AND a.MATERIAL_NAME  LIKE CONCAT('%',#{materialName},'%')
+        </if>
+        <if test="null != categoryId1 and categoryId1 != ''">
+            AND (a.STRUCT LIKE CONCAT('%',#{categoryId1},'%')
+            <if test="null != categoryId2 and categoryId2 != ''">
+                or a.STRUCT LIKE CONCAT('%',#{categoryId2},'%')
+            </if>
+            )
+        </if>
+        <if test="categoryFilter == 'showIT'" >
+            and a.CATEGORY_ID IN
+            <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="categoryFilter == 'notShowIT'" >
+            and a.CATEGORY_ID NOT IN
+            <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryMaterialQueryDTOByCatalogingY"
+            parameterType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO"
+            resultType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO">
+        SELECT
+        a.ITEM_ID                AS materialId,
+        a.ITEM_DESC              AS materialName,
+        a.ITEM_CODE              AS materialCode,
+        a.UNIT                   AS unitName,
+        a.UNIT_CODE              AS unit,
+        a.CEEA_ORG_ID            AS orgId,
+        a.CEEA_ORG_NAME          AS orgName,
+        a.CEEA_ORGANIZATION_ID   AS organizationId,
+        a.CEEA_ORGANIZATION_NAME AS organizationName,
+        a.EFFECTIVE_DATE,
+        a.EXPIRATION_DATE,
+        a.TAX_PRICE,
+        a.CURRENCY_ID,
+        a.CURRENCY_CODE,
+        a.CURRENCY_NAME,
+        a.CEEA_IF_USE,
+        a.VENDOR_NAME            AS ceeaSupplierName,
+        a.VENDOR_ID              AS ceeaSupplierId,
+        a.VENDOR_CODE            AS ceeaSupplierCode,
+        a.CATEGORY_ID            AS categoryId,
+        a.CATEGORY_CODE          AS categoryCode,
+        a.CATEGORY_NAME          AS categoryName,
+        c.MATERIAL_PICTURE_FILE_ID materialPictureFileId
+        FROM cloud_biz_inquiry.scc_price_library a
+        JOIN cloud_biz_base.scc_base_material_item b ON a.ITEM_ID = b.MATERIAL_ID
+        LEFT JOIN cloud_biz_base.ceea_base_material_item_sec c on c.MATERIAL_NAME = a.ITEM_DESC and c.MATERIAL_CODE = a.ITEM_CODE and c.CEEA_SUPPLIER_ID = a.VENDOR_ID
+        WHERE 1 = 1
+        AND a.CEEA_ORG_ID = #{ceeaOrgId}
+        AND a.CEEA_ORGANIZATION_ID = #{ceeaOrganizationId}
+        AND a.CEEA_IF_USE = 'Y'
+        AND now() BETWEEN a.EFFECTIVE_DATE AND a.EXPIRATION_DATE
+        <if test="null != materialId and materialId != ''">
+            AND a.ITEM_ID  = #{materialId}
+        </if>
+        <if test="materialCode != null and materialCode !=''">
+            and a.material_code = #{materialCode}
+        </if>
+        <if test="null != ceeaSupplierId and ceeaSupplierId != ''">
+            AND a.VENDOR_ID  = #{ceeaSupplierId}
+        </if>
+        <if test="null != categoryId3 and categoryId3 != ''">
+            AND a.CURRENCY_ID  = #{categoryId3}
+        </if>
+        <if test="null != materialName and materialName != ''">
+            AND a.ITEM_DESC  LIKE CONCAT('%',#{materialName},'%')
+        </if>
+        <if test="null != categoryId1 and categoryId1 != ''">
+            AND (b.STRUCT LIKE CONCAT('%',#{categoryId1},'%')
+            <if test="null != categoryId2 and categoryId2 != ''">
+                or b.STRUCT LIKE CONCAT('%',#{categoryId2},'%')
+            </if>
+            )
+        </if>
+        <if test="categoryFilter == 'showIT'" >
+            and b.CATEGORY_ID IN
+            <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="categoryFilter == 'notShowIT'" >
+            and b.CATEGORY_ID NOT IN
+            <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+
+    </select>
+
+    <select id="queryMaterialQueryDTOByCatalogingY1"
+            parameterType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO"
+            resultType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO">
+        SELECT
+        a.ITEM_ID                AS materialId,
+        a.ITEM_DESC              AS materialName,
+        a.ITEM_CODE              AS materialCode,
+        a.UNIT                   AS unitName,
+        a.UNIT_CODE              AS unit,
+        a.CEEA_ORG_ID            AS orgId,
+        a.CEEA_ORG_NAME          AS orgName,
+        a.CEEA_ORGANIZATION_ID   AS organizationId,
+        a.CEEA_ORGANIZATION_NAME AS organizationName,
+        a.EFFECTIVE_DATE,
+        a.EXPIRATION_DATE,
+        a.TAX_PRICE,
+        a.CURRENCY_ID,
+        a.CURRENCY_CODE,
+        a.CURRENCY_NAME,
+        a.CEEA_IF_USE,
+        a.VENDOR_NAME            AS ceeaSupplierName,
+        a.VENDOR_ID              AS ceeaSupplierId,
+        a.VENDOR_CODE            AS ceeaSupplierCode,
+        a.CATEGORY_ID            AS categoryId,
+        a.CATEGORY_CODE          AS categoryCode,
+        a.CATEGORY_NAME          AS categoryName,
+        c.MATERIAL_PICTURE_FILE_ID materialPictureFileId
+        FROM cloud_biz_inquiry.scc_price_library a
+        JOIN cloud_biz_base.scc_base_material_item b ON a.ITEM_ID = b.MATERIAL_ID
+        LEFT JOIN cloud_biz_base.ceea_base_material_item_sec c on c.MATERIAL_NAME = a.ITEM_DESC and c.MATERIAL_CODE = a.ITEM_CODE and c.CEEA_SUPPLIER_ID = a.VENDOR_ID
+        WHERE 1 = 1
+        AND a.CEEA_ORG_ID = #{ceeaOrgId}
+        AND a.CEEA_ORGANIZATION_ID = #{ceeaOrganizationId}
+        AND a.CEEA_IF_USE = 'Y'
+        AND now() BETWEEN a.EFFECTIVE_DATE AND a.EXPIRATION_DATE
+        <if test="null != materialCode and materialCode != ''">
+            AND a.ITEM_CODE  = #{materialCode}
+        </if>
+        <if test="null != materialName and materialName != ''">
+            AND a.ITEM_DESC  = #{materialName}
+        </if>
+        <if test="null != ceeaSupplierId and ceeaSupplierId != ''">
+            AND a.VENDOR_ID  = #{ceeaSupplierId}
+        </if>
+        <if test="null != categoryId1 and categoryId1 != ''">
+            AND (b.STRUCT LIKE CONCAT('%',#{categoryId1},'%')
+            <if test="null != categoryId2 and categoryId2 != ''">
+                or b.STRUCT LIKE CONCAT('%',#{categoryId2},'%')
+            </if>
+            )
+        </if>
+
+    </select>
+
+
+
+    <select id="ceeaListPurchaseCatalogPage2"
+            parameterType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO"
+            resultType="com.midea.cloud.srm.model.base.material.dto.MaterialQueryDTO">
+        select
+        pl.ITEM_ID as materialId,
+        pl.ITEM_DESC as materialName,
+        pl.ITEM_CODE as materialCode,
+        pl.UNIT as unitName,
+        pl.UNIT_CODE as unit,
+        mi2.*,
+        pl.CEEA_ORG_ID as orgId,
+        pl.CEEA_ORG_NAME as orgName,          <!-- 业务实体 -->
+        pl.CEEA_ORGANIZATION_ID as organizationId,
+        pl.CEEA_ORGANIZATION_NAME as organizationName, <!-- 库存组织 -->
+        pl.EFFECTIVE_DATE,    <!-- 有效开始时间 -->
+        pl.EXPIRATION_DATE,
+        pl.TAX_PRICE,
+        pl.CURRENCY_ID,
+        pl.CURRENCY_CODE,
+        pl.CURRENCY_NAME,
+        pl.CEEA_IF_USE,
+        pl.VENDOR_NAME as ceeaSupplierName,
+        pl.VENDOR_ID as ceeaSupplierId,
+        pl.VENDOR_CODE as ceeaSupplierCode,
+        pl.CATEGORY_ID as categoryId,
+        pl.CATEGORY_CODE as categoryCode,
+        pl.CATEGORY_NAME as categoryName
+        from (select p.EFFECTIVE_DATE,
+        p.EXPIRATION_DATE,
+        p.TAX_PRICE,
+        p.CURRENCY_ID,
+        p.CURRENCY_CODE,
+        p.CURRENCY_NAME,
+        p.CEEA_IF_USE,
+        p.ITEM_ID,
+        p.ITEM_DESC,
+        p.ITEM_CODE,
+        p.VENDOR_ID,
+        p.VENDOR_NAME,
+        p.VENDOR_CODE,
+        p.UNIT,
+        p.UNIT_CODE,
+        p.CATEGORY_ID,
+        p.CATEGORY_NAME,
+        p.CATEGORY_CODE,
+        p.CEEA_ORG_ID,
+        p.CEEA_ORG_NAME,
+        p.CEEA_ORGANIZATION_ID,
+        p.CEEA_ORGANIZATION_NAME
+        from cloud_biz_inquiry.scc_price_library p
+        where current_date >= DATE_FORMAT(p.EFFECTIVE_DATE,'%Y-%m-%d')
+        and current_date &lt;= DATE_FORMAT(p.EXPIRATION_DATE,'%Y-%m-%d')
+        and p.CEEA_IF_USE = 'Y') pl
+        left join cloud_biz_base.ceea_base_material_item_sec mi2 on mi2.MATERIAL_NAME = pl.ITEM_DESC and mi2.MATERIAL_CODE = pl.ITEM_CODE and mi2.CEEA_SUPPLIER_ID = pl.VENDOR_ID
+        <where>
+            pl.CEEA_ORG_ID = #{ceeaOrgId}
+            and pl.CEEA_ORGANIZATION_ID = #{ceeaOrganizationId}
+            /*【ceea_base_material_item_sec】的【MATERIAL_ID】修改为【scc_price_library】的【ITEM_ID】*/
+            <if test="materialId != null">
+                and pl.ITEM_ID = #{materialId}
+            </if>
+            /*【ceea_base_material_item_sec】的【MATERIAL_NAME】修改为【scc_price_library】的【ITEM_DESC】*/
+            <if test="materialName != null and materialName != ''">
+                and pl.ITEM_DESC LIKE CONCAT('%',#{materialName},'%')
+            </if>
+            <if test="categoryId != null">
+                and mi2.categoryId = #{categoryId}
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                and mi2.CATEGORY_FULL_NAME LIKE CONCAT('%',#{categoryName},'%')
+            </if>
+            <if test="ifCatalogMaterial == 'Y'.toString()">
+                and pl.CEEA_IF_USE = 'Y'
+            </if>
+            <if test="ceeaSupplierId != null and ceeaSupplierId != ''">
+                and pl.VENDOR_ID = #{ceeaSupplierId}
+            </if>
+            <if test="smallCategoryIds != null and smallCategoryIds.size() > 0">
+                and pl.CATEGORY_ID in
+                <foreach collection="smallCategoryIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            /*目录化物料加入购车车查询条件-物料名称*/
+            <if test="categoryMaterialName != null and categoryMaterialName != ''">
+                and pl.ITEM_DESC = #{categoryMaterialName}
+            </if>
+            /*目录化物料加入购物车查询条件-物料编码*/
+            <if test="categoryMaterialCode != null and categoryMaterialCode != ''">
+                and pl.ITEM_CODE = #{categoryMaterialCode}
+            </if>
+        </where>
+    </select>
+
+    <select id="PurchaseCatalogQueryBatch"
+            parameterType="list"
+            resultType="com.midea.cloud.srm.model.base.material.dto.PurchaseCatalogQueryDto">
+        select a.*,t.rowId from (select mi.*,
+        mo.ORG_NAME as orgName,
+        mo.ORGANIZATION_NAME as organizationName,
+        mo.ORG_ID as ceeaOrgId,
+        mo.ORGANIZATION_ID as ceeaOrganizationId,
+        pl.TAX_PRICE as taxPrice,
+        pl.CURRENCY_ID as currencyId,
+        pl.CURRENCY_CODE as currencyCode,
+        pl.CURRENCY_NAME as currencyName,
+        pl.CEEA_IF_USE as ceeaIfUse <!-- 目录化 -->
+        from cloud_biz_base.scc_base_material_item mi
+        left join ceea_base_material_org mo on mi.MATERIAL_ID = mo.MATERIAL_ID
+        left join (select p.EFFECTIVE_DATE,
+        p.EXPIRATION_DATE,
+        p.TAX_PRICE,
+        p.CURRENCY_ID,
+        p.CURRENCY_CODE,
+        p.CURRENCY_NAME,
+        p.CEEA_IF_USE,
+        p.ITEM_ID,
+        p.item_code
+        from cloud_biz_inquiry.scc_price_library p
+        where NOW() &gt;= p.EFFECTIVE_DATE
+        and NOW() &lt;= p.EXPIRATION_DATE
+        and p.CEEA_IF_USE = 'Y'
+        group by p.EFFECTIVE_DATE,
+        p.EXPIRATION_DATE,
+        p.TAX_PRICE,
+        p.CURRENCY_ID,
+        p.CURRENCY_CODE,
+        p.CURRENCY_NAME,
+        p.CEEA_IF_USE, p.ITEM_ID, p.item_code) pl
+        on mi.MATERIAL_ID = pl.ITEM_ID and mi.MATERIAL_CODE = pl.item_code
+        where 1=1
+        and mo.USER_PURCHASE = 'Y') a
+        inner join (
+        <foreach collection="list" item="item" index="index" separator="UNION ALL">
+            SELECT #{item.materialCode} materialCode,#{item.materialName} materialName,#{item.organizationName}
+            organizationName,
+            #{item.orgName} orgName,#{item.rowId} rowId
+        </foreach>
+        ) t on
+        a.MATERIAL_CODE = t.materialCode
+        and a.MATERIAL_NAME = t.materialName and a.orgName = t.orgName
+        and a.organizationName = t.organizationName
+    </select>
+
+    <select id="queryMaterialItemByCodes" resultType="com.midea.cloud.srm.model.base.material.MaterialItem"
+            parameterType="java.util.List">
+        select a.*, b.FORMULA_VALUE pricingFormulaValue, b.FORMULA_ID pricingFormulaHeaderId
+        from scc_base_material_item a
+        LEFT JOIN ceea_material_formula_relate b ON a.MATERIAL_ID = b.MATERIAL_ID
+        where a.MATERIAL_CODE IN
+        <foreach collection="materialCodeList" item="code" index="index"
+                 open="(" close=")" separator=",">
+            #{code}
+        </foreach>
+    </select>
+
+    <select id="listAllForTranferOrder" resultType="com.midea.cloud.srm.model.base.material.MaterialItem" parameterType="java.util.List">
+        select a.MATERIAL_ID,b.CEEA_IF_USE as ceeaIfCatalogMaterial
+        from scc_base_material_item a
+        inner join cloud_biz_inquiry.scc_price_library b ON b.ITEM_ID = a.MATERIAL_ID
+        <where>
+            <if test="materialIds != null and materialIds.size() > 0">
+                and a.MATERIAL_ID in
+                <foreach collection="materialIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            and b.CEEA_IF_USE = 'Y'
+            and a.CATEGORY_ID is not null
+        </where>
+        GROUP BY a.MATERIAL_ID
+    </select>
+
+    <select id="listAllForImportPriceLibrary" resultType="com.midea.cloud.srm.model.base.material.MaterialItem">
+        select m.MATERIAL_ID,m.MATERIAL_CODE,m.MATERIAL_NAME,m.CATEGORY_ID,m.CATEGORY_NAME,m.UNIT,m.UNIT_NAME
+        from scc_base_material_item m
+    </select>
+
+    <select id="queryItemIdUserPurchase" resultType="com.midea.cloud.srm.model.base.material.dto.ItemCodeUserPurchaseDto"
+            parameterType="com.midea.cloud.srm.model.base.material.dto.ItemCodeUserPurchaseDto">
+        select b.MATERIAL_CODE,a.USER_PURCHASE,a.ITEM_STATUS from ceea_base_material_org a
+        JOIN scc_base_material_item b ON a.MATERIAL_ID = b.MATERIAL_ID
+        where a.ORG_ID = #{orgId}
+        AND a.ORGANIZATION_ID = #{invId}
+        AND b.MATERIAL_CODE in
+        <foreach collection="itemCodes" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="ListMaterialItemByCategoryCode" parameterType="com.midea.cloud.srm.model.base.material.MaterialItem"
+            resultType="com.midea.cloud.srm.model.base.material.MaterialItem">
+    select a.MATERIAL_ID,a.MATERIAL_CODE,a.MATERIAL_NAME,a.CATEGORY_ID,a.CATEGORY_NAME,b.CATEGORY_CODE from cloud_biz_base.scc_base_material_item a
+    inner join cloud_biz_base.scc_base_purchase_category b ON a.CATEGORY_ID = b.CATEGORY_ID
+    ${ew.customSqlSegment}
+    </select>
+
+</mapper>

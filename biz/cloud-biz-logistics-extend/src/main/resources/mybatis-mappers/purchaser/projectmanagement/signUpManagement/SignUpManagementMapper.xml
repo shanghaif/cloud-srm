@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bid.purchaser.projectmanagement.signupmanagement.mapper.SignUpManagementMapper">
+
+    <select id="getSignUpManagementPageInfo"
+            resultType="com.midea.cloud.srm.model.logistics.bid.purchaser.projectmanagement.signupmanagement.vo.SignUpManagementVO">
+        SELECT * FROM (
+	        SELECT v.BIDING_ID, v.BID_VENDOR_ID, v.VENDOR_ID, s.SIGN_UP_ID, v.VENDOR_CODE
+		    , v.VENDOR_NAME, v.LINK_MAN_NAME, v.PHONE, v.EMAIL, s.SIGN_UP_STATUS
+		    , s.REJECT_REASON, s.REPLY_DATETIME
+	        FROM scc_bid_sign_up s
+		    RIGHT JOIN scc_bid_vendor v
+		    ON v.BIDING_ID = s.BIDING_ID AND v.VENDOR_ID = s.VENDOR_ID) c
+        <if test="bidingId != null">
+            WHERE c.BIDING_ID = #{bidingId}
+        </if>
+    </select>
+</mapper>

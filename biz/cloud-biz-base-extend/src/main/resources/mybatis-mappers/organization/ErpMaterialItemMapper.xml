@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.organization.mapper.ErpMaterialItemMapper">
+    <select id="queryErpMaterialItem500"
+            resultType="com.midea.cloud.srm.model.base.organization.entity.ErpMaterialItem">
+        select *
+        from ceea_base_material_item
+        where IMPORT_STATUS = 0
+        limit 1000
+    </select>
+</mapper>

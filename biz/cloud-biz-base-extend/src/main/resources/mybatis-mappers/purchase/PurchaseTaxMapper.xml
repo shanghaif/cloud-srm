@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.purchase.mapper.PurchaseTaxMapper">
+    <select id="queryTaxBy1" resultType="com.midea.cloud.srm.model.base.purchase.entity.PurchaseTax">
+        select * from scc_base_purchase_tax
+        where TAX_KEY LIKE 'IN%'
+          AND TAX_KEY NOT LIKE '%IN VAT%'
+          AND TAX_KEY NOT LIKE '%IN-ASSET%'
+          AND ENABLED = 'Y'
+    </select>
+    <select id="queryTaxBy2" resultType="com.midea.cloud.srm.model.base.purchase.entity.PurchaseTax">
+        select * from scc_base_purchase_tax
+        where TAX_KEY LIKE 'IN-ASSET%'
+        AND ENABLED = 'Y'
+    </select>
+    <select id="queryTaxBy3" resultType="com.midea.cloud.srm.model.base.purchase.entity.PurchaseTax">
+        select * from scc_base_purchase_tax
+        where TAX_KEY LIKE 'IN %'
+        AND ENABLED = 'Y'
+    </select>
+</mapper>

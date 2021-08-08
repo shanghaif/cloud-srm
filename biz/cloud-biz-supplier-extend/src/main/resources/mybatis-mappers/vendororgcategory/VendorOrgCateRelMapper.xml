@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.vendororgcategory.mapper.VendorOrgCateRelMapper">
+
+    <select id="findValidVendorWithOrgCateRelPermission"
+            resultType="com.midea.cloud.srm.model.supplier.info.entity.CompanyInfo">
+        SELECT DISTINCT
+        SSCI.COMPANY_ID,
+        SSCI.COMPANY_CODE,
+        SSCI.COMPANY_NAME
+        FROM SCC_SUP_COMPANY_INFO SSCI
+        INNER JOIN SCC_SUP_ORG_CATEGORY SSOC ON (
+        SSOC.COMPANY_ID = SSCI.COMPANY_ID AND (SSOC.SERVICE_STATUS = 'GREEN' OR SSOC.SERVICE_STATUS = 'VERIFY' OR
+        SSOC.SERVICE_STATUS = 'YELLOW' OR SSOC.SERVICE_STATUS = 'ONE_TIME' OR SSOC.SERVICE_STATUS = 'REGISTERED')
+        )
+        WHERE 1 = 1
+
+        <if test="parameter.vendorIds != null">
+            <foreach collection="parameter.vendorIds" item="vendorId" open="AND (" close=")" separator="or">
+                SSCI.COMPANY_ID = #{vendorId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.orgIds != null">
+            <foreach collection="parameter.orgIds" item="orgId" open="AND (" close=")" separator="or">
+                SSOC.ORG_ID = #{orgId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.categoryIds != null">
+            <foreach collection="parameter.categoryIds" item="categoryId" open="AND (" close=")" separator="or">
+                SSOC.CATEGORY_ID = #{categoryId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.orgCateComposes != null">
+            <foreach collection="parameter.orgCateComposes" item="orgCateCompose" open="AND (" close=")" separator="or">
+                SSOC.ORG_ID = #{orgCateCompose.orgId} AND SSOC.CATEGORY_ID = #{orgCateCompose.categoryId}
+            </foreach>
+        </if>
+
+        ORDER BY
+        CASE SSOC.SERVICE_STATUS WHEN 'GREEN' THEN 1 ELSE 2 END ASC
+
+    </select>
+
+
+    <select id="findValidVendorOrgCateRelations"
+            resultType="com.midea.cloud.srm.model.supplier.vendororgcategory.vo.VendorOrgCateRelVO">
+        SELECT DISTINCT
+        SSCI.COMPANY_ID,
+        SSCI.COMPANY_CODE,
+        SSCI.COMPANY_NAME,
+        SSOC.ORG_CATEGORY_ID,
+        SSOC.ORG_ID,
+        SSOC.ORG_CODE,
+        SSOC.ORG_NAME,
+        SSOC.CATEGORY_ID,
+        SSOC.CATEGORY_CODE,
+        SSOC.CATEGORY_NAME,
+        SSOC.CATEGORY_FULL_ID,
+        SSOC.CATEGORY_FULL_NAME
+        FROM SCC_SUP_COMPANY_INFO SSCI
+        INNER JOIN SCC_SUP_ORG_CATEGORY SSOC ON (
+        SSOC.COMPANY_ID = SSCI.COMPANY_ID AND (SSOC.SERVICE_STATUS = 'GREEN' OR SSOC.SERVICE_STATUS = 'VERIFY' OR
+        SSOC.SERVICE_STATUS = 'YELLOW' OR SSOC.SERVICE_STATUS = 'ONE_TIME'
+        OR SSOC.SERVICE_STATUS = 'REGISTERED'
+        )
+        )
+        WHERE 1 = 1
+
+        <if test="parameter.vendorIds != null">
+            <foreach collection="parameter.vendorIds" item="vendorId" open="AND (" close=")" separator="or">
+                SSCI.COMPANY_ID = #{vendorId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.orgIds != null">
+            <foreach collection="parameter.orgIds" item="orgId" open="AND (" close=")" separator="or">
+                SSOC.ORG_ID = #{orgId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.categoryIds != null">
+            <foreach collection="parameter.categoryIds" item="categoryId" open="AND (" close=")" separator="or">
+                SSOC.CATEGORY_ID = #{categoryId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.orgCateComposes != null">
+            <foreach collection="parameter.orgCateComposes" item="orgCateCompose" open="AND (" close=")" separator="or">
+                (SSOC.ORG_ID = #{orgCateCompose.orgId} AND SSOC.CATEGORY_ID = #{orgCateCompose.categoryId})
+            </foreach>
+        </if>
+
+        ORDER BY
+        CASE SSOC.SERVICE_STATUS WHEN 'GREEN' THEN 1 ELSE 2 END ASC
+
+    </select>
+
+
+    <select id="findVendorOrgCateRelations"
+            resultType="com.midea.cloud.srm.model.supplier.vendororgcategory.vo.VendorOrgCateRelVO">
+        SELECT DISTINCT
+        SSCI.COMPANY_ID,
+        SSCI.COMPANY_CODE,
+        SSCI.COMPANY_NAME,
+        SSOC.ORG_CATEGORY_ID,
+        SSOC.ORG_ID,
+        SSOC.ORG_CODE,
+        SSOC.ORG_NAME,
+        SSOC.CATEGORY_ID,
+        SSOC.CATEGORY_CODE,
+        SSOC.CATEGORY_NAME,
+        SSOC.CATEGORY_FULL_ID,
+        SSOC.CATEGORY_FULL_NAME,
+        SSOC.SERVICE_STATUS
+        FROM SCC_SUP_COMPANY_INFO SSCI
+        INNER JOIN SCC_SUP_ORG_CATEGORY SSOC ON SSOC.COMPANY_ID = SSCI.COMPANY_ID
+        WHERE 1 = 1
+
+        <if test="parameter.vendorIds != null">
+            <foreach collection="parameter.vendorIds" item="vendorId" open="AND (" close=")" separator="or">
+                SSCI.COMPANY_ID = #{vendorId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.orgIds != null">
+            <foreach collection="parameter.orgIds" item="orgId" open="AND (" close=")" separator="or">
+                SSOC.ORG_ID = #{orgId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.categoryIds != null">
+            <foreach collection="parameter.categoryIds" item="categoryId" open="AND (" close=")" separator="or">
+                SSOC.CATEGORY_ID = #{categoryId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+
+        <if test="parameter.orgCateComposes != null">
+            <foreach collection="parameter.orgCateComposes" item="orgCateCompose" open="AND (" close=")" separator="or">
+                (SSOC.ORG_ID = #{orgCateCompose.orgId} AND SSOC.CATEGORY_ID = #{orgCateCompose.categoryId})
+            </foreach>
+        </if>
+
+        ORDER BY
+        CASE SSOC.SERVICE_STATUS WHEN 'GREEN' THEN 1 ELSE 2 END ASC
+
+    </select>
+</mapper>

@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.cm.contract.mapper.ContractHeadMapper">
+
+    <select id="listPageByParam" resultType="com.midea.cloud.srm.model.cm.contract.entity.ContractHead">
+        select
+        CH.CONTRACT_HEAD_ID,
+        CH.CONTRACT_TYPE,
+        CH.CONTRACT_CLASS,
+        CH.TEMPL_HEAD_ID,
+        CH.TEMPL_NAME,
+        CH.CONTRACT_NO,
+        CH.CONTRACT_NAME,
+        CH.SOURCE_NUMBER,
+        CH.MAIN_CONTRACT_NO,
+        CH.VENDOR_ID,
+        CH.VENDOR_CODE,
+        CH.VENDOR_NAME,
+        CH.CURRENCY_ID,
+        CH.CURRENCY_NAME,
+        CH.CURRENCY_CODE,
+        CH.TAX_KEY,
+        CH.TAX_RATE,
+        CH.TAX_NAME,
+        CH.TAX_ID,
+        CH.EXCLUDE_TAX_AMOUNT,
+        CH.ORGANIZATION_ID,
+        CH.FULL_PATH_ID,
+        CH.ORGANIZATION_CODE,
+        CH.ORGANIZATION_NAME,
+        CH.ENGINEER_START_DATE,
+        CH.ENGINEER_END_DATE,
+        CH.ENGINEER_DAYS,
+        CH.ACCEPTANCE_TIME,
+        CH.WARRANTY_PERIOD,
+        CH.CONTRACT_REMARK,
+        CH.APPROVAL_ADVICE,
+        CH.BUYER_ID,
+        CH.BUYER_NAME,
+        CH.CONTRACT_STATUS,
+        CH.VENDOR_CONFIRM_DATE,
+        CH.VENDOR_CONFIRM_BY,
+        CH.PAID_SUM_AMOUNT,
+        CH.UNPAID_AMOUNT,
+        CH.VENDOR_REMARK,
+        CH.VENDOR_REJECT_REASON,
+        CH.CONTRACT_SEND_TYPE,
+        CH.LOGISTICS_NO,
+        CH.ARRIVAL_TIME,
+        CH.RECEIVED_BY,
+        CH.WARRANTY_START_DATE,
+        CH.WARRANTY_END_DATE,
+        CH.VENDOR_FILE_ID,
+        CH.VENDOR_FILE_NAME,
+        CH.OWNER,
+        CH.FAX,
+        CH.PHONE,
+        CH.SIGNING_SITE,
+        CH.POSTCODE,
+        CH.OPENING_BANK,
+        CH.BANK_ACCOUNT,
+        CH.LEGAL_PERSON,
+        CH.ENTRUSTED_AGENT,
+        CH.SECOND_PARTY,
+        CH.SECOND_FAX,
+        CH.SECOND_PHONE,
+        CH.SECOND_SITE,
+        CH.SECOND_POSTCODE,
+        CH.SECOND_OPENING_BANK,
+        CH.SECOND_BANK_ACCOUNT,
+        CH.SECOND_BANK_ACCOUNT_NAME,
+        CH.SECOND_LEGAL_PERSON,
+        CH.SECOND_ENTRUSTED_AGENT,
+        CH.SECOND_SIGN_DATE,
+        CH.START_DATE,
+        CH.END_DATE,
+        CH.CREATED_ID,
+        CH.CREATED_BY,
+        CH.CREATION_DATE,
+        CH.CREATED_BY_IP,
+        CH.LAST_UPDATED_ID,
+        CH.LAST_UPDATED_BY,
+        CH.LAST_UPDATE_DATE,
+        CH.LAST_UPDATED_BY_IP,
+        CH.TENANT_ID,
+        CH.VERSION,
+        CH.MODEL_HEAD_ID,
+        CH.MODEL_NAME,
+        CH.CONTENT,
+        CH.ENABLE,
+        CH.INCLUDE_TAX_AMOUNT,
+        CH.EFFECTIVE_DATE_FROM,
+        CH.EFFECTIVE_DATE_TO,
+        CH.IS_FRAMEWORK_AGREEMENT,
+        CH.IS_HEADQUARTERS,
+        CH.DRAFTER_OPINION,
+        CH.CONTRACT_LEVEL,
+        CH.BU_ID,
+        CH.BU_CODE,
+        CH.BU_NAME,
+        CH.BU_FULL_PATH_ID,
+        CH.CONTRACT_CODE,
+        CH.CONTRACT_OLD_CODE,
+        CH.IS_POWER_STATION,
+        CH.CEEA_FRAMEWORK_AGREEMENT_ID frameworkAgreementId,
+        CH.CEEA_FRAMEWORK_AGREEMENT_NAME frameworkAgreementName,
+        CH.CEEA_FRAMEWORK_AGREEMENT_CODE frameworkAgreementCode,
+        CH.CEEA_IS_PORTABLE_CONTRACT,
+        CH.CEEA_CONTRACT_OLD_ID,
+        CH.CEEA_IF_VIRTUAL
+        from
+        scc_contract_head CH
+        <where>
+            <if test="contractNo != null and contractNo != ''">
+                AND CH.CONTRACT_NO LIKE CONCAT('%', #{contractNo}, '%')
+            </if>
+            <if test="contractCode != null and contractCode != ''">
+                AND CH.CONTRACT_CODE LIKE CONCAT('%', #{contractCode}, '%')
+            </if>
+            <if test="mainContractNo != null and mainContractNo != ''">
+                AND CH.MAIN_CONTRACT_NO LIKE CONCAT('%', #{mainContractNo}, '%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND CH.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="contractName != null and contractName != ''">
+                AND CH.CONTRACT_NAME LIKE CONCAT('%', #{contractName}, '%')
+            </if>
+            <if test="sourceNumber!=null and sourceNumber!=''">
+                AND CH.SOURCE_NUMBER LIKE CONCAT('%', #{sourceNumber}, '%')
+            </if>
+            <if test="contractStatus != null and contractStatus != ''">
+                AND CH.CONTRACT_STATUS LIKE CONCAT('%', #{contractStatus}, '%')
+            </if>
+            <if test="contractType != null and contractType != ''">
+                AND CH.CONTRACT_TYPE LIKE CONCAT('%', #{contractType}, '%')
+            </if>
+            <if test="contractClass != null and contractClass != ''">
+                AND CH.CONTRACT_CLASS LIKE CONCAT('%', #{contractClass}, '%')
+            </if>
+            <if test="buId != null and buId != ''">
+                AND CH.BU_ID LIKE CONCAT('%', #{buId}, '%')
+            </if>
+            <if test="creationDate != null">
+                AND (CH.CREATION_DATE &gt; #{startCreationDate} and CH.CREATION_DATE &lt; #{endCreationDate})
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                AND CH.CREATED_BY LIKE CONCAT('%', #{createdBy}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND CH.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="vendorIdMan != null">
+                AND CH.VENDOR_ID = #{vendorIdMan}
+            </if>
+            <if test="userType == 'VENDOR'">
+                AND CH.CONTRACT_STATUS NOT IN ('DRAFT', 'UNDER_REVIEW', 'UNPUBLISHED', 'REFUSED')
+            </if>
+            <if test="null != frameworkAgreementCode and frameworkAgreementCode != ''">
+                AND CH.CEEA_FRAMEWORK_AGREEMENT_CODE LIKE CONCAT('%', #{frameworkAgreementCode}, '%')
+            </if>
+            <if test="null != frameworkAgreementName and frameworkAgreementName != ''">
+                AND CH.CEEA_FRAMEWORK_AGREEMENT_NAME LIKE CONCAT('%', #{frameworkAgreementName}, '%')
+            </if>
+            <if test="null != ceeaIfVirtual and ceeaIfVirtual != ''">
+                AND CEEA_IF_VIRTUAL = #{ceeaIfVirtual}
+            </if>
+        </where>
+        order by LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="listPageByParamExport" resultType="com.midea.cloud.srm.model.cm.contract.entity.ContractHead">
+        select
+        CH.CONTRACT_HEAD_ID,
+        CH.CONTRACT_TYPE,
+        CH.CONTRACT_CLASS,
+        CH.TEMPL_HEAD_ID,
+        CH.TEMPL_NAME,
+        CH.CONTRACT_NO,
+        CH.CONTRACT_NAME,
+        CH.SOURCE_NUMBER,
+        CH.MAIN_CONTRACT_NO,
+        CH.VENDOR_ID,
+        CH.VENDOR_CODE,
+        CH.VENDOR_NAME,
+        CH.CURRENCY_ID,
+        CH.CURRENCY_NAME,
+        CH.CURRENCY_CODE,
+        CH.TAX_KEY,
+        CH.TAX_RATE,
+        CH.TAX_NAME,
+        CH.EXCLUDE_TAX_AMOUNT,
+        CH.ENGINEER_START_DATE,
+        CH.ENGINEER_END_DATE,
+        CH.ENGINEER_DAYS,
+        CH.ACCEPTANCE_TIME,
+        CH.WARRANTY_PERIOD,
+        CH.CONTRACT_REMARK,
+        CH.APPROVAL_ADVICE,
+        CH.BUYER_ID,
+        CH.BUYER_NAME,
+        CH.CONTRACT_STATUS,
+        CH.VENDOR_CONFIRM_DATE,
+        CH.VENDOR_CONFIRM_BY,
+        CH.PAID_SUM_AMOUNT,
+        CH.UNPAID_AMOUNT,
+        CH.VENDOR_REMARK,
+        CH.VENDOR_REJECT_REASON,
+        CH.CONTRACT_SEND_TYPE,
+        CH.LOGISTICS_NO,
+        CH.ARRIVAL_TIME,
+        CH.RECEIVED_BY,
+        CH.WARRANTY_START_DATE,
+        CH.WARRANTY_END_DATE,
+        CH.VENDOR_FILE_ID,
+        CH.VENDOR_FILE_NAME,
+        CH.OWNER,
+        CH.FAX,
+        CH.PHONE,
+        CH.SIGNING_SITE,
+        CH.POSTCODE,
+        CH.OPENING_BANK,
+        CH.BANK_ACCOUNT,
+        CH.LEGAL_PERSON,
+        CH.ENTRUSTED_AGENT,
+        CH.SECOND_PARTY,
+        CH.SECOND_FAX,
+        CH.SECOND_PHONE,
+        CH.SECOND_SITE,
+        CH.SECOND_POSTCODE,
+        CH.SECOND_OPENING_BANK,
+        CH.SECOND_BANK_ACCOUNT,
+        CH.SECOND_BANK_ACCOUNT_NAME,
+        CH.SECOND_LEGAL_PERSON,
+        CH.SECOND_ENTRUSTED_AGENT,
+        CH.SECOND_SIGN_DATE,
+        CH.START_DATE,
+        CH.END_DATE,
+        CH.CREATED_ID,
+        CH.CREATED_BY,
+        CH.CREATION_DATE,
+        CH.MODEL_HEAD_ID,
+        CH.MODEL_NAME,
+        CH.ENABLE,
+        CH.INCLUDE_TAX_AMOUNT,
+        CH.EFFECTIVE_DATE_FROM,
+        CH.EFFECTIVE_DATE_TO,
+        CH.IS_FRAMEWORK_AGREEMENT,
+        CH.IS_HEADQUARTERS,
+        CH.DRAFTER_OPINION,
+        CH.CONTRACT_LEVEL,
+        CH.BU_CODE,
+        CH.BU_NAME,
+        CH.CONTRACT_CODE,
+        CH.CONTRACT_OLD_CODE,
+        CH.IS_POWER_STATION,
+        CH.CEEA_FRAMEWORK_AGREEMENT_ID frameworkAgreementId,
+        CH.CEEA_FRAMEWORK_AGREEMENT_NAME frameworkAgreementName,
+        CH.CEEA_FRAMEWORK_AGREEMENT_CODE frameworkAgreementCode,
+        CH.CEEA_IS_PORTABLE_CONTRACT,
+        CH.CEEA_CONTRACT_OLD_ID,
+        CH.CEEA_IF_VIRTUAL
+        from
+        scc_contract_head CH
+        <where>
+            <if test="contractNo != null and contractNo != ''">
+                AND CH.CONTRACT_NO LIKE CONCAT('%', #{contractNo}, '%')
+            </if>
+            <if test="contractCode != null and contractCode != ''">
+                AND CH.CONTRACT_CODE LIKE CONCAT('%', #{contractCode}, '%')
+            </if>
+            <if test="mainContractNo != null and mainContractNo != ''">
+                AND CH.MAIN_CONTRACT_NO LIKE CONCAT('%', #{mainContractNo}, '%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND CH.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="contractName != null and contractName != ''">
+                AND CH.CONTRACT_NAME LIKE CONCAT('%', #{contractName}, '%')
+            </if>
+            <if test="sourceNumber!=null and sourceNumber!=''">
+                AND CH.SOURCE_NUMBER LIKE CONCAT('%', #{sourceNumber}, '%')
+            </if>
+            <if test="contractStatus != null and contractStatus != ''">
+                AND CH.CONTRACT_STATUS LIKE CONCAT('%', #{contractStatus}, '%')
+            </if>
+            <if test="contractType != null and contractType != ''">
+                AND CH.CONTRACT_TYPE LIKE CONCAT('%', #{contractType}, '%')
+            </if>
+            <if test="contractClass != null and contractClass != ''">
+                AND CH.CONTRACT_CLASS LIKE CONCAT('%', #{contractClass}, '%')
+            </if>
+            <if test="buId != null and buId != ''">
+                AND CH.BU_ID LIKE CONCAT('%', #{buId}, '%')
+            </if>
+            <if test="creationDate != null">
+                AND (CH.CREATION_DATE &gt; #{startCreationDate} and CH.CREATION_DATE &lt; #{endCreationDate})
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                AND CH.CREATED_BY LIKE CONCAT('%', #{createdBy}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND CH.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="vendorIdMan != null">
+                AND CH.VENDOR_ID = #{vendorIdMan}
+            </if>
+            <if test="userType == 'VENDOR'">
+                AND CH.CONTRACT_STATUS NOT IN ('DRAFT', 'UNDER_REVIEW', 'UNPUBLISHED', 'REFUSED')
+            </if>
+            <if test="null != frameworkAgreementCode and frameworkAgreementCode != ''">
+                AND CH.CEEA_FRAMEWORK_AGREEMENT_CODE LIKE CONCAT('%', #{frameworkAgreementCode}, '%')
+            </if>
+            <if test="null != frameworkAgreementName and frameworkAgreementName != ''">
+                AND CH.CEEA_FRAMEWORK_AGREEMENT_NAME LIKE CONCAT('%', #{frameworkAgreementName}, '%')
+            </if>
+            <if test="null != ceeaIfVirtual and ceeaIfVirtual != ''">
+                AND CEEA_IF_VIRTUAL = #{ceeaIfVirtual}
+            </if>
+        </where>
+        order by LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="queryContractDescExportDate" parameterType="com.midea.cloud.srm.model.cm.contract.dto.ContractHeadDTO"
+            resultType="com.midea.cloud.srm.model.cm.contract.dto.ContractDescExportDto">
+        select a.CONTRACT_NO,
+        a.CONTRACT_CODE,
+        a.CONTRACT_STATUS,
+        (select sum(CEEA_USED_NUMBER)
+        from scc_contract_material cm
+        where cm.CONTRACT_HEAD_ID = a.CONTRACT_HEAD_ID) CEEA_USED_NUMBER,
+        a.CREATION_DATE,
+        a.CREATED_BY,
+        a.CONTRACT_NAME,
+        a.CONTRACT_CLASS,
+        a.MODEL_NAME,
+        a.VENDOR_NAME,
+        a.IS_HEADQUARTERS,
+        a.EFFECTIVE_DATE_FROM,
+        a.EFFECTIVE_DATE_TO,
+        a.CURRENCY_NAME,
+        a.CONTRACT_LEVEL,
+        a.BU_NAME,
+        a.INCLUDE_TAX_AMOUNT,
+        a.CONTRACT_REMARK,
+        b.SOURCE_TYPE,
+        b.SOURCE_NUMBER,
+        b.BU_NAME lineBuName,
+        b.INV_NAME,
+        b.MATERIAL_CODE,
+        b.MATERIAL_NAME,
+        b.CATEGORY_ID,
+        b.CONTRACT_QUANTITY,
+        b.UNIT_NAME,
+        b.UNTAXED_PRICE,
+        b.TAXED_PRICE,
+        b.AMOUNT,
+        b.UN_AMOUNT,
+        b.TAX_KEY,
+        b.START_DATE,
+        b.END_DATE,
+        b.SHELF_LIFE,
+        b.LINE_REMARK,
+        a.CONTRACT_HEAD_ID
+        from scc_contract_head a
+        LEFT JOIN scc_contract_material b ON a.CONTRACT_HEAD_ID = b.CONTRACT_HEAD_ID
+        <where>
+            <if test="contractHeadId != null and contractHeadId != ''">
+                AND a.CONTRACT_HEAD_ID = #{contractHeadId}
+            </if>
+            <if test="contractNo != null and contractNo != ''">
+                AND a.CONTRACT_NO LIKE CONCAT('%', #{contractNo}, '%')
+            </if>
+            <if test="contractCode != null and contractCode != ''">
+                AND a.CONTRACT_CODE LIKE CONCAT('%', #{contractCode}, '%')
+            </if>
+            <if test="mainContractNo != null and mainContractNo != ''">
+                AND a.MAIN_CONTRACT_NO LIKE CONCAT('%', #{mainContractNo}, '%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND a.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="contractName != null and contractName != ''">
+                AND a.CONTRACT_NAME LIKE CONCAT('%', #{contractName}, '%')
+            </if>
+            <if test="sourceNumber!=null and sourceNumber!=''">
+                AND a.SOURCE_NUMBER LIKE CONCAT('%', #{sourceNumber}, '%')
+            </if>
+            <if test="contractStatus != null and contractStatus != ''">
+                AND a.CONTRACT_STATUS LIKE CONCAT('%', #{contractStatus}, '%')
+            </if>
+            <if test="contractType != null and contractType != ''">
+                AND a.CONTRACT_TYPE LIKE CONCAT('%', #{contractType}, '%')
+            </if>
+            <if test="contractClass != null and contractClass != ''">
+                AND a.CONTRACT_CLASS LIKE CONCAT('%', #{contractClass}, '%')
+            </if>
+            <if test="buId != null and buId != ''">
+                AND a.BU_ID LIKE CONCAT('%', #{buId}, '%')
+            </if>
+            <if test="creationDate != null">
+                AND (a.CREATION_DATE &gt; #{startCreationDate} and a.CREATION_DATE &lt; #{endCreationDate})
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                AND a.CREATED_BY LIKE CONCAT('%', #{createdBy}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND a.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="vendorIdMan != null">
+                AND a.VENDOR_ID = #{vendorIdMan}
+            </if>
+            <if test="userType == 'VENDOR'">
+                AND a.CONTRACT_STATUS NOT IN ('DRAFT', 'UNDER_REVIEW', 'UNPUBLISHED', 'REFUSED')
+            </if>
+            <if test="null != frameworkAgreementCode and frameworkAgreementCode != ''">
+                AND a.CEEA_FRAMEWORK_AGREEMENT_CODE LIKE CONCAT('%', #{frameworkAgreementCode}, '%')
+            </if>
+            <if test="null != frameworkAgreementName and frameworkAgreementName != ''">
+                AND a.CEEA_FRAMEWORK_AGREEMENT_NAME LIKE CONCAT('%', #{frameworkAgreementName}, '%')
+            </if>
+            <if test="null != ceeaIfVirtual and ceeaIfVirtual != ''">
+                AND CEEA_IF_VIRTUAL = #{ceeaIfVirtual}
+            </if>
+        </where>
+        order by a.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="queryContractDescExportcount" parameterType="com.midea.cloud.srm.model.cm.contract.dto.ContractHeadDTO"
+            resultType="java.lang.Long">
+        select count(1)
+        from scc_contract_head a
+        LEFT JOIN scc_contract_material b ON a.CONTRACT_HEAD_ID = b.CONTRACT_HEAD_ID
+        <where>
+            <if test="contractHeadId != null and contractHeadId != ''">
+                AND a.CONTRACT_HEAD_ID = #{contractHeadId}
+            </if>
+            <if test="contractNo != null and contractNo != ''">
+                AND a.CONTRACT_NO LIKE CONCAT('%', #{contractNo}, '%')
+            </if>
+            <if test="contractCode != null and contractCode != ''">
+                AND a.CONTRACT_CODE LIKE CONCAT('%', #{contractCode}, '%')
+            </if>
+            <if test="mainContractNo != null and mainContractNo != ''">
+                AND a.MAIN_CONTRACT_NO LIKE CONCAT('%', #{mainContractNo}, '%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND a.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="contractName != null and contractName != ''">
+                AND a.CONTRACT_NAME LIKE CONCAT('%', #{contractName}, '%')
+            </if>
+            <if test="sourceNumber!=null and sourceNumber!=''">
+                AND a.SOURCE_NUMBER LIKE CONCAT('%', #{sourceNumber}, '%')
+            </if>
+            <if test="contractStatus != null and contractStatus != ''">
+                AND a.CONTRACT_STATUS LIKE CONCAT('%', #{contractStatus}, '%')
+            </if>
+            <if test="contractType != null and contractType != ''">
+                AND a.CONTRACT_TYPE LIKE CONCAT('%', #{contractType}, '%')
+            </if>
+            <if test="contractClass != null and contractClass != ''">
+                AND a.CONTRACT_CLASS LIKE CONCAT('%', #{contractClass}, '%')
+            </if>
+            <if test="buId != null and buId != ''">
+                AND a.BU_ID LIKE CONCAT('%', #{buId}, '%')
+            </if>
+            <if test="creationDate != null">
+                AND (a.CREATION_DATE &gt; #{startCreationDate} and a.CREATION_DATE &lt; #{endCreationDate})
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                AND a.CREATED_BY LIKE CONCAT('%', #{createdBy}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND a.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="vendorIdMan != null">
+                AND a.VENDOR_ID = #{vendorIdMan}
+            </if>
+            <if test="userType == 'VENDOR'">
+                AND a.CONTRACT_STATUS NOT IN ('DRAFT', 'UNDER_REVIEW', 'UNPUBLISHED', 'REFUSED')
+            </if>
+            <if test="null != frameworkAgreementCode and frameworkAgreementCode != ''">
+                AND a.CEEA_FRAMEWORK_AGREEMENT_CODE LIKE CONCAT('%', #{frameworkAgreementCode}, '%')
+            </if>
+            <if test="null != frameworkAgreementName and frameworkAgreementName != ''">
+                AND a.CEEA_FRAMEWORK_AGREEMENT_NAME LIKE CONCAT('%', #{frameworkAgreementName}, '%')
+            </if>
+            <if test="null != ceeaIfVirtual and ceeaIfVirtual != ''">
+                AND CEEA_IF_VIRTUAL = #{ceeaIfVirtual}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="queryCount" parameterType="com.midea.cloud.srm.model.cm.contract.dto.ContractHeadDTO"
+            resultType="java.lang.Long">
+        select count(1)
+        from
+        scc_contract_head CH
+        <where>
+            <if test="contractNo != null and contractNo != ''">
+                AND CH.CONTRACT_NO LIKE CONCAT('%', #{contractNo}, '%')
+            </if>
+            <if test="contractCode != null and contractCode != ''">
+                AND CH.CONTRACT_CODE LIKE CONCAT('%', #{contractCode}, '%')
+            </if>
+            <if test="mainContractNo != null and mainContractNo != ''">
+                AND CH.MAIN_CONTRACT_NO LIKE CONCAT('%', #{mainContractNo}, '%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND CH.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="contractName != null and contractName != ''">
+                AND CH.CONTRACT_NAME LIKE CONCAT('%', #{contractName}, '%')
+            </if>
+            <if test="sourceNumber!=null and sourceNumber!=''">
+                AND CH.SOURCE_NUMBER LIKE CONCAT('%', #{sourceNumber}, '%')
+            </if>
+            <if test="contractStatus != null and contractStatus != ''">
+                AND CH.CONTRACT_STATUS LIKE CONCAT('%', #{contractStatus}, '%')
+            </if>
+            <if test="contractType != null and contractType != ''">
+                AND CH.CONTRACT_TYPE LIKE CONCAT('%', #{contractType}, '%')
+            </if>
+            <if test="contractClass != null and contractClass != ''">
+                AND CH.CONTRACT_CLASS LIKE CONCAT('%', #{contractClass}, '%')
+            </if>
+            <if test="buId != null and buId != ''">
+                AND CH.BU_ID LIKE CONCAT('%', #{buId}, '%')
+            </if>
+            <if test="creationDate != null">
+                AND (CH.CREATION_DATE &gt; #{startCreationDate} and CH.CREATION_DATE &lt; #{endCreationDate})
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                AND CH.CREATED_BY LIKE CONCAT('%', #{createdBy}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND CH.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="vendorIdMan != null">
+                AND CH.VENDOR_ID = #{vendorIdMan}
+            </if>
+            <if test="userType == 'VENDOR'">
+                AND CH.CONTRACT_STATUS NOT IN ('DRAFT', 'UNDER_REVIEW', 'UNPUBLISHED', 'REFUSED')
+            </if>
+            <if test="null != frameworkAgreementCode and frameworkAgreementCode != ''">
+                AND CH.CEEA_FRAMEWORK_AGREEMENT_CODE LIKE CONCAT('%', #{frameworkAgreementCode}, '%')
+            </if>
+            <if test="null != frameworkAgreementName and frameworkAgreementName != ''">
+                AND CH.CEEA_FRAMEWORK_AGREEMENT_NAME LIKE CONCAT('%', #{frameworkAgreementName}, '%')
+            </if>
+            <if test="null != ceeaIfVirtual and ceeaIfVirtual != ''">
+                AND CEEA_IF_VIRTUAL = #{ceeaIfVirtual}
+            </if>
+        </where>
+    </select>
+
+    <select id="getOnShelvesContractList" parameterType="java.util.HashMap"
+            resultType="com.midea.cloud.srm.model.inq.price.dto.PriceLibraryContractResDTO">
+        SELECT distinct T.CONTRACT_CODE,T.CONTRACT_HEAD_ID,T.CONTRACT_NO,T.CONTRACT_NAME,T.VENDOR_NAME
+        FROM (SELECT *
+        FROM scc_contract_head
+        WHERE NOW() >= START_DATE
+        AND NOW() &lt;= END_DATE
+        AND START_DATE IS NOT NULL
+        AND END_DATE IS NOT NULL
+        UNION
+        SELECT *
+        FROM scc_contract_head
+        WHERE NOW() >= START_DATE
+        AND START_DATE IS NOT NULL
+        AND END_DATE IS NULL
+        UNION
+        SELECT *
+        FROM scc_contract_head
+        WHERE NOW() &lt;= END_DATE
+        AND START_DATE IS NULL
+        AND END_DATE IS NOT NULL) T
+        left join scc_contract_material M on T.CONTRACT_HEAD_ID = M.CONTRACT_HEAD_ID
+        where T.CONTRACT_STATUS = 'ARCHIVED'
+        <if test="contractCode != null and contractCode != ''">
+            AND T.CONTRACT_NO = #{contractCode}
+        </if>
+        <if test="contractName != null and contractName != ''">
+            AND T.CONTRACT_NAME = #{contractName}
+        </if>
+        <if test="vendorName != null and vendorName != ''">
+            AND T.VENDOR_NAME = #{vendorName}
+        </if>
+        <if test="orgName != null and orgName != ''">
+            AND M.BU_NAME = #{orgName}
+        </if>
+        <if test="OrganizationName != null and OrganizationName != ''">
+            AND M.INV_NAME = #{OrganizationName}
+        </if>
+        <if test="priceLibraryList != null and priceLibraryList.size()> 0">
+            AND
+            <foreach collection="priceLibraryList" index="index" item="item" open="(" separator="or" close=")">
+                (T.VENDOR_CODE = #{item.vendorCode} AND M.MATERIAL_CODE = #{item.itemCode} AND M.MATERIAL_NAME =
+                #{item.itemDesc} AND M.INV_CODE = #{item.ceeaOrganizationCode} AND M.BU_CODE = #{item.ceeaOrgCode})
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryContractItem" parameterType="com.midea.cloud.srm.model.cm.contract.dto.ContractItemDto"
+            resultType="com.midea.cloud.srm.model.cm.contract.dto.ContractMaterialDto2">
+        SELECT a.AMOUNT, b.VENDOR_ID, b.VENDOR_CODE, b.VENDOR_NAME, b.CONTRACT_NO, b.CONTRACT_CODE,
+        b.CONTRACT_HEAD_ID,a.CONTRACT_MATERIAL_ID
+        FROM scc_contract_material a
+        LEFT JOIN scc_contract_head b ON a.CONTRACT_HEAD_ID = b.CONTRACT_HEAD_ID
+        WHERE 1 = 1
+        <if test="null != ouId and ouId != ''">
+            AND a.BU_ID = #{ouId}
+        </if>
+        <if test="null != invId and invId != ''">
+            AND a.INV_ID = #{invId}
+        </if>
+        <if test="null != itemCode and itemCode != ''">
+            AND a.MATERIAL_CODE = #{itemCode}
+        </if>
+        <if test="null != vendorId and vendorId != ''">
+            AND b.VENDOR_ID = #{vendorId}
+        </if>
+        AND (a.END_DATE IS NULL OR a.END_DATE > now())
+        AND (b.END_DATE IS NULL OR b.END_DATE > now())
+    </select>
+
+    <update id="updateContractAmount">
+        UPDATE scc_contract_head a
+        set a.INCLUDE_TAX_AMOUNT = (
+        select sum(b.AMOUNT) from scc_contract_material b where b.CONTRACT_HEAD_ID = a.CONTRACT_HEAD_ID
+        )
+        where a.CONTRACT_HEAD_ID = #{contractHeadId}
+    </update>
+
+
+    <select id="listAllEffectiveCM"
+            resultType="com.midea.cloud.srm.model.cm.contract.vo.ContractVo">
+        SELECT b.CURRENCY_ID,b.CURRENCY_CODE,b.CURRENCY_NAME,b.CONTRACT_CODE,b.VENDOR_ID as
+        HEAD_VENDOR_ID,b.VENDOR_NAME as HEAD_VENDOR_NAME,b.VENDOR_CODE as
+        HEAD_VENDOR_CODE,b.CONTRACT_NO,b.IS_FRAMEWORK_AGREEMENT ,b.CONTRACT_HEAD_ID ,c.CEEA_OU_ID as BU_ID
+        FROM scc_contract_head b
+        left join scc_contract_partner c on b.CONTRACT_HEAD_ID = c.CONTRACT_HEAD_ID
+        WHERE
+        b.IS_FRAMEWORK_AGREEMENT = 'Y'
+        AND (b.END_DATE IS NULL OR b.END_DATE > now())
+        AND (c.END_DATE IS NULL OR c.END_DATE > now())
+        AND b.CONTRACT_STATUS = 'ARCHIVED'
+        <if test="contractItemDto.vendorId != null and contractItemDto.vendorId != ''">
+            and b.VENDOR_ID = #{contractItemDto.vendorId}
+        </if>
+        <!--合同编号id-->
+        <if test="contractItemDto.materialIds != null and contractItemDto.materialIds.size() > 0">
+            and c.CEEA_OU_ID in
+            <foreach collection="contractItemDto.materialIds" item="item" index="index" open="(" close=")"
+                     separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+    <select id="listEffectiveContractByParam"
+            resultType="com.midea.cloud.srm.model.cm.contract.vo.ContractVo">
+        SELECT a.*,b.CURRENCY_ID,b.CURRENCY_CODE,b.CURRENCY_NAME,b.CONTRACT_CODE
+        FROM scc_contract_material a
+        LEFT JOIN scc_contract_head b ON a.CONTRACT_HEAD_ID = b.CONTRACT_HEAD_ID
+        WHERE
+        (a.END_DATE IS NULL OR a.END_DATE > now())
+        AND (b.END_DATE IS NULL OR b.END_DATE > now())
+        AND b.CONTRACT_STATUS = 'ARCHIVED'
+        <if test="buId != null">
+            AND a.BU_ID = #{buId}
+        </if>
+        <if test="invId != null">
+            AND a.INV_ID = #{invId}
+        </if>
+        <if test="materialCode != null and materialCode != ''">
+            AND a.MATERIAL_CODE = #{materialCode}
+        </if>
+        <if test="materialName != null and materialName != ''">
+            AND a.MATERIAL_NAME = #{materialName}
+        </if>
+        <if test="vendorId != null">
+            AND b.VENDOR_ID = #{vendorId}
+        </if>
+    </select>
+
+    <select id="listEffectiveContractByInvCodeAndMaterialCode"
+            resultType="com.midea.cloud.srm.model.cm.contract.vo.ContractVo">
+        SELECT a.INV_ID,a.INV_CODE,a.MATERIAL_CODE,a.MATERIAL_ID,a.MATERIAL_NAME,a.BU_CODE,
+        b.VENDOR_ID as headVendorId,a.CONTRACT_HEAD_ID,b.VENDOR_NAME as headVendorName,b.VENDOR_CODE as headVendorCode,
+        b.CURRENCY_ID as currencyId,b.CURRENCY_NAME as currencyName,b.CURRENCY_CODE as currencyCode,
+        a.UNTAXED_PRICE as untaxedPrice,a.TAXED_PRICE as taxedPrice,a.TAX_KEY as taxKey,b.IS_FRAMEWORK_AGREEMENT as
+        isFrameworkAgreement,
+        a.IS_SEA_FOOD_FORMULA , a.PRICE_JSON ,
+        a.CEEA_FORMULA_VALUE as formulaValue,
+        a.CEEA_FORMULA_ID as formulaId ,
+        a.ESSENTIAL_FACTOR_VALUES,
+        a.TAX_RATE as taxRate,b.CONTRACT_CODE as contractCode,b.CONTRACT_NO as contractNo,b.CREATION_DATE as
+        creationDate,
+        a.CONTRACT_MATERIAL_ID,b.CONTRACT_HEAD_ID
+        FROM scc_contract_material a
+        LEFT JOIN scc_contract_head b ON a.CONTRACT_HEAD_ID = b.CONTRACT_HEAD_ID
+        WHERE
+        b.CONTRACT_STATUS = 'ARCHIVED'
+        <if test="frame !=null and frame != ''">
+            and b.IS_FRAMEWORK_AGREEMENT=#{frame}
+        </if>
+        <if test="invCodes != null and invCodes.size() > 0">
+            and a.INV_CODE in
+            <foreach collection="invCodes" item="invCode" index="index" open="(" close=")" separator=",">
+                #{invCode}
+            </foreach>
+        </if>
+        <if test="materialCodes != null and materialCodes.size() > 0">
+            AND a.MATERIAL_CODE in
+            <foreach collection="materialCodes" item="materialCode" index="index" open="(" close=")" separator=",">
+                #{materialCode}
+            </foreach>
+        </if>
+        <if test="orgCodes != null and orgCodes.size() > 0">
+            AND a.BU_CODE in
+            <foreach collection="orgCodes" item="orgCode" index="index" open="(" close=")" separator=",">
+                #{orgCode}
+            </foreach>
+        </if>
+        and b.EFFECTIVE_DATE_FROM &lt;= #{to} and b.EFFECTIVE_DATE_TO &gt;= #{from}
+        and a.START_DATE &lt;= #{to} and a.END_DATE &gt;= #{from}
+    </select>
+
+    <select id="listEffectiveContractByOrgId"
+            resultType="com.midea.cloud.srm.model.cm.contract.vo.ContractVo">
+        SELECT a.CEEA_OU_ID as buId,a.CEEA_OU_CODE as buCode,
+        b.VENDOR_ID as headVendorId,b.VENDOR_NAME as headVendorName,b.VENDOR_CODE as headVendorCode,
+        b.CURRENCY_ID as currencyId,b.CURRENCY_NAME as currencyName,b.CURRENCY_CODE as currencyCode,
+        b.CONTRACT_CODE as contractCode,b.CREATION_DATE as creationDate,b.CONTRACT_NO as contractNo
+        FROM scc_contract_partner a
+        LEFT JOIN scc_contract_head b ON a.CONTRACT_HEAD_ID = b.CONTRACT_HEAD_ID
+        WHERE
+        b.CONTRACT_STATUS = 'ARCHIVED'
+        and b.IS_FRAMEWORK_AGREEMENT='Y'
+        and a.PARTNER_TYPE='甲方'
+        <if test="orgCodes != null and orgCodes.size() > 0">
+            and a.CEEA_OU_CODE in
+            <foreach collection="orgCodes" item="orgCode" index="index" open="(" close=")" separator=",">
+                #{orgCode}
+            </foreach>
+        </if>
+        and b.EFFECTIVE_DATE_FROM &lt;= #{now} and b.EFFECTIVE_DATE_TO &gt;= #{now}
+    </select>
+
+    <select id="listPageEffectiveByParam"
+            resultType="com.midea.cloud.srm.model.cm.contract.entity.ContractHead">
+        select a.*
+        from scc_contract_head a
+        left join scc_contract_partner b on a.CONTRACT_HEAD_ID = b.CONTRACT_HEAD_ID
+        <where>
+            <if test="buId != null">
+                and b.CEEA_OU_ID = #{buId}
+            </if>
+            <if test="vendorId != null">
+                and a.VENDOR_ID = #{vendorId}
+            </if>
+            and b.PARTNER_TYPE = '甲方'
+            and a.CONTRACT_STATUS = 'ARCHIVED'
+            and a.IS_FRAMEWORK_AGREEMENT = 'N'
+        </where>
+        GROUP BY a.CONTRACT_HEAD_ID
+        order by a.CREATION_DATE desc
+    </select>
+    <select id="listPageEffectiveByParam_COUNT" resultType="Long">
+        select count(distinct a.CONTRACT_HEAD_ID)
+        from scc_contract_head a
+        left join scc_contract_partner b on a.CONTRACT_HEAD_ID = b.CONTRACT_HEAD_ID
+        <where>
+            <if test="buId != null">
+                and b.CEEA_OU_ID = #{buId}
+            </if>
+            <if test="vendorId != null">
+                and a.VENDOR_ID = #{vendorId}
+            </if>
+            and b.PARTNER_TYPE = '甲方'
+            and a.CONTRACT_STATUS = 'ARCHIVED'
+            and a.IS_FRAMEWORK_AGREEMENT = 'N'
+        </where>
+    </select>
+
+    <select id="listContractHeadByVendorIdAndIsFrameworkAgreement"
+            resultType="com.midea.cloud.srm.model.cm.contract.entity.ContractHead">
+        select c.CONTRACT_HEAD_ID,c.CONTRACT_NAME,c.CONTRACT_CODE
+        from scc_contract_head c
+        where c.CONTRACT_STATUS = 'ARCHIVED'
+        <if test="isFrameworkAgreement != null and isFrameworkAgreement != '' ">
+            and c.IS_FRAMEWORK_AGREEMENT= #{isFrameworkAgreement}
+        </if>
+        <if test="vendorId != null and vendorId != ''">
+            and c.VENDOR_ID = #{vendorId}
+        </if>
+    </select>
+
+    <select id="getContractHeadVOList" resultType="com.midea.cloud.srm.model.cm.contract.vo.ContractHeadVO" parameterType="com.midea.cloud.srm.model.cm.contract.entity.ContractHead">
+        select
+        a.CONTRACT_NO,
+        a.CONTRACT_CODE,
+        (SELECT DICT_ITEM_NAME FROM cloud_biz_base.scc_base_dict_item WHERE DICT_ITEM_CODE = a.CONTRACT_STATUS and DICT_ID = 7206491198062592) AS CONTRACT_STATUS,
+        a.CONTRACT_STATUS,
+        a.CREATION_DATE,
+        d.NICKNAME as createdBy,
+        a.CONTRACT_NAME,
+        (SELECT DICT_ITEM_NAME FROM cloud_biz_base.scc_base_dict_item WHERE DICT_ITEM_CODE = a.CONTRACT_CLASS and DICT_ID = 7743554703196160) AS CONTRACT_CLASS,
+        a.TEMPL_NAME,
+        a.VENDOR_NAME,
+        IF(a.IS_HEADQUARTERS='Y','是','否'),
+        a.EFFECTIVE_DATE_FROM,
+        a.EFFECTIVE_DATE_TO,
+        a.CURRENCY_NAME,
+        a.CONTRACT_LEVEL,
+        a.BU_NAME as orgName,
+        0 as line,
+        IF(b.SOURCE_TYPE='RFX','询比价',IF(b.SOURCE_TYPE='BID','招标',b.SOURCE_TYPE)) as SOURCE_TYPE,
+        b.REQ_NUMBER,
+        b.BU_NAME,
+        b.INV_NAME,
+        b.MATERIAL_CODE,
+        b.MATERIAL_NAME,
+        b.CATEGORY_NAME,
+        c.CATEGORY_FULL_NAME,
+        b.ORDER_QUANTITY,
+        b.PRICE_UNIT,
+        b.UN_AMOUNT,
+        b.UNTAXED_PRICE,
+        b.TAXED_PRICE,
+        a.INCLUDE_TAX_AMOUNT,
+        b.START_DATE,
+        b.END_DATE,
+        b.SHELF_LIFE,
+        a.CONTRACT_REMARK,
+        a.LAST_UPDATE_DATE
+        from cloud_biz_contract.scc_contract_head a
+        left join cloud_biz_contract.scc_contract_material b on a.CONTRACT_HEAD_ID=b.CONTRACT_HEAD_ID
+        left join cloud_biz_base.scc_base_material_item  c on b.MATERIAL_ID=c.MATERIAL_ID
+        left join cloud_rbac.scc_rbac_user d on a.CREATED_ID =d.USER_ID
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

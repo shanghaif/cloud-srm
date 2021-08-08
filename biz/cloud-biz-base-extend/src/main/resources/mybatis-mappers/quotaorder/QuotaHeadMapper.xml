@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.quotaorder.mapper.QuotaHeadMapper">
+    <select id="listPage" parameterType="com.midea.cloud.srm.model.base.quotaorder.dto.QuotaHeadDto"
+            resultType="com.midea.cloud.srm.model.base.quotaorder.dto.QuotaHeadDto">
+        select
+            a.*,b.COMPANY_NAME,b.ALLOCATED_AMOUNT,b.QUOTA,b.BASE_NUM
+        from scc_base_quota_head a
+                 LEFT JOIN scc_base_quota_line b on a.QUOTA_HEAD_ID = b.QUOTA_HEAD_ID
+        <where>
+            <if test="null != organizationId">
+                AND a.ORGANIZATION_ID =  #{organizationId}
+            </if>
+            <if test="null != materialId">
+                AND a.MATERIAL_ID =  #{materialId}
+            </if>
+            <if test="null != categoryId">
+                AND a.CATEGORY_ID =  #{categoryId}
+            </if>
+            <if test="null != companyId">
+                AND b.COMPANY_ID =  #{companyId}
+            </if>
+            <if test="null != createdBy">
+                AND a.CREATED_BY like concat('%',#{createdBy},'%')
+            </if>
+            <if test="null != creationDateStart">
+                AND a.CREATION_DATE &gt;=  #{creationDateStart}
+            </if>
+            <if test="null != creationDateEnd">
+                AND a.CREATION_DATE &lt;=  #{creationDateEnd}
+            </if>
+        </where>
+        Order BY a.LAST_UPDATE_DATE
+    </select>
+
+</mapper>

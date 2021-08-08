@@ -1,0 +1,161 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-prd.xml
+  logstashhost: 10.0.3.184 #logstash服务器
+spring:
+  redis:
+    host: 10.0.3.182
+    port: 6379
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  aop:
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+mybatis-plus:
+  type-aliases-package: com.midea.cloud.srm.model.api
+  mapper-locations: classpath*:/mybatis-mappers/**/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+security:
+  oauth2:
+    resource:
+      prefer-token-info: false
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000
+cloud:
+  scc:
+    dynamic:
+      default-module: API
+      datasouces:
+        BASE:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_biz_base?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        SUP:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_biz_supplier?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        BID:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_biz_bidding?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        SUPCOOPERATE:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_biz_supplier_cooperate?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        INQ:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_biz_inquiry?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        FLOW:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_flow?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        LOG:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_log?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        FILE:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_file?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        OAUTH:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_oauth?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        RBAC:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_rbac?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        QUARTZ:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_quartz?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        CONTRACT:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_biz_contract?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        PERF:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_biz_performance?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+        API:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_api?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 5
+          maximumPoolSize: 1000
+        BARGAIN:
+          dirverpath: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.0.3.172:3306/cloud_biz_bargaining?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: apprun
+          password: sre5Prd!j4
+          minimumIdle: 0
+          maximumPoolSize: 1000
+mrpService:
+  token: Bearer 5b14dfa8-1161-4bd0-a0b7-d6ddbb6c5515

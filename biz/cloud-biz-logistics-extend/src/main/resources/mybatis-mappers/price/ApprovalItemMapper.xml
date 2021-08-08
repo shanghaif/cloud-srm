@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.inq.price.mapper.ApprovalItemMapper">
+
+	<select id="queryApprovalItemList" resultType="com.midea.cloud.srm.model.inq.price.entity.ApprovalItem" parameterType="com.midea.cloud.srm.model.pm.po.dto.NetPriceQueryDTO">
+		SELECT 
+			i.*
+		FROM 
+			scc_price_approval_item i
+		WHERE 
+			i.ORGANIZATION_ID = #{organizationId}
+		AND i.VENDOR_ID = #{vendorId}
+		AND i.ITEM_ID = #{materialId}
+		<![CDATA[ AND i.FIXED_PRICE_BEGIN <= #{requirementDate} ]]>
+		<![CDATA[ AND i.FIXED_PRICE_END >= #{requirementDate} ]]>
+		AND EXISTS (
+			SELECT 
+				1
+			FROM 
+				scc_price_approval_header h
+			WHERE 
+				h.APPROVAL_HEADER_ID = i.APPROVAL_HEADER_ID
+			AND h.STATUS = 'RESULT_PASSED'
+		)
+	</select>
+
+</mapper>

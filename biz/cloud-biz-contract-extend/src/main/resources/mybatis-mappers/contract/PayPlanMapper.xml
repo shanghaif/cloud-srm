@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.cm.contract.mapper.PayPlanMapper">
+
+    <select id="listPageContractPayPlanDTO"
+            resultType="com.midea.cloud.srm.model.cm.contract.dto.ContractPayPlanDTO">
+        SELECT
+        SCH.CONTRACT_NO,
+        SCH.VENDOR_ID,
+        SCH.VENDOR_CODE,
+        SCH.VENDOR_NAME,
+        SCH.CONTRACT_HEAD_ID,
+        SCH.TAX_KEY,
+        SCH.TAX_RATE,
+        SCH.TAX_NAME,
+        SCH.TAX_ID,
+        SCPP.PAY_PLAN_ID,
+        SCPP.MILESTONE_STAGE,
+        SCPP.PAY_TYPE_ID,
+        SCPP.PAY_TYPE,
+        SCPP.PAY_METHOD,
+        SCPP.EXCLUDE_TAX_PAY_AMOUNT AS totalAmountNoTax,
+        SCPP.PAID_AMOUNT
+        FROM
+        scc_contract_head SCH
+        LEFT JOIN
+        scc_contract_pay_plan SCPP
+        ON
+        SCH.CONTRACT_HEAD_ID = SCPP.CONTRACT_HEAD_ID
+        <where>
+            <if test="contractNo != null and contractNo != ''">
+                AND SCH.CONTRACT_NO LIKE CONCAT('%', #{contractNo}, '%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND SCH.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND SCH.VENDOR_ID = #{vendorId}
+            </if>
+        </where>
+        order by SCH.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="findList" resultType="com.midea.cloud.srm.model.cm.contract.vo.PayPlanVo">
+        select p.*,h.CONTRACT_NO
+        FROM scc_contract_head h
+        LEFT JOIN scc_contract_pay_plan p ON p.CONTRACT_HEAD_ID = h.CONTRACT_HEAD_ID
+        <where>
+            <!--没有内容的付款计划不显示-->
+            p.pay_plan_id IS NOT null
+            <if test="vendorId != null">
+                and h.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="contractNo != null and contractNo != ''">
+                and (h.CONTRACT_NO = #{contractNo} or h.CONTRACT_CODE = #{contractNo})
+            </if>
+            <if test="orgId != null">
+                and h.BU_ID = #{orgId}
+            </if>
+        </where>
+
+    </select>
+</mapper>

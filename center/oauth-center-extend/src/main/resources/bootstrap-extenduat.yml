@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: oauth-center
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-center
+      profile: uat
+server:
+  port: 8805
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://10.16.81.59:8761/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-expiration-duration-in-seconds: 15
+    lease-renewal-interval-in-seconds: 5
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.hostname}:${spring.cloud.client.ip-address}:${server.port}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /

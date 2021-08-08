@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.inq.quote.mapper.QuoteHeaderMapper">
+
+    <resultMap id="quoteTrackingQueryMap" type="com.midea.cloud.srm.model.inq.quote.domain.QuoteTrackingQueryResult">
+        <id column="QUOTE_ID" property="quoteId" jdbcType="BIGINT"></id>
+        <result column="QUOTE_NO" property="quoteNo" jdbcType="VARCHAR"></result>
+        <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR"></result>
+        <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR"></result>
+        <result column="LINK_MAN" property="linkMan" jdbcType="VARCHAR"></result>
+        <result column="PHONE" property="phone" jdbcType="VARCHAR"></result>
+        <result column="EMAIL" property="email" jdbcType="VARCHAR"></result>
+        <result column="STATUS" property="quoteStatus" jdbcType="VARCHAR"></result>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"></result>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"></result>
+        <result column="CANCEL_DESCRIPTION" property="cancelDescription" jdbcType="VARCHAR"></result>
+    </resultMap>
+    <select id="queryByInquiryId" resultMap="quoteTrackingQueryMap">
+        SELECT
+            header.QUOTE_ID,
+            header.QUOTE_NO,
+            vendor.VENDOR_CODE,
+            vendor.VENDOR_NAME,
+            vendor.LINK_MAN,
+            vendor.PHONE,
+            vendor.EMAIL,
+            header.STATUS,
+            header.REJRCT_REASON,
+            header.CURRENCY,
+            header.CREATED_BY,
+            header.CREATION_DATE,
+            header.CANCEL_DESCRIPTION
+        FROM
+            scc_inquiry_vendor vendor
+            LEFT JOIN scc_quote_header header ON header.INQUIRY_ID = vendor.INQUIRY_ID
+                AND header.VENDOR_ID = vendor.VENDOR_ID
+                AND header.STATUS NOT IN ('ABANDONED')
+            WHERE vendor.INQUIRY_ID = #{inquiryId}
+    </select>
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.reconciliation.mapper.ReconciliationTrackMapper" >
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.ReconciliationTrack" >
+    <id column="RECONCILIATION_TRACK_ID" property="reconciliationTrackId" jdbcType="BIGINT" />
+    <result column="BILL_TYPE" property="billType" jdbcType="VARCHAR" />
+    <result column="BILL_CODE" property="billCode" jdbcType="VARCHAR" />
+    <result column="BUSINESS_DATE" property="businessDate" jdbcType="TIMESTAMP" />
+    <result column="RFQ_SETTLEMENT_CURRENCY" property="rfqSettlementCurrency" jdbcType="VARCHAR" />
+    <result column="PRICE_TAX_SUM" property="priceTaxSum" jdbcType="DECIMAL" />
+    <result column="ORDER_ID" property="orderId" jdbcType="BIGINT" />
+    <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="WAREHOUSE_RECEIPT_ID" property="warehouseReceiptId" jdbcType="BIGINT" />
+    <result column="WAREHOUSE_RECEIPT_NUMBER" property="warehouseReceiptNumber" jdbcType="VARCHAR" />
+    <result column="RETURN_ORDER_ID" property="returnOrderId" jdbcType="BIGINT" />
+    <result column="RETURN_ORDER_NUMBER" property="returnOrderNumber" jdbcType="VARCHAR" />
+    <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+    <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+    <result column="VERSION" property="version" jdbcType="BIGINT" />
+  </resultMap>
+  <resultMap id="ListResultMap" extends="BaseResultMap"
+             type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.dto.ReconciliationTrackDTO">
+    <collection column="RECONCILIATION_TRACK_ID" javaType="java.util.List" property="reconciliationInvoices"
+                select="com.midea.cloud.srm.supcooperate.reconciliation.mapper.ReconciliationInvoiceMapper.findList"
+                ofType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.ReconciliationInvoice"/>
+    <collection column="RECONCILIATION_TRACK_ID" javaType="java.util.List" property="reconciliationPayments"
+                select="com.midea.cloud.srm.supcooperate.reconciliation.mapper.ReconciliationPaymentMapper.findList"
+                ofType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.ReconciliationPayment"/>
+  </resultMap>
+
+  <select id="findList" resultMap="ListResultMap"
+          parameterType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.dto.ReconciliationTrackRequestDTO">
+        SELECT rt.* FROM scc_sc_reconciliation_track rt
+        <where>
+          <if test="vendorId != null">
+            and rt.VENDOR_ID = #{vendorId}
+          </if>
+          <if test="billCode != null and billCode !=''">
+            and rt.BILL_CODE LIKE CONCAT('%',#{billCode},'%')
+          </if>
+          <if test="startBusinessDate != null and startBusinessDate != ''">
+            and rt.BUSINESS_DATE &gt;= STR_TO_DATE(#{startBusinessDate}, '%Y-%m-%d')
+          </if>
+          <if test="endBusinessDate != null and endBusinessDate != ''">
+            and rt.BUSINESS_DATE &lt;= STR_TO_DATE(#{endBusinessDate}, '%Y-%m-%d')
+          </if>
+        </where>
+    ORDER BY rt.CREATION_DATE
+  </select>
+</mapper>

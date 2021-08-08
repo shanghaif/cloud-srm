@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.flow.workflow.mapper.TemplateHeaderMapper">
+
+    <!-- 根据条件获取流程头、行相关信息ResultMap-->
+    <resultMap id="queryProcessTemplateByParamResultMap" type="com.midea.cloud.srm.model.flow.process.dto.TemplateHeaderDTO">
+        <id column="templateHeadId" property="templateHeadId" />
+        <result column="modelId" property="modelId" />
+        <result column="templateCode" property="templateCode" />
+        <result column="templateId" property="templateId" />
+        <result column="description" property="description" />
+        <result column="pendingApproveUrl" property="pendingApproveUrl" />
+        <result column="feignClient" property="feignClient" />
+        <result column="bussinessClass" property="bussinessClass" />
+        <result column="language" property="language" />
+        <result column="version" property="version" />
+        <result column="enableFlag" property="enableFlag" />
+
+        <collection property="templateLinesList" ofType="com.midea.cloud.srm.model.flow.process.entity.TemplateLines">
+            <id column="templateLinesId" property="templateLinesId" />
+            <result column="linesDescription" property="description" />
+            <result column="bussinessType" property="bussinessType" />
+            <result column="bussinessFunction" property="bussinessFunction" />
+        </collection>
+
+    </resultMap>
+
+    <!-- 根据条件获取流程头、行相关信息-->
+    <select id="queryProcessTemplateByParam" resultMap="queryProcessTemplateByParamResultMap">
+        SELECT
+        h.TEMPLATE_HEAD_ID templateHeadId,
+        h.MODEL_ID modelId,
+        h.TEMPLATE_CODE templateCode,
+        h.TEMPLATE_ID templateId,
+        h.DESCRIPTION description,
+        h.PENDING_APPROVE_URL pendingApproveUrl,
+        h.FEIGN_CLIENT feignClient,
+        h.BUSSINESS_CLASS bussinessClass,
+        h.LANGUAGE language,
+        h.VERSION VERSION,
+        h.ENABLE_FLAG enableFlag,
+        l.TEMPLATE_LINES_ID templateLinesId,l.DESCRIPTION linesDescription,l.BUSSINESS_TYPE bussinessType,
+        l.BUSSINESS_FUNCTION bussinessFunction
+        FROM srm_cbpm_template_header h
+        LEFT JOIN srm_cbpm_template_lines l ON h.TEMPLATE_HEAD_ID = l.TEMPLATE_HEAD_ID
+        <if test="templateHeader.deleteFlag != null"> AND l.DELETE_FLAG = #{templateHeader.deleteFlag} </if>
+        WHERE 1=1 <if test="templateHeader.deleteFlag != null"> AND h.DELETE_FLAG = #{templateHeader.deleteFlag} </if>
+        <if test="templateHeader.modelId != null and '' != templateHeader.modelId">AND h.MODEL_ID = #{templateHeader.modelId}</if>
+        <if test="templateHeader.templateCode != null and '' != templateHeader.templateCode">AND h.TEMPLATE_CODE = #{templateHeader.templateCode}</if>
+        <if test="templateHeader.templateHeadId != null and '' != templateHeader.templateHeadId">AND h.TEMPLATE_HEAD_ID = #{templateHeader.templateHeadId}</if>
+        <if test="templateHeader.modelId != null and '' != templateHeader.modelId">AND h.MODEL_ID = #{templateHeader.modelId}</if>
+        <if test="templateHeader.enableFlag != null and '' != templateHeader.enableFlag">AND h.ENABLE_FLAG = #{templateHeader.enableFlag}</if>
+        <if test="templateHeader.bussinessType != null and '' != templateHeader.bussinessType">AND l.BUSSINESS_TYPE = #{templateHeader.bussinessType}</if>
+        <if test="templateHeader.bussinessFunction != null and '' != templateHeader.bussinessFunction">AND l.BUSSINESS_FUNCTION = #{templateHeader.bussinessFunction}</if>
+    </select>
+
+</mapper>

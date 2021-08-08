@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.ps.payment.mapper.CeeaPaymentApplyHeadMapper">
+    <select id="findList" parameterType="com.midea.cloud.srm.model.pm.ps.payment.dto.CeeaPaymentApplyHeadQueryDTO" resultType="com.midea.cloud.srm.model.pm.ps.payment.entity.CeeaPaymentApplyHead">
+        select *
+        from ceea_ps_payment_apply_head pah
+        <where>
+            <if test="paymentApplyNumber != null and paymentApplyNumber != ''">
+                and pah.PAYMENT_APPLY_NUMBER like CONCAT('%',#{paymentApplyNumber},'%')
+            </if>
+            <if test="startDate != null and startDate != ''">
+                and pah.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startDate},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and pah.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endDate},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="orgIdList != null and orgIdList.size() > 0">
+                and pah.ORG_ID in
+                <foreach collection="orgIdList" item="orgIdItem" index="index" open="(" close=")" separator=",">
+                    #{orgIdItem}
+                </foreach>
+            </if>
+
+            <if test="vendorKey != null and vendorKey != ''">
+                and pah.VENDOR_CODE like CONCAT('%',#{vendorKey},'%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                and pah.VENDOR_NAME like CONCAT('%',#{vendorName},'%')
+            </if>
+
+            <if test="costTypeName != null and costTypeName != ''">
+                and pah.COST_TYPE_NAME = #{costTypeName}
+            </if>
+            <if test="costTypeCode != null and costTypeCode != ''">
+                and pah.COST_TYPE_CODE = #{costTypeCode}
+            </if>
+            <if test="receiptStatus != null and receiptStatus != ''">
+                and pah.RECEIPT_STATUS = #{receiptStatus}
+            </if>
+            <if test="contractNum != null and contractNum != ''">
+                and pah.CONTRACT_NUM like CONCAT('%',#{contractNum},'%')
+            </if>
+            <if test="businessType != null and businessType != ''">
+                and pah.BUSINESS_TYPE = #{businessType}
+            </if>
+            <if test="ifPayAgent != null and ifPayAgent != ''">
+                and pah.IF_PAY_AGENT = #{ifPayAgent}
+            </if>
+            <if test="payAgentOrgIds != null and payAgentOrgIds.size() > 0">
+                and pah.PAY_AGENT_ORG_ID in
+                <foreach collection="payAgentOrgIds" item="payAgentOrgIdItem" index="index" open="(" close=")" separator=",">
+                    #{payAgentOrgIdItem}
+                </foreach>
+            </if>
+            <if test="ifPowerStationBusiness != null and ifPowerStationBusiness != ''">
+                and pah.IF_POWER_STATION_BUSINESS = #{ifPowerStationBusiness}
+            </if>
+            <if test="projectCode != null and projectCode != ''">
+                and pah.PROJECT_CODE like CONCAT('%',#{projectCode},'%')
+            </if>
+        </where>
+        order by pah.CREATION_DATE desc
+    </select>
+</mapper>

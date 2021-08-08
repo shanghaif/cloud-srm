@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.report.supplier.mapper.SupplierMapper">
+
+	<select id="getSupplierCount" resultType="java.math.BigDecimal">
+       	select count(DISTINCT COMPANY_ID)  from scc_sup_org_info  t
+        <where>
+            <if test="list != null and list.size()>0">
+                and t.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="endDate != null" >
+           		<![CDATA[ AND t.creation_date <= #{endDate}]]>
+            </if>
+        </where>
+    </select>
+    
+    <select id="getActiveCount" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+       	select 
+		od.CURRENCY
+		,od.ORDER_NUM
+		,od.UNIT_PRICE_CONTAINING_TAX
+		,o.VENDOR_ID
+		,c.COMPANY_NAME VENDOR_NAME
+		from scc_sc_order o 
+		INNER JOIN scc_sc_order_detail od on o.ORDER_ID = od.ORDER_DETAIL_ID
+		left join scc_sup_company_info c on c.company_id = o.vendor_id
+        <where>
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="startDate != null and endDate != null">
+                AND o.creation_date between #{startDate} AND #{endDate}
+            </if>
+        </where>
+    </select>   
+    
+    
+    <select id="getWareHouse" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        select
+		wr.WAREHOUSE_RECEIPT_QUANTITY
+		,RETURN_QUANTITY 
+		,od.UNIT_PRICE_CONTAINING_TAX    
+		,od.CURRENCY   
+		,od.ORDER_NUM   
+		,od.REQUIREMENT_DATE
+		,o.VENDOR_ID
+		,c.COMPANY_NAME VENDOR_NAME
+		,od.CATEGORY_NAME
+		,od.CATEGORY_ID
+		,od.ORGANIZATION_NAME
+		from scc_sc_warehouse_receipt wr
+		INNER JOIN scc_sc_order_detail od on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		inner join scc_sc_order o on od.order_id = o.order_id
+		left join (
+				select srd.WAREHOUSE_RECEIPT_ID,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join  scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id where return_status='CONFIRM'
+				group by srd.WAREHOUSE_RECEIPT_ID
+		) rd  on rd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+		left join scc_sup_company_info c on c.company_id = o.vendor_id
+        <where>
+             o.ORDER_STATUS = 'ACCEPT'
+             and wr.WAREHOUSE_RECEIPT_STATUS='CONFIRMED'
+            
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="startDate != null and endDate != null">
+                AND wr.CONFIRM_TIME between #{startDate} AND #{endDate}
+            </if>
+        </where>
+
+        union all
+        select
+        0 WAREHOUSE_RECEIPT_QUANTITY,
+        null RETURN_QUANTITY ,
+        0 UNIT_PRICE_CONTAINING_TAX,
+        'CNY' CURRENCY,
+        0 ORDER_NUM ,
+        null REQUIREMENT_DATE ,
+        c.COMPANY_ID ,
+        c.COMPANY_NAME VENDOR_NAME,
+        null CATEGORY_NAME,
+        null CATEGORY_ID,
+        null ORGANIZATION_NAME
+
+        from scc_sup_company_info c
+        where c.COMPANY_ID in(
+        select company_id from scc_sup_org_info t
+        where t.company_id not in(
+        select o.VENDOR_ID
+        from scc_sc_warehouse_receipt wr
+        INNER JOIN scc_sc_order_detail od on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+        inner join scc_sc_order o on od.order_id = o.order_id
+        where o.ORDER_STATUS = 'ACCEPT'
+        and wr.WAREHOUSE_RECEIPT_STATUS='CONFIRMED'
+        ))
+
+    </select> 
+    
+    <select id="getAddCount" resultType="java.math.BigDecimal">
+    	select count(DISTINCT COMPANY_ID) from (
+		select MIN(START_DATE) START_DATE,COMPANY_ID from scc_sup_org_info t
+		where t.SERVICE_STATUS in ('EFFECTIVE')
+		<if test="list != null and list.size()>0">
+            and t.full_path_id in
+            <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
+        </if>
+		group by COMPANY_ID
+		) a where 1=1
+		<if test="startDate != null and endDate != null">
+                AND a.START_DATE between #{startDate} AND #{endDate}
+        </if>
+    </select> 
+    
+    <select id="getOutCount" resultType="java.math.BigDecimal">
+    	select count(DISTINCT COMPANY_ID) from scc_sup_org_info t
+		where t.SERVICE_STATUS = 'INVALID'
+		<if test="list != null and list.size()>0">
+            and t.full_path_id in
+            <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
+        </if>
+		
+		<if test="startDate != null and endDate != null">
+           AND t.END_DATE between #{startDate} AND #{endDate}
+        </if>
+		and not exists (
+		select 1 from scc_sup_org_info t1
+		where (t1.SERVICE_STATUS in ('EFFECTIVE','INTRODUCTION')
+		or (t1.SERVICE_STATUS in('INVALID') 
+		<if test="endDate != null">
+			and t1.END_DATE >#{endDate}
+		</if>
+		 )
+		 
+		)  and t.COMPANY_ID = t1.COMPANY_ID
+		
+		<if test="list != null and list.size()>0">
+            and t1.full_path_id in
+            <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
+        </if>
+		)
+    </select> 
+    
+    <select id="getCompanyMonths" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierMonthsDTO">
+        select 
+		t.COMPANY_ID
+		,TIMESTAMPDIFF(month,min(t.CREATION_DATE),now()) months
+		from scc_sup_org_info t
+        <where>
+        	 t.SERVICE_STATUS='EFFECTIVE'
+            <if test="list != null and list.size()>0">
+                and t.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="endDate != null" >
+           		<![CDATA[ AND t.creation_date <= #{endDate}]]>
+            </if>
+        </where>
+        group by t.COMPANY_ID
+    </select>
+    
+    
+    <select id="getMap" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierMapDTO">
+        select c.COMPANY_PROVINCE ,count(0) num from scc_sup_company_info c
+        <where>
+        	 c.COMPANY_PROVINCE is not null
+			and c.COMPANY_PROVINCE !=''
+            <if test="list != null and list.size()>0">
+            and exists (
+				select 1 from scc_sup_org_info t 
+				where t.company_id = c.company_id
+				and t.SERVICE_STATUS in ('EFFECTIVE','INTRODUCTION')
+	            and t.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            
+            <if test="endDate != null" >
+           		<![CDATA[ AND t.START_DATE <= #{endDate}]]>
+            </if>
+            
+            )
+            </if>
+        </where>
+        group by c.COMPANY_PROVINCE
+    </select>
+    
+    <select id="getPeformance" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierPerformanceDTO">
+          select 
+          t.OVERALL_SCORE_ID
+		,t.FULL_PATH_ID
+		,t.COMPANY_ID
+		,t.CATEGORY_ID
+		,t.CREATION_DATE
+		,t.PER_START_MONTH
+		,t.PER_END_MONTH
+		,t.SCORE
+		from 
+		scc_perf_overall_score t
+	
+        <where>
+        	 t.Status='RESULT_PUBLISHED'
+            <if test="list != null and list.size()>0">
+	            and t.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            <if test="startDate != null and endDate != null">
+            	<![CDATA[
+                	and (
+                	( t.per_start_month <= #{startDate} and t.per_end_month >= #{startDate} )
+                	or ( t.per_start_month <= #{endDate} and t.per_end_month >= #{endDate} )
+                	or (t.per_start_month >= #{startDate} and t.per_end_month <= #{endDate}) 
+                	)
+                ]]>
+            </if>
+            
+            </if>
+        </where>
+        order by CREATION_DATE desc
+    </select>
+    
+    
+    <select id="getCategory" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierCategoryDTO">
+       select 
+		t.CATEGORY_ID
+		,count(DISTINCT t.COMPANY_ID) num
+		from scc_sup_org_category t
+        <where>
+        	 t.SERVICE_STATUS='GREEN'
+            <if test="list != null and list.size()>0">
+                and t.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="endDate != null" >
+           		<![CDATA[ AND t.START_DATE <= #{endDate}]]>
+            </if>
+        </where>
+        group by t.CATEGORY_ID
+    </select>
+    
+    
+    <select id="queryCooperationDetail" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierAnalysisDetailDTO">
+       select 
+		c.COMPANY_NAME
+		,o.ORG_NAME ORGANIZATION_NAME
+		,c.COMPANY_REGISTERED_DATE
+		,o.START_DATE
+		,o.END_DATE
+		,round(TIMESTAMPDIFF(month,o.START_DATE,now())/12,0) COOPERATION_YEAR
+		,c.DATA_SOURCES
+		from scc_sup_org_info o
+		INNER JOIN scc_sup_company_info c on o.COMPANY_ID = c.COMPANY_ID
+        <where>
+        	 o.SERVICE_STATUS='EFFECTIVE'
+            <if test="list != null and list.size()>0">
+                and o.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="endDate != null" >
+           		<![CDATA[ AND o.START_DATE <= #{endDate}]]>
+            </if>
+        </where>
+    </select>
+    
+    <select id="queryPeformanceDetail" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierAnalysisDetailDTO">
+       select
+		t.COMPANY_NAME
+		,t.SCORE
+		,t.PER_START_MONTH
+		,t.PER_END_MONTH
+		,ms.INDICATOR_LINE_DES
+		,t.CATEGORY_NAME
+		,t.ORGANIZATION_NAME
+		,ms.LAST_UPDATE_DATE evalution_Date
+		,ms.INDICATOR_NAME
+		,ms.SCORE_NICK_NAME
+		from scc_perf_overall_score t 
+		INNER JOIN scc_perf_score_man_scoring ms on t.SCORE_ITEMS_ID = ms.SCORE_ITEMS_ID and t.TEMPLATE_HEAD_ID = ms.TEMPLATE_HEAD_ID
+		and t.PER_START_MONTH = ms.PER_START_MONTH and t.PER_END_MONTH = ms.PER_END_MONTH and t.EVALUATION_PERIOD = ms.EVALUATION_PERIOD and ms.status='SCORE_CALCULATED'
+		and t.COMPANY_ID = ms.COMPANY_ID and t.CATEGORY_ID = ms.CATEGORY_ID and t.full_path_id = ms.full_path_id
+		<where>
+        	 t.Status='RESULT_PUBLISHED'
+            <if test="list != null and list.size()>0">
+	            and t.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            <if test="startDate != null and endDate != null">
+            	<![CDATA[
+                	and (
+                	( t.per_start_month <= #{startDate} and t.per_end_month >= #{startDate} )
+                	or ( t.per_start_month <= #{endDate} and t.per_end_month >= #{endDate} )
+                	or (t.per_start_month >= #{startDate} and t.per_end_month <= #{endDate}) 
+                	)
+                ]]>
+            </if>
+            
+            </if>
+        </where>
+    </select>
+    
+    
+    <select id="queryCategoryDetail" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierAnalysisDetailDTO">
+      	select
+		max(t.CATEGORY_NAME) CATEGORY_NAME
+		,t.CATEGORY_ID
+		,sum(case when t.SERVICE_STATUS ='GREEN' then 1 else 0 end) cooperation_Vendor_Num
+		,sum(case when t.SERVICE_STATUS = 'INVALID' then 1 else 0 end) out_Vendor_Num
+		from scc_sup_org_category t
+		<where>
+        	 t.SERVICE_STATUS='GREEN'
+            <if test="list != null and list.size()>0">
+                and t.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="endDate != null" >
+           		<![CDATA[ AND t.START_DATE <= #{endDate}]]>
+            </if>
+        </where>
+		group by t.CATEGORY_ID
+    </select>
+    
+    <select id="querySupplierDetail" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierAnalysisDetailDTO">
+     	select
+		wr.WAREHOUSE_RECEIPT_QUANTITY
+		,RETURN_QUANTITY 
+		,od.UNIT_PRICE_CONTAINING_TAX    
+		,od.CURRENCY   
+		,od.ORDER_NUM   
+		,od.REQUIREMENT_DATE
+		,o.VENDOR_ID
+		,c.COMPANY_NAME
+		,od.CATEGORY_NAME
+		,od.CATEGORY_ID
+		,od.ORGANIZATION_NAME
+		,od.MATERIAL_CODE
+		,od.MATERIAL_NAME
+		,c.COMPANY_REGISTERED_DATE
+		,oi.START_DATE
+		,oi.END_DATE
+		,c.DATA_SOURCES
+		,round(TIMESTAMPDIFF(month,oi.START_DATE,now())/12,0) COOPERATION_YEAR
+		from scc_sc_warehouse_receipt wr
+		INNER JOIN scc_sc_order_detail od on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		inner join scc_sc_order o on od.order_id = o.order_id
+		left join (
+				select srd.WAREHOUSE_RECEIPT_ID,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join  scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id where return_status='CONFIRM'
+				group by srd.WAREHOUSE_RECEIPT_ID
+		) rd  on rd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+		left join scc_sup_company_info c on c.company_id = o.vendor_id
+		INNER JOIN scc_sup_org_info oi on oi.COMPANY_ID = c.COMPANY_ID and oi.FULL_PATH_ID = o.FULL_PATH_ID
+		<where>
+             o.ORDER_STATUS = 'ACCEPT'
+             and wr.WAREHOUSE_RECEIPT_STATUS='CONFIRMED'
+            
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="startDate != null and endDate != null">
+                AND wr.CONFIRM_TIME between #{startDate} AND #{endDate}
+            </if>
+            <if test="categoryId != null and '' != categoryId">
+                AND od.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="materialCode != null and '' != materialCode">
+                AND od.MATERIAL_CODE = #{materialCode}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="querySupplierDetailExclude" resultType="com.midea.cloud.srm.model.report.supplier.dto.SupplierAnalysisDetailDTO">
+
+        select
+        0 WAREHOUSE_RECEIPT_QUANTITY
+        ,'' RETURN_QUANTITY
+        ,0 UNIT_PRICE_CONTAINING_TAX
+        ,'CNY' CURRENCY
+        ,0 ORDER_NUM
+        ,NOW() REQUIREMENT_DATE
+        ,'' VENDOR_ID
+        ,'' COMPANY_NAME
+        ,sbpc.CATEGORY_NAME
+        ,sbpc.CATEGORY_ID
+        ,'' ORGANIZATION_NAME
+        ,sbpc.CATEGORY_ID MATERIAL_CODE
+        ,sbpc.CATEGORY_ID MATERIAL_NAME
+        ,NOW() COMPANY_REGISTERED_DATE
+        ,NOW() START_DATE
+        ,NOW() END_DATE
+        ,'' DATA_SOURCES
+        ,'' COOPERATION_YEAR
+        from cloud_biz_base.scc_base_purchase_category sbpc
+        where sbpc.category_id not in(
+        select od.CATEGORY_ID
+        from scc_sc_warehouse_receipt wr
+        INNER JOIN scc_sc_order_detail od on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+        inner join scc_sc_order o on od.order_id = o.order_id
+        left join (
+        select srd.WAREHOUSE_RECEIPT_ID,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join  scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id where return_status='CONFIRM'
+        group by srd.WAREHOUSE_RECEIPT_ID
+        ) rd  on rd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+        left join scc_sup_company_info c on c.company_id = o.vendor_id
+        INNER JOIN scc_sup_org_info oi on oi.COMPANY_ID = c.COMPANY_ID and oi.FULL_PATH_ID = o.FULL_PATH_ID
+        <where>
+            o.ORDER_STATUS = 'ACCEPT'
+            and wr.WAREHOUSE_RECEIPT_STATUS='CONFIRMED'
+
+            <if test="list != null and list.size()>0">
+                and od.full_path_id in
+                <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="startDate != null and endDate != null">
+                AND wr.CONFIRM_TIME between #{startDate} AND #{endDate}
+            </if>
+            <if test="categoryId != null and '' != categoryId">
+                AND od.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="materialCode != null and '' != materialCode">
+                AND od.MATERIAL_CODE = #{materialCode}
+            </if>
+        </where>
+        )
+
+
+    </select>
+</mapper>

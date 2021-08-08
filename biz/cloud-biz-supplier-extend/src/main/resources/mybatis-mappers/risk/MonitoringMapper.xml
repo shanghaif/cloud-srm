@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.risk.mapper.MonitoringMapper">
+    <select id="queryByVendorIdAndRiskType" resultType="com.midea.cloud.srm.model.supplier.risk.entity.Monitoring">
+        select *
+        from scc_sup_risk_monitoring
+        where 1 = 1
+          AND VENDOR_ID = #{vendorId}
+          AND RISK_TYPE = #{riskType}
+        ORDER BY RISK_MONITORING_ID DESC
+        LIMIT 1,1
+    </select>
+</mapper>

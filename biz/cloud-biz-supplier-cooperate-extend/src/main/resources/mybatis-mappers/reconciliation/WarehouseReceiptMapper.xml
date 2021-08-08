@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.reconciliation.mapper.WarehouseReceiptMapper" >
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.WarehouseReceipt" >
+    <id column="WAREHOUSE_RECEIPT_ID" property="warehouseReceiptId" jdbcType="BIGINT" />
+    <result column="WAREHOUSE_RECEIPT_NUMBER" property="warehouseReceiptNumber" jdbcType="VARCHAR" />
+    <result column="CREATED_ID" property="createdId" jdbcType="BIGINT" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+    <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+    <result column="VERSION" property="version" jdbcType="BIGINT" />
+  </resultMap>
+
+
+  <select id="listPageOld" resultType="com.midea.cloud.srm.model.pm.po.dto.WarehouseReceiptPageDTO" parameterType="com.midea.cloud.srm.model.pm.po.dto.WarehouseReceiptPageQueryDTO">
+  		SELECT * FROM (
+			SELECT
+			    wr.WAREHOUSE_RECEIPT_ID,
+			    dn.DELIVERY_NOTE_ID,
+			    dnd.DELIVERY_NOTE_DETAIL_ID,
+			    od.CATEGORY_NAME,
+			    od.MATERIAL_CODE,
+			    od.MATERIAL_NAME,
+			    dn.DELIVERY_DATE,
+			    dnd.DELIVERY_QUANTITY,
+			    wr.WAREHOUSE_RECEIPT_QUANTITY,
+			    wr.WAREHOUSE_RECEIPT_NUMBER,
+			    wr.WAREHOUSE_RECEIPT_ROW_NUM,
+			    wr.CONFIRM_TIME,
+			    IFNULL(wr.WAREHOUSE_RECEIPT_STATUS,'UNCONFIRMED') WAREHOUSE_RECEIPT_STATUS,
+			    so.ORGANIZATION_NAME,
+			    so.ORDER_NUMBER,
+			    so.VENDOR_CODE,
+			    so.VENDOR_NAME,
+			    dn.DELIVERY_NUMBER,
+			    dn.CONTACT_PEOPLE,
+			    dn.CONTACT_NUMBER,
+			    od.RECEIVED_FACTORY,
+			    od.INVENTORY_PLACE,
+			    ro.RETURN_ORDER_NUMBER,
+			    od.LINE_NUM ORDER_LINE_NUM,
+			    od.ORDER_DETAIL_ID
+			FROM
+			    scc_sc_delivery_note dn,
+			    scc_sc_delivery_note_detail dnd
+			        LEFT JOIN
+			    scc_sc_warehouse_receipt wr ON dnd.DELIVERY_NOTE_DETAIL_ID = wr.DELIVERY_NOTE_DETAIL_ID AND wr.WRITE_OFF != 'Y',
+			    scc_sc_order so,
+			    scc_sc_order_detail od
+			        LEFT JOIN
+			    scc_sc_return_order ro ON od.ORDER_ID = ro.RETURN_ORDER_ID
+			WHERE
+				1 = 1
+			    	AND dn.DELIVERY_NOTE_ID = dnd.DELIVERY_NOTE_ID
+			        AND dnd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+			        AND so.ORDER_ID = od.ORDER_ID
+			<if test="orderNumber != null and '' != orderNumber">AND so.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')</if>
+			<if test="vendorId != null and '' != vendorId">AND so.VENDOR_ID = #{vendorId}</if>
+			<if test="vendorName != null and '' != vendorName">AND so.VENDOR_NAME LIKE CONCAT('%',#{vendorName},'%')</if>
+			<if test="deliveryNumber != null and '' != deliveryNumber">AND dn.DELIVERY_NUMBER LIKE CONCAT('%',#{deliveryNumber},'%')</if>
+			<if test="organizationName != null and '' != organizationName">AND so.ORGANIZATION_NAME LIKE CONCAT('%',#{organizationName},'%')</if>
+			<if test="organizationId != null and '' != organizationId">AND so.ORGANIZATION_ID = #{organizationId}</if>
+			<if test="materialCode != null and '' != materialCode">AND od.MATERIAL_CODE LIKE CONCAT('%',#{materialCode},'%')</if>
+			<if test="materialId != null and '' != materialId">AND od.MATERIAL_ID = #{materialId}</if>
+			<if test="receivedFactory != null and '' != receivedFactory">AND od.RECEIVED_FACTORY LIKE CONCAT('%',#{receivedFactory},'%')</if>
+			<if test="warehouseReceiptNumber != null and '' != warehouseReceiptNumber">AND wr.WAREHOUSE_RECEIPT_NUMBER LIKE CONCAT('%',#{warehouseReceiptNumber},'%')</if>
+		) t
+		WHERE
+			1 = 1
+		<if test="warehouseReceiptStatus != null and '' != warehouseReceiptStatus">AND t.WAREHOUSE_RECEIPT_STATUS = #{warehouseReceiptStatus}</if>
+		ORDER BY t.DELIVERY_DATE DESC
+  </select>
+
+	<select id="listPage"
+			resultType="com.midea.cloud.srm.model.suppliercooperate.order.vo.WarehouseReceiptVO"
+			parameterType="com.midea.cloud.srm.model.pm.po.dto.WarehouseReceiptPageQueryDTO"
+	>
+		select *
+		from scc_sc_warehouse_receipt wr
+		<where>
+			<if test="orgId != null">
+				and wr.ORG_ID = #{orgId}
+			</if>
+			<if test="vendorName != null and vendorName != ''">
+				and wr.VENDOR_NAME like concat('%',#{vendorName},'%')
+			</if>
+			<if test="orderNumber != null and orderNumber != ''">
+				and exists (
+					select *
+					from scc_sc_warehouse_receipt_detail wrd
+					left join scc_sc_delivery_note_detail dnd on wrd.DELIVERY_NOTE_DETAIL_ID = dnd.DELIVERY_NOTE_DETAIL_ID
+					left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dnd.ORDER_DETAIL_ID
+					left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+					where o.ORDER_NUMBER like concat('%',#{orderNumber},'%')
+					and wrd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+				)
+			</if>
+			<if test="materialCode != null and materialCode != ''">
+				and exists (
+					select *
+					from scc_sc_warehouse_receipt_detail wrd
+					left join scc_sc_delivery_note_detail dnd on wrd.DELIVERY_NOTE_DETAIL_ID = dnd.DELIVERY_NOTE_DETAIL_ID
+					left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dnd.ORDER_DETAIL_ID
+					where od.MATERIAL_CODE like concat('%',#{materialCode},'%')
+					and wrd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+				)
+			</if>
+			<if test="materialName != null and materialName != ''">
+				and exists (
+					select count(1)
+					from scc_sc_warehouse_receipt_detail wrd
+					left join scc_sc_delivery_note_detail dnd on wrd.DELIVERY_NOTE_DETAIL_ID = dnd.DELIVERY_NOTE_DETAIL_ID
+					left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dnd.ORDER_DETAIL_ID
+					where od.MATERIAL_NAME like concat('%',#{materialName},'%')
+					and wrd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+				)
+			</if>
+			<if test="warehouseReceiptNumber != null and warehouseReceiptNumber != ''">
+				and wr.WAREHOUSE_RECEIPT_NUMBER like concat('%',#{warehouseReceiptNumber},'%')
+			</if>
+			<if test="deliveryNumber != null and deliveryNumber != ''">
+				and exists (
+					select *
+					from scc_sc_warehouse_receipt_detail wrd
+					left join scc_sc_delivery_note_detail dnd on wrd.DELIVERY_NOTE_DETAIL_ID = dnd.DELIVERY_NOTE_DETAIL_ID
+					left join scc_sc_delivery_note dn on dn.DELIVERY_NOTE_ID = dnd.DELIVERY_NOTE_ID
+					where dn.DELIVERY_NUMBER like concat('%',#{deliveryNumber},'%')
+					and wrd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+				)
+			</if>
+			<if test="warehouseReceiptStatus != null and warehouseReceiptStatus != ''">
+				and wr.WAREHOUSE_RECEIPT_STATUS = #{warehouseReceiptStatus}
+			</if>
+		</where>
+		order by wr.LAST_UPDATE_DATE desc
+	</select>
+
+
+
+  <select id="listStatementReceiptDTOPage" resultType="com.midea.cloud.srm.model.pm.ps.statement.dto.StatementReceiptDTO" parameterType="com.midea.cloud.srm.model.pm.po.dto.WarehouseReceiptPageQueryDTO">
+		SELECT
+		    wr.WAREHOUSE_RECEIPT_ID,
+		    wr.WAREHOUSE_RECEIPT_NUMBER,
+		    wr.WAREHOUSE_RECEIPT_ROW_NUM,
+		    wr.CONFIRM_TIME HAPPEN_DATE,
+		    so.ORDER_ID,
+		    od.ORDER_DETAIL_ID,
+		    od.MATERIAL_ID,
+		    od.MATERIAL_CODE,
+		    od.MATERIAL_NAME,
+		    od.UNIT,
+		    so.ORDER_NUMBER,
+		    od.LINE_NUM ORDER_LINE_NUM,
+		    wr.WAREHOUSE_RECEIPT_QUANTITY,
+		    od.UNIT_PRICE_EXCLUDING_TAX UNIT_PRICE_NO_TAX,
+		    od.UNIT_PRICE_EXCLUDING_TAX * wr.WAREHOUSE_RECEIPT_QUANTITY TOTAL_AMOUNT_NO_TAX
+		FROM
+		    scc_sc_warehouse_receipt wr,
+		    scc_sc_order so,
+		    scc_sc_order_detail od
+		WHERE
+		    1 = 1
+        AND wr.WAREHOUSE_RECEIPT_STATUS = 'CONFIRMED'
+        AND wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+        AND so.ORDER_ID = od.ORDER_ID
+        AND (wr.STATEMENT_REFER IS NULL OR wr.STATEMENT_REFER = 'N')
+        <if test="writeOff != null and '' != writeOff">AND wr.WRITE_OFF = #{writeOff}</if>
+        <if test="orderNumber != null and '' != orderNumber">AND so.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')</if>
+		<if test="vendorId != null and '' != vendorId">AND so.VENDOR_ID = #{vendorId}</if>
+		<if test="vendorName != null and '' != vendorName">AND so.VENDOR_NAME LIKE CONCAT('%',#{vendorName},'%')</if>
+		<if test="deliveryNumber != null and '' != deliveryNumber">AND dn.DELIVERY_NUMBER LIKE CONCAT('%',#{deliveryNumber},'%')</if>
+		<if test="organizationName != null and '' != organizationName">AND so.ORGANIZATION_NAME LIKE CONCAT('%',#{organizationName},'%')</if>
+		<if test="organizationId != null and '' != organizationId">AND so.ORGANIZATION_ID = #{organizationId}</if>
+		<if test="materialCode != null and '' != materialCode">AND od.MATERIAL_CODE LIKE CONCAT('%',#{materialCode},'%')</if>
+		<if test="materialId != null and '' != materialId">AND od.MATERIAL_ID = #{materialId}</if>
+		<if test="receivedFactory != null and '' != receivedFactory">AND od.RECEIVED_FACTORY LIKE CONCAT('%',#{receivedFactory},'%')</if>
+		<if test="warehouseReceiptNumber != null and '' != warehouseReceiptNumber">AND wr.WAREHOUSE_RECEIPT_NUMBER LIKE CONCAT('%',#{warehouseReceiptNumber},'%')</if>
+		<if test="happenDateBegin != null and happenDateBegin != ''">AND wr.CONFIRM_TIME &gt;= STR_TO_DATE(CONCAT(#{happenDateBegin},' 00:00:00'), '%Y-%m-%d %H:%i:%s')</if>
+        <if test="happenDateEnd != null and happenDateEnd != ''">AND wr.CONFIRM_TIME &lt;= STR_TO_DATE(CONCAT(#{happenDateEnd},' 23:59:59'), '%Y-%m-%d %H:%i:%s')</if>
+
+  </select>
+
+</mapper>

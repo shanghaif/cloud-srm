@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.dict.mapper.DictItemMapper">
+
+    <select id="findByNameOrCode" resultType="java.lang.Integer">
+        select count(DICT_ITEM_ID) from  scc_base_dict_item
+        <where>
+            <if test="dictItemName != null and dictItemCode != null">
+                AND (DICT_ITEM_NAME = #{dictItemName}
+                OR DICT_ITEM_CODE = #{dictItemCode})
+            </if>
+            <if test="id != null">
+                AND DICT_ITEM_ID != #{id}
+            </if>
+            <if test="dictId != null">
+                AND DICT_ID = #{dictId}
+            </if>
+        </where>
+    </select>
+
+
+
+    <select id="queryPageByConditions"
+            resultType="com.midea.cloud.srm.model.base.dict.entity.DictItem">
+        select * from  scc_base_dict_item
+        <where>
+            <if test="dictItemName != null and dictItemName != ''">
+                AND DICT_ITEM_NAME LIKE  CONCAT('%',#{dictItemName},'%')
+            </if>
+            <if test="dictItemCode != null and dictItemCode != ''">
+                AND DICT_ITEM_CODE LIKE CONCAT('%',#{dictItemCode},'%')
+            </if>
+            <if test="itemDescription != null and itemDescription != ''">
+                AND ITEM_DESCRIPTION LIKE CONCAT('%',#{itemDescription},'%')
+            </if>
+            <if test="dictId != null">
+                AND DICT_ID =  #{dictId}
+            </if>
+            <if test="itemLanguage != null">
+                AND ITEM_LANGUAGE = #{itemLanguage}
+            </if>
+                order by DICT_ITEM_NO IS NULL, DICT_ITEM_NO, CREATION_DATE
+
+        </where>
+    </select>
+
+    <select id="queryById"
+            resultType="com.midea.cloud.srm.model.base.dict.dto.DictItemDTO">
+        SELECT
+        bd.DICT_CODE,
+        bd.DICT_NAME,
+        bd.`LANGUAGE`,
+        bd.LANGUAGE_NAME,
+        bd.DESCRIPTION,
+        bdi.DICT_ID,
+        bdi.DICT_ITEM_CODE,
+        bdi.DICT_ITEM_NAME,
+        bdi.ITEM_LANGUAGE,
+        bdi.ITEM_LANGUAGE_NAME,
+        bdi.ITEM_DESCRIPTION,
+        bdi.DICT_ITEM_NO,
+        bdi.DICT_ITEM_MARK,
+        bdi.ACTIVE_DATE,
+        bdi.INACTIVE_DATE,
+        bdi.CREATED_BY,
+        bdi.CREATION_DATE,
+        bdi.LAST_UPDATED_BY,
+        bdi.LAST_UPDATE_DATE,
+        bdi.DICT_ITEM_ID
+        FROM
+        scc_base_dict bd,
+        scc_base_dict_item bdi
+        WHERE
+        bd.DICT_ID = bdi.DICT_ID
+        AND bdi.DICT_ITEM_ID =#{id}
+    </select>
+
+    <select id="listAllByDictCode"
+            resultType="com.midea.cloud.srm.model.base.dict.dto.DictItemDTO">
+        SELECT
+            bd.DICT_CODE,
+            bd.DICT_NAME,
+            bd.`LANGUAGE`,
+            bd.LANGUAGE_NAME,
+            bd.DESCRIPTION,
+            bdi.DICT_ID,
+            bdi.DICT_ITEM_CODE,
+            bdi.DICT_ITEM_NAME,
+            bdi.ITEM_LANGUAGE,
+            bdi.ITEM_LANGUAGE_NAME,
+            bdi.ITEM_DESCRIPTION,
+            bdi.DICT_ITEM_NO,
+            bdi.DICT_ITEM_MARK,
+            bdi.ACTIVE_DATE,
+            bdi.INACTIVE_DATE,
+            bdi.CREATED_BY,
+            bdi.CREATION_DATE,
+            bdi.LAST_UPDATED_BY,
+            bdi.LAST_UPDATE_DATE,
+            bdi.DICT_ITEM_ID
+        FROM
+            scc_base_dict bd,
+            scc_base_dict_item bdi
+        WHERE
+            bd.DICT_ID = bdi.DICT_ID
+          AND bd.DICT_CODE =#{dictCode}
+          AND bd.language = #{language}
+    </select>
+
+    <select id="listByDictCode"
+            resultType="com.midea.cloud.srm.model.base.dict.dto.DictItemDTO">
+        SELECT
+        bd.DICT_CODE,
+        bd.DICT_NAME,
+        bd.`LANGUAGE`,
+        bd.LANGUAGE_NAME,
+        bd.DESCRIPTION,
+        bdi.DICT_ID,
+        bdi.DICT_ITEM_CODE,
+        bdi.DICT_ITEM_NAME,
+        bdi.ITEM_LANGUAGE,
+        bdi.ITEM_LANGUAGE_NAME,
+        bdi.ITEM_DESCRIPTION,
+        bdi.DICT_ITEM_NO,
+        bdi.DICT_ITEM_MARK,
+        bdi.ACTIVE_DATE,
+        bdi.INACTIVE_DATE,
+        bdi.CREATED_BY,
+        bdi.CREATION_DATE,
+        bdi.LAST_UPDATED_BY,
+        bdi.LAST_UPDATE_DATE,
+        bdi.DICT_ITEM_ID
+        FROM
+        scc_base_dict bd,
+        scc_base_dict_item bdi
+        WHERE
+        bd.DICT_ID = bdi.DICT_ID
+        <if test="null != dictCodes and dictCodes.size() > 0">
+            AND bd.DICT_CODE in
+            <foreach collection="dictCodes" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        AND bd.language = #{language}
+    </select>
+
+    <select id="listAllByParam"
+            parameterType="com.midea.cloud.srm.model.base.dict.dto.DictItemDTO"
+            resultType="com.midea.cloud.srm.model.base.dict.dto.DictItemDTO">
+        SELECT
+        bd.DICT_CODE,
+        bd.DICT_NAME,
+        bd.`LANGUAGE`,
+        bd.LANGUAGE_NAME,
+        bd.DESCRIPTION,
+        bdi.DICT_ID,
+        bdi.DICT_ITEM_CODE,
+        bdi.DICT_ITEM_NAME,
+        bdi.ITEM_LANGUAGE,
+        bdi.ITEM_LANGUAGE_NAME,
+        bdi.ITEM_DESCRIPTION,
+        bdi.DICT_ITEM_NO,
+        bdi.DICT_ITEM_MARK,
+        bdi.ACTIVE_DATE,
+        bdi.INACTIVE_DATE,
+        bdi.CREATED_BY,
+        bdi.CREATION_DATE,
+        bdi.LAST_UPDATED_BY,
+        bdi.LAST_UPDATE_DATE,
+        bdi.DICT_ITEM_ID
+        FROM
+        scc_base_dict bd,
+        scc_base_dict_item bdi
+        WHERE
+        bd.DICT_ID = bdi.DICT_ID AND ((bdi.INACTIVE_DATE IS NOT NULL AND CAST(bdi.INACTIVE_DATE AS CHAR) > CAST(CURDATE() AS CHAR)) OR (bdi.INACTIVE_DATE IS NULL))
+        <if test="dictCode != null and dictCode != ''">
+            AND bd.DICT_CODE =#{dictCode}
+        </if>
+        <if test="language != null and language != ''">
+            AND bd.LANGUAGE = #{language}
+        </if>
+        <if test="dictId != null ">
+            AND bd.DICT_ID =#{dictId}
+        </if>
+        <if test="dictItemCode != null and dictItemCode !=''">
+            AND bdi.DICT_ITEM_CODE =#{dictItemCode}
+        </if>
+        ORDER BY bdi.DICT_ITEM_NO
+    </select>
+
+    <select id="getDictItemsByDictCodeAndDictItemNames"
+            resultType="com.midea.cloud.srm.model.base.dict.dto.DictItemDTO">
+        SELECT
+        bd.DICT_CODE,
+        bd.DICT_NAME,
+        bd.`LANGUAGE`,
+        bd.LANGUAGE_NAME,
+        bd.DESCRIPTION,
+        bdi.DICT_ID,
+        bdi.DICT_ITEM_CODE,
+        bdi.DICT_ITEM_NAME,
+        bdi.ITEM_LANGUAGE,
+        bdi.ITEM_LANGUAGE_NAME,
+        bdi.ITEM_DESCRIPTION,
+        bdi.DICT_ITEM_NO,
+        bdi.DICT_ITEM_MARK,
+        bdi.ACTIVE_DATE,
+        bdi.INACTIVE_DATE,
+        bdi.CREATED_BY,
+        bdi.CREATION_DATE,
+        bdi.LAST_UPDATED_BY,
+        bdi.LAST_UPDATE_DATE,
+        bdi.DICT_ITEM_ID
+        FROM
+        scc_base_dict bd,
+        scc_base_dict_item bdi
+        WHERE
+        bd.DICT_ID = bdi.DICT_ID AND ((bdi.INACTIVE_DATE IS NOT NULL AND CAST(bdi.INACTIVE_DATE AS CHAR) > CAST(CURDATE() AS CHAR)) OR (bdi.INACTIVE_DATE IS NULL))
+        <if test="dictCode != null and dictCode != ''">
+            AND bd.DICT_CODE =#{dictCode}
+        </if>
+        <if test="null != dictItemNames and dictItemNames.size() > 0">
+            AND bdi.DICT_ITEM_NAME in
+            <foreach collection="dictItemNames" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    
+    <select id="queryProductType" resultType="com.midea.cloud.srm.model.base.dict.dto.DictItemDTO">
+        select DICT_ITEM_CODE,DICT_ITEM_NAME from scc_base_dict_item i,scc_base_service_config c
+        where i.dict_id=11
+        and i.dict_item_code &lt;= c.service_level
+    </select>
+
+    <select id="queryDictItemBy" resultType="com.midea.cloud.srm.model.base.dict.entity.DictItem">
+        SELECT *
+            FROM scc_base_dict_item
+            WHERE
+            ITEM_LANGUAGE = #{itemLanguage}
+            AND DICT_ID = #{dictId}
+            AND ITEM_DESCRIPTION = #{itemDescription}
+            AND (INACTIVE_DATE IS NULL OR INACTIVE_DATE > now())
+    </select>
+
+    <select id="getExportData" resultType="com.midea.cloud.srm.model.base.dict.dto.ExcelDictItemDTO">
+        SELECT
+        bd.DICT_CODE,
+        bd.DICT_NAME,
+        bd.`LANGUAGE`,
+        bd.LANGUAGE_NAME,
+        bd.DESCRIPTION,
+        bdi.DICT_ID,
+        bdi.DICT_ITEM_CODE,
+        bdi.DICT_ITEM_NAME,
+        bdi.ITEM_LANGUAGE,
+        bdi.ITEM_LANGUAGE_NAME,
+        bdi.ITEM_DESCRIPTION,
+        bdi.DICT_ITEM_NO,
+        bdi.DICT_ITEM_MARK,
+        bdi.ACTIVE_DATE,
+        bdi.INACTIVE_DATE,
+        bdi.CREATED_BY,
+        bdi.CREATION_DATE,
+        bdi.LAST_UPDATED_BY,
+        bdi.LAST_UPDATE_DATE,
+        bdi.DICT_ITEM_ID
+        FROM
+        scc_base_dict bd,
+        scc_base_dict_item bdi
+        WHERE
+        bd.DICT_ID = bdi.DICT_ID and bd.DICT_ID in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY bd.DICT_ID
+    </select>
+
+    <select id="getRecordsByDictProperties" resultType="com.midea.cloud.srm.model.base.dict.dto.ExcelDictItemDTO">
+        SELECT
+        bd.DICT_CODE,
+        bd.DICT_NAME,
+        bd.`LANGUAGE`,
+        bd.LANGUAGE_NAME,
+        bd.DESCRIPTION,
+        bd.DICT_ID,
+        bdi.DICT_ITEM_CODE,
+        bdi.DICT_ITEM_NAME,
+        bdi.ITEM_LANGUAGE,
+        bdi.ITEM_LANGUAGE_NAME,
+        bdi.ITEM_DESCRIPTION,
+        bdi.DICT_ITEM_NO,
+        bdi.DICT_ITEM_MARK,
+        bdi.ACTIVE_DATE,
+        bdi.INACTIVE_DATE,
+        bdi.CREATED_BY,
+        bdi.CREATION_DATE,
+        bdi.LAST_UPDATED_BY,
+        bdi.LAST_UPDATE_DATE,
+        bdi.DICT_ITEM_ID
+        FROM
+        scc_base_dict bd
+        left join
+        scc_base_dict_item bdi
+        on bd.DICT_ID = bdi.DICT_ID
+        WHERE
+        bd.DICT_CODE =#{dictCode}
+        and bd.LANGUAGE =#{language}
+        and bd.DICT_NAME =#{dictName}
+        ORDER BY bd.DICT_ID
+    </select>
+</mapper>

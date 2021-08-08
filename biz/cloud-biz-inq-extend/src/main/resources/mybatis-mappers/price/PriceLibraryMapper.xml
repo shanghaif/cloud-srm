@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.inq.price.mapper.PriceLibraryMapper">
+    <select id="ceeaFindListByParams"
+            parameterType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary"
+            resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        SELECT
+        p.*
+        FROM
+        scc_price_library p
+        where p.ITEM_CODE = #{itemCode}
+        <if test="itemDesc !=null and itemDesc != ''">
+            and p.ITEM_DESC = #{itemDesc}
+        </if>
+        and p.VENDOR_CODE = #{vendorCode}
+        and p.CEEA_ORG_ID = #{ceeaOrgId}
+        and p.CEEA_ORGANIZATION_ID = #{ceeaOrganizationId}
+        <choose>
+            <when test="ceeaArrivalPlace != null and ceeaArrivalPlace != ''">
+                and p.CEEA_ARRIVAL_PLACE = #{ceeaArrivalPlace}
+            </when>
+            <otherwise>
+                and (p.CEEA_ARRIVAL_PLACE = '' or p.CEEA_ARRIVAL_PLACE is null)
+            </otherwise>
+        </choose>
+        and p.PRICE_TYPE = #{priceType}
+        and DATE_FORMAT(p.EFFECTIVE_DATE,'%Y-%m-%d') = DATE_FORMAT(#{effectiveDate},'%Y-%m-%d')
+        and DATE_FORMAT(p.EXPIRATION_DATE,'%Y-%m-%d') = DATE_FORMAT(#{expirationDate},'%Y-%m-%d')
+    </select>
+
+    <select id="ceeaFindListByParams2"
+            parameterType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary"
+            resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        SELECT
+        p.*
+        FROM
+        scc_price_library p
+        where p.ITEM_CODE = #{itemCode}
+        <if test="itemDesc !=null and itemDesc != ''">
+            and p.ITEM_DESC = #{itemDesc}
+        </if>
+        and p.VENDOR_CODE = #{vendorCode}
+        and p.CEEA_ORG_ID = #{ceeaOrgId}
+        and p.CEEA_ORGANIZATION_ID = #{ceeaOrganizationId}
+        <choose>
+            <when test="ceeaArrivalPlace != null and ceeaArrivalPlace != ''">
+                and p.CEEA_ARRIVAL_PLACE = #{ceeaArrivalPlace}
+            </when>
+            <otherwise>
+                and (p.CEEA_ARRIVAL_PLACE = '' or p.CEEA_ARRIVAL_PLACE is null)
+            </otherwise>
+        </choose>
+        and p.PRICE_TYPE = #{priceType}
+    </select>
+
+    <select id="findEffectivePriceCount" resultType="java.lang.Integer">
+        SELECT
+        count(*)
+        FROM
+        scc_price_library p
+        <where>
+            <if test="itemCode != null and itemCode != ''">
+                and p.ITEM_CODE = #{itemCode}
+            </if>
+            <if test="itemDesc != null and itemDesc != ''">
+                and p.ITEM_DESC = #{itemDesc}
+            </if>
+            <if test="ceeaOrgId != null">
+                and p.CEEA_ORG_ID = #{ceeaOrgId}
+            </if>
+            <if test="ceeaOrganizationId != null">
+                and p.CEEA_ORGANIZATION_ID = #{ceeaOrganizationId}
+            </if>
+            <if test="vendorId != null">
+                and p.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="ceeaIfUse != null and ceeaIfUse != ''">
+                and p.CEEA_IF_USE = #{ceeaIfUse}
+            </if>
+            and p.PRICE_TYPE = 'STANDARD'
+            and current_date >= DATE_FORMAT(p.EFFECTIVE_DATE,'%Y-%m-%d')
+            and current_date &lt;= DATE_FORMAT(p.EXPIRATION_DATE,'%Y-%m-%d')
+        </where>
+    </select>
+
+    <select id="findEffectivePrice" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        SELECT
+        p.*
+        FROM
+        scc_price_library p
+        <where>
+            <if test="itemCode != null and itemCode != ''">
+                and p.ITEM_CODE = #{itemCode}
+            </if>
+            <if test="itemDesc != null and itemDesc != ''">
+                and p.ITEM_DESC = #{itemDesc}
+            </if>
+            <if test="ceeaOrgId != null">
+                and p.CEEA_ORG_ID = #{ceeaOrgId}
+            </if>
+            <if test="ceeaOrganizationId != null">
+                and p.CEEA_ORGANIZATION_ID = #{ceeaOrganizationId}
+            </if>
+            <if test="vendorId != null">
+                and p.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="ceeaIfUse != null and ceeaIfUse != ''">
+                and p.CEEA_IF_USE = #{ceeaIfUse}
+            </if>
+            and current_date >= DATE_FORMAT(p.EFFECTIVE_DATE,'%Y-%m-%d')
+            and current_date &lt;= DATE_FORMAT(p.EXPIRATION_DATE,'%Y-%m-%d')
+        </where>
+    </select>
+
+    <select id="getThreeYearsBidFrequency" resultType="java.lang.Integer">
+        select count(1) sum
+        FROM (SELECT *
+            FROM scc_price_library
+            WHERE 1 = 1
+            AND SOURCE_TYPE = 'BIDDINGBi'
+            AND VENDOR_ID = #{param.vendorId}
+            AND CREATION_DATE BETWEEN #{param.startDate} AND #{param.endDate}
+            GROUP BY SOURCE_NO) a
+    </select>
+
+    <select id="listAllEffective" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        select
+        p.*
+        from scc_price_library p
+        <where>
+            <if test="vendorId != null">
+                and p.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="ceeaOrganizationId != null">
+                and p.CEEA_ORGANIZATION_ID = #{ceeaOrganizationId}
+            </if>
+            <if test="ceeaOrgIds != null and ceeaOrgIds.size() > 0">
+                and p.CEEA_ORG_ID in
+                <foreach collection="ceeaOrgIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="ceeaOrganizationIds != null and ceeaOrganizationIds.size() > 0">
+                and p.CEEA_ORGANIZATION_ID in
+                <foreach collection="ceeaOrganizationIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="itemIds != null and itemIds.size() > 0">
+                and p.ITEM_ID in
+                <foreach collection="itemIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            and current_date >= DATE_FORMAT(p.EFFECTIVE_DATE,'%Y-%m-%d')
+            and current_date &lt;= DATE_FORMAT(p.EXPIRATION_DATE,'%Y-%m-%d')
+        </where>
+    </select>
+
+    <select id="listPageCopy" parameterType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary"
+            resultType="com.midea.cloud.srm.model.inq.price.vo.PriceLibraryVO">
+        select *
+        from scc_price_library ${ew.customSqlSegment}
+    </select>
+
+    <select id="listAllPriceForImport" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        select p.ITEM_CODE,
+               p.ITEM_DESC,
+               p.VENDOR_ID,
+               p.VENDOR_CODE,
+               p.CEEA_ORG_ID,
+               p.CEEA_ORG_CODE,
+               p.CEEA_ORG_NAME,
+               p.CEEA_ORGANIZATION_ID,
+               p.CEEA_ORGANIZATION_CODE,
+               p.CEEA_ORGANIZATION_NAME,
+               p.CEEA_ARRIVAL_PLACE,
+               p.PRICE_TYPE,
+               p.EFFECTIVE_DATE,
+               p.EXPIRATION_DATE,
+               p.PRICE_LIBRARY_ID
+        from scc_price_library p
+    </select>
+
+    <select id="getLatest" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        select p.*
+        from scc_price_library p
+        <where>
+            <if test="itemId != null">
+                and p.ITEM_ID = #{itemId}
+            </if>
+            <if test="ceeaOrgId != null">
+                and p.CEEA_ORG_ID = #{ceeaOrgId}
+            </if>
+            and p.PRICE_TYPE = 'STANDARD'
+            order by p.CREATION_DATE DESC limit 0,1
+        </where>
+    </select>
+
+    <select id="getLastestBatch" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        select CEEA_ORG_ID, ITEM_ID, substring_index(group_concat(TAX_PRICE),',',1) TAX_PRICE
+        from (select CEEA_ORG_ID,ITEM_ID,TAX_PRICE
+        from scc_price_library
+        where PRICE_TYPE = 'STANDARD'
+        <if test="orgIds != null and orgIds.size() != 0">
+            and CEEA_ORG_ID in
+            <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                #{orgId}
+            </foreach>
+        </if>
+        <if test="itemIds != null and itemIds.size() != 0">
+            and ITEM_ID in
+            <foreach collection="itemIds" item="itemId" index="index" open="(" close=")" separator=",">
+                #{itemId}
+            </foreach>
+        </if>
+        order by CREATION_DATE desc) f
+        group by CEEA_ORG_ID, ITEM_ID
+    </select>
+
+    <select id="getLatestFive" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        select p.*
+        from scc_price_library p
+        <where>
+            p.PRICE_TYPE = 'STANDARD'
+            <if test="ceeaOrgIds != null and ceeaOrgIds.size() > 0">
+                and p.CEEA_ORG_ID in
+                <foreach collection="ceeaOrgIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="itemIds != null and itemIds.size() > 0">
+                and p.ITEM_ID in
+                <foreach collection="itemIds" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="findPriceTrends" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        SELECT
+        ORI_SPL.*
+        FROM
+        SCC_PRICE_LIBRARY ORI_SPL
+        INNER JOIN (
+        SELECT
+        SPL.ITEM_ID,
+        SPL.CEEA_ORG_ID,
+        SPL.ITEM_DESC,
+        DATE_FORMAT(SPL.CREATION_DATE,'%Y-%m-%d') AS CREATION_DATE,
+        MIN(SPL.TAX_PRICE) AS MIN_TAX_PRICE
+        FROM SCC_PRICE_LIBRARY SPL
+        WHERE SPL.ITEM_ID IS NOT NULL AND SPL.CEEA_ORG_ID IS NOT NULL AND SPL.CREATION_DATE IS NOT NULL AND
+        SPL.TAX_PRICE IS NOT NULL
+
+        <if test="parameter.orgId != null">
+            AND SPL.CEEA_ORG_ID = #{parameter.orgId, jdbcType=NUMERIC}
+        </if>
+
+        <if test="parameter.itemId != null">
+            AND SPL.ITEM_ID = #{parameter.itemId, jdbcType=NUMERIC}
+        </if>
+
+        <if test="parameter.orgItemCompose != null">
+            AND (SPL.ITEM_ID = #{parameter.orgItemCompose.itemId} AND SPL.CEEA_ORG_ID =
+            #{parameter.orgItemCompose.orgId})
+        </if>
+        <if test="parameter.itemDesc != null and parameter.itemDesc != ''">
+            and SPL.ITEM_DESC=#{parameter.itemDesc}
+        </if>
+
+        GROUP BY
+        SPL.ITEM_ID, SPL.CEEA_ORG_ID, DATE_FORMAT(SPL.CREATION_DATE,'%Y-%m-%d')
+        <if test="parameter.itemDesc != null and parameter.itemDesc != ''">
+            ,SPL.ITEM_DESC
+        </if>
+        <if test="parameter.limit != null">
+            LIMIT #{parameter.limit, jdbcType=NUMERIC}
+        </if>
+
+        ) SPL ON (
+        SPL.ITEM_ID = ORI_SPL.ITEM_ID AND
+        SPL.CEEA_ORG_ID = ORI_SPL.CEEA_ORG_ID AND
+        SPL.CREATION_DATE = DATE_FORMAT(ORI_SPL.CREATION_DATE,'%Y-%m-%d') AND
+        SPL.MIN_TAX_PRICE = ORI_SPL.TAX_PRICE
+        <if test="parameter.itemDesc != null and parameter.itemDesc != ''">
+            and  SPL.ITEM_DESC = #{parameter.itemDesc}
+        </if>
+        )
+    </select>
+    <select id="listPriceLibraryOld" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibraryOld">
+        SELECT ORI_SPL.*
+        FROM price_library_old ORI_SPL
+        INNER JOIN (
+        SELECT SPL.TARGET_NUM,
+        SPL.ORG_CODE,
+        DATE_FORMAT(SPL.CREATION_DATE, '%Y-%m-%d') AS CREATION_DATE,
+        MIN(SPL.PRICE) AS MIN_TAX_PRICE,
+        SPL.TARGET_DESC
+        FROM price_library_old SPL
+        WHERE SPL.ORG_CODE = #{orgCode}
+        and spl.TARGET_NUM = #{itemCode}
+        <if test="itemDesc != null and itemDesc != ''">
+            and SPL.TARGET_DESC = #{itemDesc}
+        </if>
+        GROUP BY SPL.TARGET_NUM, SPL.ORG_CODE, DATE_FORMAT(SPL.CREATION_DATE, '%Y-%m-%d')
+        <if test="itemDesc != null and itemDesc != ''">
+            ,SPL.TARGET_DESC
+        </if>
+        ) SPL ON (
+        SPL.TARGET_NUM = ORI_SPL.TARGET_NUM AND
+        SPL.ORG_CODE = ORI_SPL.ORG_CODE AND
+        SPL.CREATION_DATE = DATE_FORMAT(ORI_SPL.CREATION_DATE, '%Y-%m-%d') AND
+        SPL.MIN_TAX_PRICE = ORI_SPL.PRICE
+        <if test="itemDesc != null and itemDesc != ''">
+            and  SPL.TARGET_DESC = #{itemDesc}
+        </if>
+        );
+    </select>
+    <select id="listForMaterialSecByBuyer" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        select *
+        from scc_price_library p
+        <where>
+            and p.ITEM_CODE = #{itemCode}
+            and p.CEEA_IF_USE = 'Y'
+            and current_date >= DATE_FORMAT(p.EFFECTIVE_DATE,'%Y-%m-%d')
+            and current_date &lt;= DATE_FORMAT(p.EXPIRATION_DATE,'%Y-%m-%d')
+        </where>
+        group by p.ITEM_CODE,p.ITEM_DESC,p.VENDOR_ID
+    </select>
+
+    <select id="listForMaterialSecByVendor" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        select *
+        from scc_price_library p
+        <where>
+            and p.VENDOR_ID = #{vendorId}
+            and p.CEEA_IF_USE = 'Y'
+            and current_date >= DATE_FORMAT(p.EFFECTIVE_DATE,'%Y-%m-%d')
+            and current_date &lt;= DATE_FORMAT(p.EXPIRATION_DATE,'%Y-%m-%d')
+            <if test="itemDesc != null and itemDesc != ''">
+                and p.ITEM_DESC = #{itemDesc}
+            </if>
+        </where>
+        group by p.ITEM_CODE,p.ITEM_DESC,p.VENDOR_ID
+    </select>
+
+    <select id="queryItemIdByOuAndInv" resultType="java.lang.Long">
+        select DISTINCT ITEM_ID
+        from scc_price_library
+        where 1 = 1
+          AND CEEA_ORG_ID = #{ouId}
+          AND CEEA_ORGANIZATION_ID = #{invId}
+          AND CEEA_IF_USE = 'Y'
+          AND now() BETWEEN EFFECTIVE_DATE AND EXPIRATION_DATE;
+    </select>
+
+    <select id="listEffectiveForCreateOrder" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        SELECT PRICE_LIBRARY_ID,
+        ITEM_ID,
+        ITEM_CODE,
+        ITEM_DESC,
+        CATEGORY_ID,
+        CATEGORY_NAME,
+        CATEGORY_CODE,
+        VENDOR_ID,
+        VENDOR_CODE,
+        VENDOR_NAME,
+        APPROVAL_NO,
+        PRICE_TYPE,
+        NOTAX_PRICE,
+        TAX_PRICE,
+        TAX_ID,
+        TAX_KEY,
+        TAX_RATE,
+        CURRENCY_ID,
+        CURRENCY_CODE,
+        CURRENCY_NAME,
+        EFFECTIVE_DATE,
+        EXPIRATION_DATE,
+        UNIT,
+        UNIT_CODE,
+        IS_LADDER,
+        LADDER_TYPE,
+        CREATED_ID,
+        CREATED_BY,
+        CREATION_DATE,
+        CREATED_BY_IP,
+        LAST_UPDATED_ID,
+        LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,
+        LAST_UPDATED_BY_IP,
+        VERSION,
+        TENANT_ID,
+        CEEA_PRICE_LIBRARY_NO,
+        CEEA_ORG_ID,
+        CEEA_ORG_CODE,
+        CEEA_ORG_NAME,
+        CEEA_ORGANIZATION_ID,
+        CEEA_ORGANIZATION_CODE,
+        CEEA_ORGANIZATION_NAME,
+        CEEA_ARRIVAL_PLACE,
+        CEEA_ALLOCATION_TYPE,
+        CEEA_QUOTA_PROPORTION,
+        CEEA_LT,
+        CEEA_IF_USE,
+        SOURCE_NO,
+        MIN_ORDER_QUANTITY,
+        CONTRACT_CODE,
+        CONTRACT_NAME,
+        QUOTATION_LINE_ID,
+        PRICE_NUMBER,
+        ORGANIZATION_ID,
+        FULL_PATH_ID,
+        ORGANIZATION_NAME,
+        SOURCE_TYPE,
+        ITEM_GROUP_CODE,
+        SPECIFICATION,
+        ORDER_QUANTITY,
+        CONTRACT_NO,
+        MIN_PACK_QUANTITY,
+        BUSINESS_TYPE,
+        REMARKS,
+        SYNC_STATUS,
+        DEL_FLAG,
+        PRICE_UNIT,
+        CURRENCY
+        FROM scc_price_library
+        WHERE PRICE_TYPE = 'STANDARD'
+        AND EFFECTIVE_DATE &lt;= CURDATE() AND EXPIRATION_DATE &gt;= CURDATE()
+        <if test="orgCodes != null and orgCodes.size()>0">
+            AND CEEA_ORG_CODE in
+            <foreach collection="orgCodes" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="invCodes != null and invCodes.size()>0">
+            AND CEEA_ORGANIZATION_CODE in
+            <foreach collection="invCodes" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="itemCodes != null and itemCodes.size()>0">
+            AND ITEM_CODE in
+            <foreach collection="itemCodes" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="itemDescs != null and itemDescs.size()>0">
+            AND ITEM_DESC in
+            <foreach collection="itemDescs" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="listPriceLibraryForTransferOrders" resultType="com.midea.cloud.srm.model.inq.price.entity.PriceLibrary">
+        SELECT PRICE_LIBRARY_ID,
+        ITEM_ID,
+        ITEM_CODE,
+        ITEM_DESC,
+        CATEGORY_ID,
+        CATEGORY_NAME,
+        CATEGORY_CODE,
+        VENDOR_ID,
+        VENDOR_CODE,
+        VENDOR_NAME,
+        APPROVAL_NO,
+        PRICE_TYPE,
+        NOTAX_PRICE,
+        TAX_PRICE,
+        TAX_ID,
+        TAX_KEY,
+        TAX_RATE,
+        CURRENCY_ID,
+        CURRENCY_CODE,
+        CURRENCY_NAME,
+        EFFECTIVE_DATE,
+        EXPIRATION_DATE,
+        UNIT,
+        UNIT_CODE,
+        IS_LADDER,
+        LADDER_TYPE,
+        CREATED_ID,
+        CREATED_BY,
+        CREATION_DATE,
+        CREATED_BY_IP,
+        LAST_UPDATED_ID,
+        LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,
+        LAST_UPDATED_BY_IP,
+        VERSION,
+        TENANT_ID,
+        CEEA_PRICE_LIBRARY_NO,
+        CEEA_ORG_ID,
+        CEEA_ORG_CODE,
+        CEEA_ORG_NAME,
+        CEEA_ORGANIZATION_ID,
+        CEEA_ORGANIZATION_CODE,
+        CEEA_ORGANIZATION_NAME,
+        CEEA_ARRIVAL_PLACE,
+        CEEA_ALLOCATION_TYPE,
+        CEEA_QUOTA_PROPORTION,
+        CEEA_LT,
+        CEEA_IF_USE,
+        SOURCE_NO,
+        MIN_ORDER_QUANTITY,
+        CONTRACT_CODE,
+        CONTRACT_NAME,
+        QUOTATION_LINE_ID,
+        PRICE_NUMBER,
+        ORGANIZATION_ID,
+        FULL_PATH_ID,
+        ORGANIZATION_NAME,
+        SOURCE_TYPE,
+        ITEM_GROUP_CODE,
+        SPECIFICATION,
+        ORDER_QUANTITY,
+        CONTRACT_NO,
+        MIN_PACK_QUANTITY,
+        BUSINESS_TYPE,
+        REMARKS,
+        SYNC_STATUS,
+        DEL_FLAG,
+        PRICE_UNIT,
+        CURRENCY
+        FROM scc_price_library
+        WHERE PRICE_TYPE = 'STANDARD'
+        AND CEEA_IF_USE = 'Y'
+        AND EFFECTIVE_DATE &lt;= CURDATE() AND EXPIRATION_DATE &gt;= CURDATE()
+        <if test="materialIds != null and materialIds.size()>0">
+            AND ITEM_ID in
+            <foreach collection="materialIds" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="materialNames != null and materialNames.size()>0">
+            AND ITEM_DESC in
+            <foreach collection="materialNames" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="organizationIds != null and organizationIds.size()>0">
+            AND CEEA_ORGANIZATION_ID in
+            <foreach collection="organizationIds" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vendorIds != null and vendorIds.size()>0">
+            AND VENDOR_ID in
+            <foreach collection="vendorIds" item="item" index="index"
+                     open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+</mapper>

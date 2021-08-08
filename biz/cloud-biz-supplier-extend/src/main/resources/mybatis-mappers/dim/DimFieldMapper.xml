@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.dim.mapper.DimFieldMapper">
+    <select id="listPageByParam"
+            resultType="com.midea.cloud.srm.model.supplier.dim.dto.DimFieldDTO">
+          SELECT
+            sd.DIM_NAME,
+            sd.DIM_CODE,
+            sdf.*
+        FROM
+            scc_sup_dim sd,
+            scc_sup_dim_field sdf
+        WHERE
+            sd.DIM_ID = sdf.DIM_ID
+        <if test="dimCode != null and dimCode != ''">
+            AND sd.DIM_CODE =#{dimCode}
+        </if>
+        <if test="fieldName != null and fieldName != ''">
+            AND sdf.FIELD_NAME LIKE CONCAT('%',#{fieldName},'%')
+        </if>
+        <if test="fieldTypeCode != null and fieldTypeCode != ''">
+            AND sdf.FIELD_TYPE_CODE = #{fieldTypeCode}
+        </if>
+          ORDER BY sdf.FIELD_ORDER_NUM
+
+
+    </select>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.flow.workflow.mapper.TemplateInstanceMapper">
+
+    <!--根据条件获取流程实例信息（根据时间倒序） -->
+    <select id="getTemplateInstanceByParam" resultType="com.midea.cloud.srm.model.flow.process.entity.TemplateInstance"
+        parameterType="com.midea.cloud.srm.model.flow.process.entity.TemplateInstance">
+        SELECT
+        t.INSTANCE_ID instanceId,
+        t.BUSINESS_ID businessId,
+        t.TEMPLATE_CODE templateCode,
+        t.CBPM_INSTANCE_ID cbpmInstanceId,
+        t.MODEL_ID modelId,
+        t.LOGIN_NAME loginName,
+        t.FLOW_STATUS flowStatus,
+        t.VERSION version,
+        t.ATTRIBUTE1 attribute1,
+        t.DATA_SOURCES dataSources,
+        t.DATA_SOURCES_ID dataSourcesId,
+        t.FORM_ID formId,
+        t.SOURCE_TABLE sourceTable,
+        t.SOURCE_TABLE_ID sourceTableId,
+        t.CREATED_ID createdId,
+        t.CREATED_BY createdBy,
+        t.CREATED_BY_IP createdByIp,
+        t.CREATION_DATE creationDate,
+        t.LAST_UPDATED_ID lastUpdatedId,
+        t.LAST_UPDATED_BY_IP lastUpdatedBy,
+        t.LAST_UPDATED_BY_IP lastUpdatedByIp,
+        t.LAST_UPDATE_DATE lastUpdateDate,
+        t.TENANT_ID tenantId
+        FROM srm_cbpm_template_instance t
+        WHERE 1 = 1
+        <if test="businessId != null">AND t.BUSINESS_ID = #{businessId}</if>
+        <if test="templateCode != null and templateCode !=''">AND t.TEMPLATE_CODE = #{templateCode}</if>
+        <if test="cbpmInstanceId != null">AND t.CBPM_INSTANCE_ID = #{cbpmInstanceId}</if>
+        <if test="modelId != null">AND t.MODEL_ID = #{modelId}</if>
+        ORDER BY
+        t.CREATION_DATE DESC
+    </select>
+
+</mapper>

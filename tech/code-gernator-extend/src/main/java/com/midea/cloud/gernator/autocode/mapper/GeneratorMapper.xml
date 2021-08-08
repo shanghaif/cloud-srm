@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.scc.code.dao.GeneratorDao">
+
+    <resultMap id="tableNameDTO" type="com.midea.scc.code.generator.dto.TableNameDTO">
+        <result column="table_name" property="tableName" />
+        <result column="table_comment" property="tableComment" />
+        <result column="creation_date" property="creationDate" />
+    </resultMap>
+
+    <resultMap id="tableDefDTO" type="com.midea.scc.code.generator.dto.TableDefDTO">
+        <result column="code" property="code" />
+        <result column="type" property="type" />
+        <result column="name" property="name" />
+        <result column="ifnull" property="ifnull" />
+        <result column="COLUMN_KEY" property="isPk" />
+    </resultMap>
+
+    <!--查看所有表 Oracle-->
+    <select id="listTableForOracle" parameterType="com.midea.scc.code.generator.dto.TableNameDTO" resultMap="tableNameDTO">
+        select
+              t.table_name, c.comments as table_comment,o.created as creation_date
+        from
+              user_tables t
+        inner join user_tab_comments c on t.table_name = c.table_name
+        inner join user_objects o on t.table_name = o.object_name
+        where 1=1
+
+        <if test="null != tableName and ''!= tableName">
+            and t.table_name  = #{tableName}
+        </if>
+        <if test="null != keyName and ''!= keyName">
+            and
+            (
+            upper(t.table_name) like MY_STR_ADD('%', #{keyName}, '%')
+            or
+            c.comments like MY_STR_ADD('%', #{keyName}, '%')
+            )
+        </if>
+        order by o.created desc
+    </select>
+
+    <!--查看所有表 MySQL-->
+    <select id="listTableForMySQL" parameterType="com.midea.scc.code.generator.dto.TableNameDTO" resultMap="tableNameDTO">
+        select
+              table_name,table_comment,create_time as creation_date
+        from information_schema.tables
+        where table_schema = #{databaseName}
+        <if test="null != tableName and ''!= tableName">
+            and table_name  = #{tableName}
+        </if>
+        <if test="null != keyName and ''!= keyName">
+            and
+            (
+            upper(table_name) like MY_STR_ADD('%', #{keyName}, '%')
+            or
+            table_comment like MY_STR_ADD('%', #{keyName}, '%')
+            )
+        </if>
+        order by create_time desc
+    </select>
+
+    <!--根据加表名查询主键 Oracle-->
+    <select id="getPkColumnNameByTableNameForOracle" parameterType="string" resultType="java.lang.String">
+        select
+              cu.column_name
+        from
+            user_cons_columns cu, user_constraints au
+        where
+            cu.constraint_name = au.constraint_name
+          and au.constraint_type = 'P'
+          and au.table_name =#{tableName}
+    </select>
+
+    <!--根据加表名查询主键 MySQL-->
+    <select id="getPkColumnNameByTableNameForMySQL" parameterType="java.util.Map" resultType="java.lang.String">
+        select
+              column_name
+        from
+            INFORMATION_SCHEMA.`KEY_COLUMN_USAGE`
+        where
+           constraint_name = 'PRIMARY'
+           and CONSTRAINT_SCHEMA = #{databaseName}
+           and table_name =#{tableName}
+    </select>
+
+    <select id="getTableDefInfoByNameForOracle" parameterType="String" resultMap="tableDefDTO">
+        select tab_c.column_name CODE,tab_c.data_type TYPE,col_c.comments as NAME, tab_c.nullable IFNULL,pk_t.constraint_type COLUMN_KEY
+        from user_tab_columns tab_c
+        left join user_col_comments col_c
+        on tab_c.column_name = col_c.column_name
+        left join (
+            select cu.column_name, au.constraint_type from user_cons_columns cu, user_constraints au
+		    where cu.constraint_name = au.constraint_name
+		    and au.constraint_type = 'P'
+            and au.table_name = #{tableName}
+	    ) pk_t
+        on tab_c.column_name = pk_t.column_name
+        where 1=1
+        and tab_c.TABLE_NAME = #{tableName}
+        and col_c.TABLE_NAME = #{tableName}
+        order by tab_c.COLUMN_ID asc
+    </select>
+
+
+    <select id="getTableDefInfoByNameForMySQL" parameterType="java.util.Map" resultMap="tableDefDTO">
+        select
+              CS.COLUMN_NAME CODE,CS.DATA_TYPE TYPE,CS.COLUMN_COMMENT as NAME,
+              CASE WHEN(CS.IS_NULLABLE='NO') THEN 'N' WHEN(CS.IS_NULLABLE='YES') THEN 'Y' ELSE '' END AS IFNULL,
+			  CASE WHEN(CS.COLUMN_KEY='PRI') THEN 'P' ELSE '' END AS COLUMN_KEY
+        from
+              INFORMATION_SCHEMA.COLUMNS CS
+        where
+              CS.TABLE_SCHEMA = #{databaseName}
+              and CS.TABLE_NAME = #{tableName}
+        ORDER BY CS.ORDINAL_POSITION
+    </select>
+
+
+</mapper>

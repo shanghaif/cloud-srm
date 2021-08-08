@@ -1,0 +1,70 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-uat.xml
+  logstashhost: 10.0.10.50 #logstash服务器
+spring:
+  redis:
+    host: 10.17.145.83
+    port: 6479
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.17.149.182:3306/usrm_cloud_flow?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: cdc_base_new
+    password: 123456
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  aop:
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+mybatis-plus:
+  type-aliases-package: com.midea.cloud.flow
+  mapper-locations: classpath*:/mybatis-mappers/**/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+security:
+  oauth2:
+    resource:
+      prefer-token-info: false
+work-flow:
+  sourceAddr: 127.0.0.1
+  forwardTo: www.mbpm.com
+  serviceName: /mbpmEngine/data
+  ## cbmp私有云-生产环境接口对接url
+  ## url: http://10.18.12.94:60094/mbpmEngineCloudV1/data/
+  ## uat环境接口对接url(网关)
+  ## 2020-07-22 切换为工作流引擎url: https://apiuat.midea.com/cflow/CFLOW-InsideService-V1.0/data/v1/
+  url: https://apiuat.midea.com/cflow/CFLOW-InsideService-V1.0/data/v1/
+  ##租户ID
+  tenanId: SRM
+  ## 私有化配置
+  #url: http://10.17.149.192/mbpmEngineCloud/data/
+  #tenanId: SRM_TQ
+  ## 是否启动idaasToken开关(默认为true,工作流私有云部署时值为false)
+  idaasToken: true
+  ## 固定配置admin的Salt
+  adminAppId: admin
+  adminSalt: 850ad469b8c7cbd5ccaf94ec530a3b62
+  adminSysId: admin
+  ## Idaas系统的接口访问URL值(uat: http://10.16.148.47:8002/apis/v1/paas/security/getAccessToken，sit：http://10.16.81.158:8000)*
+  ## https://apiuat.midea.com/iam/v1/security/getAccessToken
+  idaasUrl: https://apiuat.midea.com/iam/v1/security
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000

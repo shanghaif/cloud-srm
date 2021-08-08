@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bargaining.purchaser.projectmanagement.techproposal.mapper.OrderHeadMapper">
+
+    <select id="getOrderHeadByBidingId" resultType="com.midea.cloud.srm.model.bargaining.suppliercooperate.vo.BidOrderHeadVO">
+        SELECT
+        head.ORDER_HEAD_ID orderHeadId,
+        head.ORDER_STATUS orderStatus,
+        sbb.BIDING_ID bidingId,
+        sbv.BID_VENDOR_ID bidVendorId,
+        sbr.ROUND_ID roundId,
+        sbr.ROUND round,
+        sbr.end_time endTime,
+        sbb.BIDING_NUM bidingNum,
+        sbb.current_round currentRound,
+        sbb.DECIMAL_ACCURACY decimalAccuracy,
+        sbb.BIDING_CURRENCY bidingCurrency,
+        sbb.TAX_INCLUSIVE_PRICE taxInclusivePrice,
+        sbb.BIDING_TYPE bidingType,
+        sbb.EVALUATE_METHOD evaluateMethod,
+        sbb.BIDING_AWARD_WAY bidingAwardWay,
+        sbb.COMPANY_CODE companyCode,
+        sbb.ORGANIZATION_CODE organizationCode
+        FROM
+        scc_brg_biding sbb
+        LEFT JOIN scc_brg_order_head head ON head.BIDING_ID = sbb.BIDING_ID AND head.ORDER_STATUS in('DRAFT','SUBMISSION')
+        LEFT JOIN scc_brg_round sbr ON sbr.BIDING_ID = sbb.BIDING_ID
+        LEFT JOIN scc_brg_vendor sbv ON sbv.BIDING_ID = sbb.BIDING_ID
+        where sbb.BIDING_ID = #{bidingId}
+        AND sbr.ROUND = (SELECT MAX(ROUND) FROM scc_brg_round sbr1 WHERE sbr1.BIDING_ID = sbb.BIDING_ID)
+        <if test="bidVendorId != null">
+            AND sbv.BID_VENDOR_ID = #{bidVendorId}
+        </if>
+    </select>
+
+    <select id="findFirstRoundNotPricingVendors" resultType="com.midea.cloud.srm.model.bargaining.purchaser.projectmanagement.bidinitiating.entity.BidVendor">
+        SELECT DISTINCT
+            SBV.*
+        FROM scc_brg_VENDOR SBV
+        INNER JOIN scc_brg_SIGN_UP SBSU ON (SBV.BIDING_ID = SBSU.BIDING_ID AND SBV.VENDOR_ID = SBSU.VENDOR_ID)
+        WHERE SBSU.SIGN_UP_STATUS = 'SIGNUPED'
+        AND NOT EXISTS(
+            SELECT 1
+            FROM scc_brg_ORDER_HEAD SBOH
+            WHERE SBOH.BID_VENDOR_ID = SBV.BID_VENDOR_ID
+            AND SBOH.ORDER_STATUS = 'SUBMISSION'
+        )
+        AND SBV.BIDING_ID = #{biddingId}
+    </select>
+
+</mapper>

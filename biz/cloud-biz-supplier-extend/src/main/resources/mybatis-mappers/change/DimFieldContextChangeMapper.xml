@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.change.mapper.DimFieldContextChangeMapper">
+
+    <select id="findKey" resultType="java.lang.String">
+          select FIELD_CODE from
+         scc_sup_dim_field_context_change
+        where   CONTEXT_CHANGE_ID = #{changeOrderId}
+    </select>
+    <select id="findByKey" resultType="java.util.Map">
+        SELECT
+        <foreach collection="keys" item="key" separator=","  >
+            MAX(CASE fdc.FIELD_CODE WHEN #{key} THEN fdc.FIELD_VALUE ELSE '' END) AS '${key}'
+        </foreach>
+        FROM scc_sup_dim_field_context_change fdc
+        WHERE  fdc.CONTEXT_CHANGE_ID = #{changeOrderId}
+        GROUP BY fdc.CONTEXT_CHANGE_ID
+    </select>
+</mapper>

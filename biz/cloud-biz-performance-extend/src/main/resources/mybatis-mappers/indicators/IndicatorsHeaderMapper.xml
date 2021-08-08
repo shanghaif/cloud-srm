@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.indicators.mapper.IndicatorsHeaderMapper">
+
+    <!-- 指标头ResultMap -->
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.perf.inditors.dto.IndicatorsHeaderDTO">
+        <id column="INDICATOR_HEAD_ID" property="indicatorHeadId" jdbcType="BIGINT" />
+        <result column="INDICATOR_TYPE" property="indicatorType" jdbcType="VARCHAR" />
+        <result column="INDICATOR_DIMENSION" property="indicatorDimension" jdbcType="VARCHAR" />
+        <result column="INDICATOR_NAME" property="indicatorName" jdbcType="VARCHAR" />
+        <result column="ENABLE_FLAG" property="enableFlag" jdbcType="VARCHAR" />
+        <result column="INDICATOR_LOGIC" property="indicatorLogic" jdbcType="VARCHAR" />
+        <result column="EVALUATION" property="evaluation" jdbcType="VARCHAR" />
+        <result column="MARK_LIMIT" property="markLimit" jdbcType="DECIMAL" />
+        <result column="QUOTE_MODE" property="quoteMode" jdbcType="VARCHAR" />
+        <result column="INDICATOR_LINE_TYPE" property="indicatorLineType" jdbcType="VARCHAR" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 指标头和行信息ResultMap -->
+    <resultMap id="findIndicationHeadAndLineListMap" type="com.midea.cloud.srm.model.perf.inditors.dto.IndicatorsHeaderDTO">
+        <id column="INDICATOR_HEAD_ID" property="indicatorHeadId" jdbcType="BIGINT" />
+        <result column="INDICATOR_TYPE" property="indicatorType" jdbcType="VARCHAR" />
+        <result column="INDICATOR_DIMENSION" property="indicatorDimension" jdbcType="VARCHAR" />
+        <result column="INDICATOR_NAME" property="indicatorName" jdbcType="VARCHAR" />
+        <result column="ENABLE_FLAG" property="enableFlag" jdbcType="VARCHAR" />
+        <result column="INDICATOR_LOGIC" property="indicatorLogic" jdbcType="VARCHAR" />
+        <result column="EVALUATION" property="evaluation" jdbcType="VARCHAR" />
+        <result column="MARK_LIMIT" property="markLimit" jdbcType="DECIMAL" />
+        <result column="QUOTE_MODE" property="quoteMode" jdbcType="VARCHAR" />
+        <result column="INDICATOR_LINE_TYPE" property="indicatorLineType" jdbcType="VARCHAR" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+
+        <collection property="indicatorsLineList" ofType="com.midea.cloud.srm.model.perf.inditors.dto.IndicatorsLineDTO" >
+            <result column="INDICATOR_LINE_ID" property="indicatorLineId" jdbcType="BIGINT" />
+            <result column="INDICATOR_LINE_DES" property="indicatorLineDes" jdbcType="VARCHAR" />
+            <result column="PEF_SCORE" property="pefScore" jdbcType="DECIMAL" />
+            <result column="ASSESSMENT_PENALTY" property="assessmentPenalty" jdbcType="DECIMAL" />
+            <result column="SCORE_START" property="scoreStart" jdbcType="DECIMAL" />
+            <result column="SCORE_END" property="scoreEnd" jdbcType="DECIMAL" />
+            <result column="lineCreatedBy" property="createdBy" jdbcType="VARCHAR" />
+            <result column="lineCreationDate" property="creationDate" jdbcType="TIMESTAMP" />
+            <result column="lineLastUpdatedBy" property="lastUpdatedBy" jdbcType="VARCHAR" />
+            <result column="lineLastUpdateDate" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        </collection>
+    </resultMap>
+
+    <!-- 根据条件获取指标头和行信息 -->
+    <select id="findIndicationHeadAndLineList" resultMap="findIndicationHeadAndLineListMap" 
+            parameterType="com.midea.cloud.srm.model.perf.inditors.dto.IndicatorsHeaderDTO">
+        SELECT ih.INDICATOR_HEAD_ID,ih.INDICATOR_TYPE,ih.INDICATOR_DIMENSION,ih.INDICATOR_NAME,ih.ENABLE_FLAG,
+        ih.INDICATOR_LOGIC,ih.EVALUATION,ih.MARK_LIMIT,ih.QUOTE_MODE,ih.INDICATOR_LINE_TYPE,ih.CREATED_BY,ih.CREATION_DATE,
+        ih.LAST_UPDATED_BY,ih.LAST_UPDATE_DATE,il.INDICATOR_LINE_ID,il.INDICATOR_LINE_DES,il.PEF_SCORE
+        ,il.ASSESSMENT_PENALTY,il.SCORE_START,il.SCORE_END,il.CREATED_BY lineCreatedBy
+        ,il.CREATION_DATE lineCreationDate,il.LAST_UPDATED_BY lineLastUpdatedBy,il.LAST_UPDATE_DATE lineLastUpdateDate
+        FROM scc_perf_indicators_header ih
+        LEFT JOIN scc_perf_indicators_line il ON ih.INDICATOR_HEAD_ID = il.INDICATOR_HEAD_ID
+        <where>
+            <if test="null != indicatorsHeader">
+                <if test="null != indicatorsHeader.indicatorHeadId">
+                    AND ih.INDICATOR_HEAD_ID = #{indicatorsHeader.indicatorHeadId}
+                </if>
+                <if test="null != indicatorsHeader.enableFlag">
+                    AND ih.ENABLE_FLAG = #{indicatorsHeader.enableFlag}
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取指标库类型-指标维度(启动、不删除和不重复的指标维度和指标类型) -->
+    <select id="findIndicatorsHeaderDimensionList" resultType="java.util.Map">
+        SELECT distinct ih.INDICATOR_TYPE indicatorType,ih.INDICATOR_DIMENSION indicatorDimension
+        FROM scc_perf_indicators_header ih
+        WHERE ih.ENABLE_FLAG='Y';
+    </select>
+
+    <!-- 根据指标类型和指标维度获取有效的指标头信息Map -->
+    <resultMap id="findIndicatorsHeaderByDimensionMap" type="com.midea.cloud.srm.model.perf.inditors.dto.IndicatorsHeaderDTO">
+        <id column="INDICATOR_HEAD_ID" property="indicatorHeadId" jdbcType="BIGINT" />
+        <result column="INDICATOR_TYPE" property="indicatorType" jdbcType="VARCHAR" />
+        <result column="INDICATOR_DIMENSION" property="indicatorDimension" jdbcType="VARCHAR" />
+        <result column="INDICATOR_NAME" property="indicatorName" jdbcType="VARCHAR" />
+        <result column="ENABLE_FLAG" property="enableFlag" jdbcType="VARCHAR" />
+        <result column="INDICATOR_LOGIC" property="indicatorLogic" jdbcType="VARCHAR" />
+        <result column="EVALUATION" property="evaluation" jdbcType="VARCHAR" />
+        <result column="MARK_LIMIT" property="markLimit" jdbcType="DECIMAL" />
+        <result column="QUOTE_MODE" property="quoteMode" jdbcType="VARCHAR" />
+        <result column="INDICATOR_LINE_TYPE" property="indicatorLineType" jdbcType="VARCHAR" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+
+        <collection property="indicatorsLineList" ofType="com.midea.cloud.srm.model.perf.inditors.entity.IndicatorsLine">
+            <id column="INDICATOR_LINE_ID" property="indicatorLineId" jdbcType="BIGINT" />
+        </collection>
+    </resultMap>
+
+    <!-- 根据指标类型和指标维度获取有效的指标头信息 -->
+    <select id="findIndicatorsHeaderByDimension" resultMap="findIndicatorsHeaderByDimensionMap"
+            parameterType="com.midea.cloud.srm.model.perf.inditors.entity.IndicatorsHeader">
+        SELECT ih.INDICATOR_HEAD_ID,ih.INDICATOR_TYPE,ih.INDICATOR_DIMENSION,ih.INDICATOR_NAME,ih.ENABLE_FLAG,
+        ih.INDICATOR_LOGIC,ih.EVALUATION,ih.MARK_LIMIT,ih.QUOTE_MODE,ih.INDICATOR_LINE_TYPE,ih.CREATED_BY,ih.CREATION_DATE,
+        ih.LAST_UPDATED_BY,ih.LAST_UPDATE_DATE,il.INDICATOR_LINE_ID
+        FROM  scc_perf_indicators_header ih
+        LEFT JOIN scc_perf_indicators_line il ON ih.INDICATOR_HEAD_ID = il.INDICATOR_HEAD_ID
+        <where>
+            <if test="null != enableFlag and '' != enableFlag">
+                AND ih.ENABLE_FLAG = #{enableFlag}
+            </if>
+            <if test="null != indicatorType and '' != indicatorType">
+                AND ih.INDICATOR_TYPE = #{indicatorType}
+            </if>
+            <if test="null != indicatorDimension and '' != indicatorDimension">
+                AND ih.INDICATOR_DIMENSION = #{indicatorDimension}
+            </if>
+        </where>
+    </select>
+
+</mapper>

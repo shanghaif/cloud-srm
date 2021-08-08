@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.inq.inquiry.mapper.VendorMapper">
+
+    <resultMap id="quoteHeaderDto" type="com.midea.cloud.srm.model.inq.inquiry.dto.QuoteHeaderDto">
+        <id column="INQUIRY_ID" property="inquiryId" jdbcType="BIGINT"></id>
+        <result column="INQUIRY_NO" property="inquiryNo" jdbcType="VARCHAR"></result>
+        <result column="QUOTE_ID" property="quoteId" jdbcType="BIGINT"></result>
+        <result column="QUOTE_NO" property="quoteNo" jdbcType="VARCHAR"></result>
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT"></result>
+        <result column="INQUIRY_TITLE" property="inquiryTitle" jdbcType="VARCHAR"></result>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT"></result>
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR"></result>
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT"></result>
+        <result column="STATUS" property="status" jdbcType="VARCHAR"></result>
+        <result column="QUOTE_STATUS" property="quoteStatus" jdbcType="VARCHAR"></result>
+        <result column="BEGIN_QUOTE" property="beginQuote" jdbcType="TIMESTAMP"></result>
+        <result column="DEADLINE" property="deadline" jdbcType="TIMESTAMP"></result>
+        <result column="PUBLISH_DATE" property="publishDate" jdbcType="TIMESTAMP"></result>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"></result>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"></result>
+        <result column="PRICE_NUM" property="priceNum" jdbcType="VARCHAR"></result>
+    </resultMap>
+    <select id="getByVendorId" resultMap="quoteHeaderDto">
+        SELECT
+			quote.QUOTE_NO QUOTE_NO ,
+			quote.QUOTE_ID QUOTE_ID,
+            vendor.INQUIRY_VENDOR_ID AS INQUIRY_VENDOR_ID,
+            vendor.VENDOR_ID AS VENDOR_ID,
+            vendor.VENDOR_CODE AS VENDOR_CODE,
+            vendor.VENDOR_NAME AS VENDOR_NAME,
+            vendor.LINK_MAN AS LINK_MAN,
+            vendor.PHONE AS PHONE,
+            vendor.QUOTE_TYPE AS QUOTE_TYPE,
+            quote.STATUS AS QUOTE_STATUS,
+            head.INQUIRY_ID AS INQUIRY_ID,
+            head.INQUIRY_NO AS INQUIRY_NO,
+            head.INQUIRY_TITLE AS INQUIRY_TITLE,
+            head.ORGANIZATION_ID AS ORGANIZATION_ID,
+            head.ORGANIZATION_NAME AS ORGANIZATION_NAME,
+            head.COMPANY_ID AS COMPANY_ID,
+            head.QUOTE_RULE AS QUOTE_RULE,
+            head.INQUIRY_RULE AS INQUIRY_RULE,
+            head.INQUIRY_TYPE AS INQUIRY_TYPE,
+            head.CURRENCY AS CURRENCY,
+            head.TAX_KEY AS TAX_KEY,
+            head.TAX_RATE AS TAX_RATE,
+            head.TYPE AS TYPE,
+            head.ADDRESS AS ADDRESS,
+            head.BEGIN_QUOTE AS BEGIN_QUOTE,
+            head.PUBLISH_DATE AS PUBLISH_DATE,
+            head.DEADLINE AS DEADLINE,
+            head.ROUND AS ROUND,
+            head.STATUS AS STATUS,
+            head.AUDIT_STATUS AS AUDIT_STATUS,
+            head.LINKMAN AS LINKMAN,
+            head.TEL AS TEL,
+            head.EMAIL AS EMAIL,
+            head.CHILD_INQUIRY_ID AS CHILD_INQUIRY_ID,
+            head.PARENT_INQUIRY_ID AS PARENT_INQUIRY_ID,
+            head.CREATE_COMPANY_ID AS CREATE_COMPANY_ID,
+            head.QUOTE_CNT AS QUOTE_CNT,
+            head.INVITE_CNT AS INVITE_CNT,
+            head.CBPM_INSTANCE_ID AS CBPM_INSTANCE_ID,
+            head.DEL_FLAG AS DEL_FLAG,
+            vendor.CREATED_BY AS CREATED_BY,
+            head.CREATION_DATE AS CREATION_DATE,
+            head.CREATED_BY_IP AS CREATED_BY_IP,
+            head.LAST_UPDATED_BY AS LAST_UPDATED_BY,
+            head.LAST_UPDATE_DATE AS LAST_UPDATE_DATE,
+            head.LAST_UPDATED_BY_IP AS LAST_UPDATED_BY_IP,
+            head.VERSION AS VERSION,
+            head.TENANT_ID AS TENANT_ID,
+            head.PRICE_NUM AS PRICE_NUM
+        FROM
+            scc_inquiry_vendor vendor
+            LEFT JOIN scc_inquiry_header head ON vendor.INQUIRY_ID = head.INQUIRY_ID
+            LEFT JOIN scc_quote_header quote ON vendor.INQUIRY_ID = quote.INQUIRY_ID and vendor.VENDOR_ID = quote.VENDOR_ID and quote.STATUS not in ('ROLLBACK')
+        WHERE head.STATUS not in('DRAFT','UNPUBLISH','CANCEL') and head.AUDIT_STATUS in ('APPROVED')
+              and vendor.VENDOR_ID = #{vendorId}
+        <if test="inquiryNo != null and inquiryNo !=''">AND head.INQUIRY_NO LIKE concat('%', #{inquiryNo}, '%')</if>
+        <if test="itemCode != null and itemCode !=''">AND head.INQUIRY_ID in(select item.INQUIRY_ID from scc_inquiry_item item where item.ITEM_CODE LIKE concat('%', #{itemCode}, '%'))</if>
+        <if test="status != null and status !='DRAFT'">AND quote.status = #{status}</if>
+        <if test="status != null and status =='DRAFT'">AND quote.status is null </if>
+        <if test="inquiryStatus != null and inquiryStatus !=''">AND head.status = #{inquiryStatus}</if>
+        <if test="organizationId != null and organizationId !=''">AND head.ORGANIZATION_ID = #{organizationId}</if>
+            ORDER  BY head.CREATION_DATE DESC
+    </select>
+
+    <select id="getByInquiryId" resultMap="quoteHeaderDto">
+        SELECT
+        vendor.INQUIRY_VENDOR_ID AS INQUIRY_VENDOR_ID,
+        vendor.VENDOR_ID AS VENDOR_ID,
+        vendor.VENDOR_CODE AS VENDOR_CODE,
+        vendor.VENDOR_NAME AS VENDOR_NAME,
+        vendor.LINK_MAN AS LINK_MAN,
+        vendor.PHONE AS PHONE,
+        vendor.QUOTE_TYPE AS QUOTE_TYPE,
+        vendor.QUOTE_STATUS AS QUOTE_STATUS,
+        head.INQUIRY_ID AS INQUIRY_ID,
+        head.INQUIRY_NO AS INQUIRY_NO,
+        head.INQUIRY_TITLE AS INQUIRY_TITLE,
+        head.ORGANIZATION_ID AS ORGANIZATION_ID,
+        head.ORGANIZATION_NAME AS ORGANIZATION_NAME,
+        head.COMPANY_ID AS COMPANY_ID,
+        head.QUOTE_RULE AS QUOTE_RULE,
+        head.INQUIRY_RULE AS INQUIRY_RULE,
+        head.INQUIRY_TYPE AS INQUIRY_TYPE,
+        head.CURRENCY AS CURRENCY,
+        head.TAX_KEY AS TAX_KEY,
+        head.TAX_RATE AS TAX_RATE,
+        head.TYPE AS TYPE,
+        head.ADDRESS AS ADDRESS,
+        head.PUBLISH_DATE AS PUBLISH_DATE,
+        head.DEADLINE AS DEADLINE,
+        head.ROUND AS ROUND,
+        head.STATUS AS STATUS,
+        head.AUDIT_STATUS AS AUDIT_STATUS,
+        head.LINKMAN AS LINKMAN,
+        head.TEL AS TEL,
+        head.EMAIL AS EMAIL,
+        head.CHILD_INQUIRY_ID AS CHILD_INQUIRY_ID,
+        head.PARENT_INQUIRY_ID AS PARENT_INQUIRY_ID,
+        head.CREATE_COMPANY_ID AS CREATE_COMPANY_ID,
+        head.QUOTE_CNT AS QUOTE_CNT,
+        head.INVITE_CNT AS INVITE_CNT,
+        head.CBPM_INSTANCE_ID AS CBPM_INSTANCE_ID,
+        head.DEL_FLAG AS DEL_FLAG,
+        head.CREATED_BY AS CREATED_BY,
+        head.CREATION_DATE AS CREATION_DATE,
+        head.CREATED_BY_IP AS CREATED_BY_IP,
+        head.LAST_UPDATED_BY AS LAST_UPDATED_BY,
+        head.LAST_UPDATE_DATE AS LAST_UPDATE_DATE,
+        head.LAST_UPDATED_BY_IP AS LAST_UPDATED_BY_IP,
+        head.VERSION AS VERSION,
+        head.TENANT_ID AS TENANT_ID,
+        head.PRICE_NUM AS PRICE_NUM
+        FROM
+        scc_inquiry_vendor vendor
+        LEFT JOIN scc_inquiry_header head ON vendor.INQUIRY_ID = head.INQUIRY_ID
+        WHERE
+        vendor.VENDOR_ID = #{vendorId} and head.INQUIRY_ID=#{inquiryId}
+    </select>
+</mapper>

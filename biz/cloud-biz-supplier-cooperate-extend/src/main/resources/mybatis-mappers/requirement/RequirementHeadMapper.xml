@@ -1,0 +1,845 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.pr.requirement.mapper.RequirementHeadMapper">
+
+    <!--根据ID批量修改采购需求头信息 -->
+    <update id="bachRequirementHead" parameterType="java.util.List">
+        <if test="null != requirementHeadList">
+            <foreach collection="requirementHeadList" index="0" item="requirementHead" separator=";">
+                update scc_pr_requirement_head
+                <set>
+                    apply_status = #{requirementHead.applyStatus},
+                    reject_reason = #{requirementHead.rejectReason}
+                </set>
+                where requirement_head_id = #{requirementHead.requirementHeadId }
+            </foreach>
+        </if>
+    </update>
+
+    <!-- 根据采购需求行表ID获取采购需求头和行集合信息-结果集 -->
+    <resultMap id="findRequirementHeadAndLineByLineIdsMap" type="com.midea.cloud.srm.model.pm.pr.requirement.dto.RequirementHeadQueryDTO">
+        <result column="REQUIREMENT_HEAD_ID" property="requirementHeadId" jdbcType="BIGINT" />
+
+        <collection property="requirementLineList" ofType="com.midea.cloud.srm.model.pm.pr.requirement.entity.RequirementLine">
+            <id column="REQUIREMENT_LINE_ID" property="requirementLineId" jdbcType="BIGINT" />
+            <result column="BUYER_ID" property="buyerId" jdbcType="BIGINT" />
+            <result column="BUYER" property="buyer" jdbcType="VARCHAR" />
+            <result column="BUYER_NAME" property="buyerName" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+
+    <!-- 根据采购需求行表ID获取采购需求头和行集合信息-->
+    <select id="findRequirementHeadAndLineByLineIds" resultMap="findRequirementHeadAndLineByLineIdsMap" parameterType="java.util.List">
+        SELECT rl.BUYER_ID,rl.BUYER,rl.BUYER_NAME,rl.REQUIREMENT_LINE_ID,rl.REQUIREMENT_HEAD_ID FROM scc_pr_requirement_head rh
+        LEFT JOIN scc_pr_requirement_line rl ON rl.REQUIREMENT_HEAD_ID = rh.REQUIREMENT_HEAD_ID
+        <where>
+            <if test="null != requirementLineIdList">
+                rl.REQUIREMENT_LINE_ID in
+                <foreach collection="requirementLineIdList" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="null != item">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+        </where>
+    </select>
+    
+    
+    
+    <select id="listPageByIds" resultType="com.midea.cloud.srm.model.pm.pr.requirement.dto.RequirementManageDTO">
+        SELECT sprh.REQUIREMENT_HEAD_ID
+        , sprh.REQUIREMENT_HEAD_NUM
+        , sprh.CEEA_PURCHASE_TYPE
+        , sprh.ORG_ID
+        , sprh.ORG_CODE
+        , sprh.ORG_NAME
+        , sprl.ORGANIZATION_ID
+        , sprl.ORGANIZATION_CODE
+        , sprl.ORGANIZATION_NAME
+        , sprh.APPLY_DATE
+        , sprh.CEEA_DEPARTMENT_ID
+        , sprh.CEEA_DEPARTMENT_NAME
+        , sprh.CEEA_DEPARTMENT_CODE
+        , sprh.CEEA_PROJECT_NAME
+        , sprh.CEEA_PROJECT_NUM
+        , sprh.CEEA_PROJECT_USER_ID
+        , sprh.CEEA_PROJECT_USER_NICKNAME
+        , sprh.CEEA_PROJECT_APPROVAL_NUM
+        , sprh.CEEA_ASSET_TYPE
+        , sprh.CEEA_IF_HQ
+        , sprh.CEEA_TOTAL_BUDGET
+        , sprh.CEEA_BUSINESS_SMALL
+        , sprh.CEEA_URGENCY_EXPLAIN
+        , sprh.CEEA_APPOINT_REASON
+        , sprh.CEEA_DRAFTER_OPINION
+        , sprh.AUDIT_STATUS
+        , sprl.REQUIREMENT_LINE_ID
+        , sprl.ROW_NUM
+        , sprl.FULL_PATH_ID
+        , sprl.REQUIREMENT_DEPARTMENT
+        , sprl.CATEGORY_ID
+        , sprl.CATEGORY_NAME
+        , sprl.CATEGORY_CODE
+        , sprl.BUDGET
+        , sprl.CEEA_IF_DIRECTORY
+        , sprl.MATERIAL_ID
+        , sprl.MATERIAL_CODE
+        , sprl.MATERIAL_NAME
+        , sprl.PURCHASE_ORGANIZATION
+        , sprl.UNIT_CODE
+        , sprl.UNIT
+        , sprl.NOTAX_PRICE
+        , sprl.PRICE_UNIT
+        , sprl.TAX_RATE
+        , sprl.TAX_KEY
+        , sprl.CURRENCY
+        , sprl.CURRENCY_ID
+        , sprl.CURRENCY_NAME
+        , sprl.CURRENCY_CODE
+        , sprl.CURRENT_INVENTORY
+        , sprl.REQUIREMENT_QUANTITY
+        , sprl.ORDER_QUANTITY
+        , sprl.HAVE_SUPPLIER
+        , sprl.HAVE_EFFECTIVE_PRICE
+        , sprl.REQUIREMENT_SOURCE
+        , sprl.RECEIVED_FACTORY
+        , sprl.EXTERNAL_APPLY_CODE
+        , sprl.EXTERNAL_APPLY_ROW_NUM
+        , sprl.FOLLOW_FORM_CODE
+        , sprl.FOLLOW_FORM_NAME
+        , sprl.TOTAL_AMOUNT
+        , sprl.REQUIREMENT_DATE
+        , sprl.VENDOR_ID
+        , sprl.VENDOR_NAME
+        , sprl.VENDOR_CODE
+        , sprl.APPLY_REASON
+        , sprl.CEEA_SUP_USER_ID
+        , sprl.CEEA_SUP_USER_NICKNAME
+        , sprl.CEEA_SUP_USER_NAME
+        , sprl.CEEA_STRATEGY_USER_ID
+        , sprl.CEEA_STRATEGY_USER_NICKNAME
+        , sprl.CEEA_STRATEGY_USER_NAME
+        , sprl.CEEA_PERFORM_USER_ID
+        , sprl.CEEA_PERFORM_USER_NICKNAME
+        , sprl.CEEA_PERFORM_USER_NAME
+        , sprl.CEEA_EXECUTED_QUANTITY
+        , sprl.CEEA_DELIVERY_PLACE
+        , sprl.APPLY_STATUS
+        , sprl.REJECT_REASON
+        , sprl.INVENTORY_PLACE
+        , sprl.COST_TYPE
+        , sprl.COST_NUM
+        , sprl.BRAND
+        , sprl.BUYER_ID
+        , sprl.BUYER
+        , sprl.BUYER_NAME
+        , sprl.CREATED_FULL_NAME
+        , sprl.INTERNAL_COMMENTS
+        , sprl.EXTERNAL_COMMENTS
+        , sprl.COMMENTS
+        , sprl.COMPANY_CODE
+        , sprl.SOURCE_SYSTEM
+        , sprh.CREATED_ID
+        , sprh.CREATED_BY
+        , sprh.CREATION_DATE
+        , sprh.CREATED_BY_IP
+        , sprl.IF_CREATE_BID
+        , sprl.IF_CREATE_ORDER
+        , sprl.LAST_UPDATED_ID
+        , sprl.LAST_UPDATED_BY
+        , sprl.LAST_UPDATE_DATE
+        , sprl.LAST_UPDATED_BY_IP
+        , sprl.TENANT_ID
+        , sprl.VERSION
+        , sprl.CEEA_BUSINESS_SMALL_CODE
+        , sprl.SHOP_CART_ID
+        , sprl.DATA_SOURCE
+        , sprl.CEEA_FIRST_QUANTITY
+        , sprl.ORDER_NUMBER
+        , sprl.DMAND_LINE_REQUEST
+        FROM scc_pr_requirement_head sprh
+        inner JOIN scc_pr_requirement_line sprl ON sprh.REQUIREMENT_HEAD_ID = sprl.REQUIREMENT_HEAD_ID
+        <where>
+            <foreach collection="requirementManageDTOs" separator=" or " item="requirementManageDTO">
+                (sprh.REQUIREMENT_HEAD_ID = #{requirementManageDTO.requirementHeadId} and sprl.REQUIREMENT_LINE_ID =
+                #{requirementManageDTO.requirementLineId})
+            </foreach>
+        </where>
+        order by sprl.CREATION_DATE desc
+    </select>
+
+    <select id="listPageByIdsNew" resultType="com.midea.cloud.srm.model.pm.pr.requirement.dto.RequirementManageDTO">
+        SELECT sprh.REQUIREMENT_HEAD_ID
+        , sprh.REQUIREMENT_HEAD_NUM
+        , sprh.CEEA_PURCHASE_TYPE
+        , sprh.ORG_ID
+        , sprh.ORG_CODE
+        , sprh.ORG_NAME
+        , sprl.ORGANIZATION_ID
+        , sprl.ORGANIZATION_CODE
+        , sprl.ORGANIZATION_NAME
+        , sprh.APPLY_DATE
+        , sprh.CEEA_DEPARTMENT_ID
+        , sprh.CEEA_DEPARTMENT_NAME
+        , sprh.CEEA_DEPARTMENT_CODE
+        , sprh.CEEA_PROJECT_NAME
+        , sprh.CEEA_PROJECT_NUM
+        , sprh.CEEA_PROJECT_USER_ID
+        , sprh.CEEA_PROJECT_USER_NICKNAME
+        , sprh.CEEA_PROJECT_APPROVAL_NUM
+        , sprh.CEEA_ASSET_TYPE
+        , sprh.CEEA_IF_HQ
+        , sprh.CEEA_TOTAL_BUDGET
+        , sprh.CEEA_BUSINESS_SMALL
+        , sprh.CEEA_URGENCY_EXPLAIN
+        , sprh.CEEA_APPOINT_REASON
+        , sprh.CEEA_DRAFTER_OPINION
+        , sprh.AUDIT_STATUS
+        , sprh.ES_REQUIREMENT_HEAD_NUM
+        , sprl.REQUIREMENT_LINE_ID
+        , sprl.ROW_NUM
+        , sprl.FULL_PATH_ID
+        , sprl.REQUIREMENT_DEPARTMENT
+        , sprl.CATEGORY_ID
+        , sprl.CATEGORY_NAME
+        , sprl.CATEGORY_CODE
+        , sprl.BUDGET
+        , sprl.CEEA_IF_DIRECTORY
+        , sprl.MATERIAL_ID
+        , sprl.MATERIAL_CODE
+        , sprl.MATERIAL_NAME
+        , sprl.PURCHASE_ORGANIZATION
+        , sprl.UNIT_CODE
+        , sprl.UNIT
+        , sprl.NOTAX_PRICE
+        , sprl.PRICE_UNIT
+        , sprl.TAX_RATE
+        , sprl.TAX_KEY
+        , sprl.CURRENCY
+        , sprl.CURRENCY_ID
+        , sprl.CURRENCY_NAME
+        , sprl.CURRENCY_CODE
+        , sprl.CURRENT_INVENTORY
+        , sprl.REQUIREMENT_QUANTITY
+        , sprl.ORDER_QUANTITY
+        , sprl.HAVE_SUPPLIER
+        , sprl.HAVE_EFFECTIVE_PRICE
+        , sprl.REQUIREMENT_SOURCE
+        , sprl.RECEIVED_FACTORY
+        , sprl.EXTERNAL_APPLY_CODE
+        , sprl.EXTERNAL_APPLY_ROW_NUM
+        , sprl.FOLLOW_FORM_CODE
+        , sprl.FOLLOW_FORM_NAME
+        , sprl.TOTAL_AMOUNT
+        , sprl.REQUIREMENT_DATE
+        , sprl.VENDOR_ID
+        , sprl.VENDOR_NAME
+        , sprl.VENDOR_CODE
+        , sprl.APPLY_REASON
+        , sprl.CEEA_SUP_USER_ID
+        , sprl.CEEA_SUP_USER_NICKNAME
+        , sprl.CEEA_SUP_USER_NAME
+        , sprl.CEEA_STRATEGY_USER_ID
+        , sprl.CEEA_STRATEGY_USER_NICKNAME
+        , sprl.CEEA_STRATEGY_USER_NAME
+        , sprl.CEEA_PERFORM_USER_ID
+        , sprl.CEEA_PERFORM_USER_NICKNAME
+        , sprl.CEEA_PERFORM_USER_NAME
+        , sprl.CEEA_EXECUTED_QUANTITY
+        , sprl.CEEA_DELIVERY_PLACE
+        , sprl.APPLY_STATUS
+        , sprl.REJECT_REASON
+        , sprl.INVENTORY_PLACE
+        , sprl.COST_TYPE
+        , sprl.COST_NUM
+        , sprl.BRAND
+        , sprl.BUYER_ID
+        , sprl.BUYER
+        , sprl.BUYER_NAME
+        , sprl.CREATED_FULL_NAME
+        , sprl.INTERNAL_COMMENTS
+        , sprl.EXTERNAL_COMMENTS
+        , sprl.COMMENTS
+        , sprl.COMPANY_CODE
+        , sprl.SOURCE_SYSTEM
+        , sprh.CREATED_ID
+        , sprh.CREATED_BY
+        , sprh.CREATION_DATE
+        , sprh.CREATED_BY_IP
+        , sprl.IF_CREATE_BID
+        , sprl.IF_CREATE_ORDER
+        , sprl.LAST_UPDATED_ID
+        , sprl.LAST_UPDATED_BY
+        , sprl.LAST_UPDATE_DATE
+        , sprl.LAST_UPDATED_BY_IP
+        , sprl.TENANT_ID
+        , sprl.VERSION
+        , sprl.CEEA_BUSINESS_SMALL_CODE
+        , sprl.SHOP_CART_ID
+        , sprl.DATA_SOURCE
+        , sprl.CEEA_FIRST_QUANTITY
+        , sprl.ORDER_NUMBER
+        , sprl.DMAND_LINE_REQUEST
+        , sprl.CEEA_IF_HOLD as ifHold
+        , sprl.RETURN_OPERATOR
+        , sprl.IF_DISTRIBUTION_VENDOR
+        , sprl.ERROR_MSG
+        FROM scc_pr_requirement_head sprh
+        inner JOIN scc_pr_requirement_line sprl ON sprh.REQUIREMENT_HEAD_ID = sprl.REQUIREMENT_HEAD_ID
+        <where>
+            sprl.REQUIREMENT_LINE_ID in
+            <foreach collection="lineIds" index="0" item="item" open="(" close=")" separator=",">
+                <if test="item != null">
+                    #{item}
+                </if>
+            </foreach>
+        </where>
+        order by sprl.CREATION_DATE desc
+    </select>
+
+    <select id="listPageByParam" resultType="com.midea.cloud.srm.model.pm.pr.requirement.dto.RequirementManageDTO">
+        SELECT
+        sprh.REQUIREMENT_HEAD_ID,
+        sprl.REQUIREMENT_LINE_ID
+        FROM scc_pr_requirement_head sprh
+        inner JOIN scc_pr_requirement_line sprl ON sprh.REQUIREMENT_HEAD_ID = sprl.REQUIREMENT_HEAD_ID
+        <if test="followFormCode!=null and followFormCode!=''">
+            left join ceea_pr_subsequent_documents psd on psd.REQUIREMENT_LINE_ID = sprl.REQUIREMENT_LINE_ID
+        </if>
+        <where>
+            <if test="orgIds != null">
+                AND sprh.ORG_ID IN
+                <foreach collection="orgIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="organizationIds != null">
+                AND sprl.ORGANIZATION_ID IN
+                <foreach collection="organizationIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="ceeaDepartmentIds != null">
+                AND sprh.CEEA_DEPARTMENT_ID IN
+                <foreach collection="ceeaDepartmentIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="createdIds != null">
+                AND sprh.CREATED_ID IN
+                <foreach collection="createdIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="materialIds != null">
+                AND sprl.MATERIAL_ID IN
+                <foreach collection="materialIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="materialCodes != null">
+                AND sprl.MATERIAL_CODE IN
+                <foreach collection="materialCodes" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="categoryIds != null">
+                AND sprl.CATEGORY_ID IN
+                <foreach collection="categoryIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="requirementHeadNums != null">
+                AND sprh.REQUIREMENT_HEAD_NUM IN
+                <foreach collection="requirementHeadNums" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                AND sprl.MATERIAL_CODE LIKE CONCAT('%', #{materialCode}, '%')
+            </if>
+            <if test="applyStatus != null and applyStatus != ''">
+                AND sprl.APPLY_STATUS = #{applyStatus}
+            </if>
+            <if test="startApplyDate != null and endApplyDate != null">
+                AND (sprh.APPLY_DATE &gt;= #{startApplyDate} AND sprh.APPLY_DATE &lt;= #{endApplyDate})
+            </if>
+            <if test="startApplyDate != null and endApplyDate == null">
+                AND sprh.APPLY_DATE &gt;= #{startApplyDate}
+            </if>
+            <if test="endApplyDate != null and startApplyDate == null">
+                AND sprh.APPLY_DATE &lt;= #{endApplyDate})
+            </if>
+            <if test="ceeaSupUserNickname != null and ceeaSupUserNickname != ''">
+                AND sprl.CEEA_SUP_USER_NICKNAME LIKE CONCAT('%', #{ceeaSupUserNickname}, '%')
+            </if>
+            <if test="ceeaStrategyUserNickname != null and ceeaStrategyUserNickname != ''">
+                AND sprl.CEEA_STRATEGY_USER_NICKNAME LIKE CONCAT('%', #{ceeaStrategyUserNickname}, '%')
+            </if>
+            <if test="ceeaPerformUserNickname != null and ceeaPerformUserNickname != ''">
+                AND sprl.CEEA_PERFORM_USER_NICKNAME LIKE CONCAT('%', #{ceeaPerformUserNickname}, '%')
+            </if>
+            <if test="requirementSource != null and requirementSource != ''">
+                AND sprl.REQUIREMENT_SOURCE LIKE CONCAT('%', #{requirementSource}, '%')
+            </if>
+            <if test="createdFullName != null and createdFullName != ''">
+                AND sprh.CREATED_FULL_NAME LIKE CONCAT('%', #{createdFullName}, '%')
+            </if>
+            <if test="ifCreateFollowForm != null and ifCreateFollowForm != ''">
+                AND sprl.IF_CREATE_FOLLOW_FORM = #{ifCreateFollowForm}
+            </if>
+            <if test="haveEffectivePrice != null and haveEffectivePrice != ''">
+                AND sprl.HAVE_EFFECTIVE_PRICE = #{haveEffectivePrice}
+            </if>
+            <if test="requirementHeadNum != null">
+                AND sprh.REQUIREMENT_HEAD_NUM LIKE CONCAT('%', #{requirementHeadNum}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND sprl.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND sprl.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="vendorCode != null and vendorCode != ''">
+                AND sprl.VENDOR_CODE LIKE CONCAT('%', #{vendorCode}, '%')
+            </if>
+            <if test="followFormCode!=null and followFormCode!=''">
+                AND psd.SUBSEQUENT_DOCUMENTS_NUMBER LIKE CONCAT('%', #{followFormCode}, '%')
+            </if>
+            <if test="haveSupplier != null and haveSupplier != ''">
+                AND sprl.HAVE_SUPPLIER = #{haveSupplier}
+            </if>
+            <if test='ifHaveOrderQuantity == "N"'>
+                AND sprl.ORDER_QUANTITY = 0
+            </if>
+            <if test='ifHaveOrderQuantity == "Y"'>
+                AND sprl.ORDER_QUANTITY != 0
+            </if>
+            <if test="ceeaDepartmentId != null and ceeaDepartmentId != ''">
+                AND sprh.CEEA_DEPARTMENT_ID = #{ceeaDepartmentId}
+            </if>
+            <if test="esRequirementHeadNum != null and esRequirementHeadNum != ''">
+                AND sprh.ES_REQUIREMENT_HEAD_NUM = #{esRequirementHeadNum}
+            </if>
+            AND sprh.AUDIT_STATUS = 'APPROVED'
+        </where>
+        <if test="followFormCode!=null and followFormCode!=''">
+            group by sprl.REQUIREMENT_LINE_ID
+        </if>
+        order by sprl.CREATION_DATE desc
+    </select>
+
+
+    <select id="listPageByParamNew" resultType="com.midea.cloud.srm.model.pm.pr.requirement.dto.RequirementManageDTO">
+        SELECT sprl.REQUIREMENT_LINE_ID
+        FROM scc_pr_requirement_line sprl
+        left JOIN scc_pr_requirement_head sprh ON sprh.REQUIREMENT_HEAD_ID = sprl.REQUIREMENT_HEAD_ID
+        <if test='(param.followFormCode!=null and param.followFormCode!="")
+or (param.ifCreateBid =="Y")
+or (param.ifCreateOrder =="Y")
+'>
+            left join ceea_pr_subsequent_documents psd on psd.REQUIREMENT_LINE_ID = sprl.REQUIREMENT_LINE_ID
+        </if>
+        <where>
+            sprh.AUDIT_STATUS='APPROVED'
+            <if test="param.ifCreateOrder != null and param.ifCreateOrder != ''">
+                and sprl.IF_CREATE_ORDER=#{param.ifCreateOrder}
+            </if>
+            <if test="param.ifCreateBid != null and param.ifCreateBid != ''">
+                and sprl.IF_CREATE_BID=#{param.ifCreateBid}
+            </if>
+            <if test="param.ifCreateFollowForm != null and param.ifCreateFollowForm != ''">
+                and sprl.IF_CREATE_FOLLOW_FORM=#{param.ifCreateFollowForm}
+            </if>
+            <if test="param.requirementHeadNum != null and param.requirementHeadNum != ''">
+                AND sprh.REQUIREMENT_HEAD_NUM = #{param.requirementHeadNum}
+            </if>
+            <if test="param.orgIds != null and param.orgIds.size() > 0">
+                AND sprh.ORG_ID IN
+                <foreach collection="param.orgIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="param.organizationIds != null and param.organizationIds.size() > 0">
+                AND sprl.ORGANIZATION_ID IN
+                <foreach collection="param.organizationIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="param.materialCode != null and param.materialCode != ''">
+                and sprl.MATERIAL_CODE=#{param.materialCode}
+            </if>
+            <if test="param.categoryIds != null and param.categoryIds.size() > 0">
+                AND sprl.CATEGORY_ID IN
+                <foreach collection="param.categoryIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="param.haveSupplier != null and param.haveSupplier != ''">
+                and sprl.HAVE_SUPPLIER = #{param.haveSupplier}
+            </if>
+            <if test="param.esRequirementHeadNum != null and param.esRequirementHeadNum != ''">
+                and sprh.ES_REQUIREMENT_HEAD_NUM = #{param.esRequirementHeadNum}
+            </if>
+            <if test="param.followFormCode!=null and param.followFormCode!=''">
+                and psd.SUBSEQUENT_DOCUMENTS_NUMBER = #{param.followFormCode}
+            </if>
+            <if test='param.ifHaveOrderQuantity !=null and param.ifHaveOrderQuantity  == "N"'>
+                AND sprl.ORDER_QUANTITY = 0
+            </if>
+            <if test='param.ifHaveOrderQuantity!=null and param.ifHaveOrderQuantity == "Y"'>
+                AND sprl.ORDER_QUANTITY > 0 and sprl.APPLY_STATUS != 'RETURNING'
+            </if>
+            <if test="param.haveEffectivePrice!=null and param.haveEffectivePrice != ''">
+                and sprl.HAVE_EFFECTIVE_PRICE = #{param.haveEffectivePrice}
+            </if>
+            <if test="param.dmandLineRequest!=null and param.dmandLineRequest != ''">
+                and sprl.DMAND_LINE_REQUEST = #{param.dmandLineRequest}
+            </if>
+            <if test="param.applyStatus!=null and param.applyStatus != ''">
+                and sprl.APPLY_STATUS = #{param.applyStatus}
+            </if>
+            <if test="param.ceeaIfDirectory != null and param.ceeaIfDirectory != ''">
+                and sprl.CEEA_IF_DIRECTORY = #{param.ceeaIfDirectory}
+            </if>
+            <if test="param.ceeaStrategyUserNickname != null and param.ceeaStrategyUserNickname != ''">
+                and sprl.CEEA_STRATEGY_USER_NICKNAME LIKE CONCAT(#{param.ceeaStrategyUserNickname}, '%')
+            </if>
+            <if test="param.ceeaDepartmentName != null and param.ceeaDepartmentName != ''">
+                and sprh.CEEA_DEPARTMENT_NAME LIKE CONCAT(#{param.ceeaDepartmentName}, '%')
+            </if>
+            <if test="param.requirementSource != null and param.requirementSource != ''">
+                and sprl.REQUIREMENT_SOURCE LIKE CONCAT(#{param.requirementSource}, '%')
+            </if>
+            <if test="param.ceeaPerformUserNickname != null and param.ceeaPerformUserNickname != ''">
+                and sprl.CEEA_PERFORM_USER_NICKNAME LIKE CONCAT(#{param.ceeaPerformUserNickname}, '%')
+            </if>
+            <if test="param.createdFullName != null and param.createdFullName != ''">
+                and sprh.CREATED_FULL_NAME LIKE CONCAT(#{param.createdFullName}, '%')
+            </if>
+            <if test="param.endApplyDate != null">
+                AND sprh.APPLY_DATE &lt;= #{param.endApplyDate}
+            </if>
+            <if test="param.startApplyDate != null">
+                AND sprh.APPLY_DATE &gt;= #{param.startApplyDate}
+            </if>
+            <if test='param.ifCreateOrder != null and param.ifCreateOrder == "N"'>
+                and sprl.IF_CREATE_ORDER = 'N'
+            </if>
+            <if test='param.ifCreateBid != null and param.ifCreateBid == "N"'>
+                and sprl.IF_CREATE_BID = 'N'
+            </if>
+            <if test='param.ifCreateOrder == "Y"'>
+                and psd.ISUBSEQUENT_DOCUMENTSS_TYPE='PURCHASE'
+            </if>
+            <if test='param.ifCreateBid == "Y"'>
+                and (psd.ISUBSEQUENT_DOCUMENTSS_TYPE = 'ENQUIRY' or psd.ISUBSEQUENT_DOCUMENTSS_TYPE='TENDER')
+            </if>
+            <if test="param.followFormCode!=null and param.followFormCode!=''">
+                and psd.SUBSEQUENT_DOCUMENTS_NUMBER = #{param.followFormCode}
+            </if>
+            <if test='param.ifHold =="Y"'>
+                and sprl.CEEA_IF_HOLD = #{param.ifHold}
+            </if>
+            <if test='param.ifHold =="N"'>
+                and (sprl.CEEA_IF_HOLD = 'N' or sprl.CEEA_IF_HOLD IS NULL)
+            </if>
+        </where>
+        order by sprh.CREATION_DATE desc limit ${(param.pageNum - 1) * param.pageSize} , #{param.pageSize}
+    </select>
+
+    <select id="listPageByParamNewCount" resultType="java.lang.Long">
+        SELECT count(sprl.REQUIREMENT_LINE_ID)
+        FROM scc_pr_requirement_line sprl
+        LEFT JOIN scc_pr_requirement_head sprh
+        ON sprh.REQUIREMENT_HEAD_ID = sprl.REQUIREMENT_HEAD_ID
+        <if test='(param.followFormCode!=null and param.followFormCode!="")
+or (param.ifCreateBid =="Y")
+or (param.ifCreateOrder =="Y")
+'>
+            left join ceea_pr_subsequent_documents psd on psd.REQUIREMENT_LINE_ID = sprl.REQUIREMENT_LINE_ID
+        </if>
+        <where>
+            sprh.AUDIT_STATUS = 'APPROVED'
+            <if test="param.ifCreateFollowForm != null and param.ifCreateFollowForm != ''">
+                and sprl.IF_CREATE_FOLLOW_FORM=#{param.ifCreateFollowForm}
+            </if>
+            <if test="param.requirementHeadNum != null and param.requirementHeadNum != ''">
+                AND sprh.REQUIREMENT_HEAD_NUM = #{param.requirementHeadNum}
+            </if>
+            <if test="param.orgIds != null and param.orgIds.size() > 0">
+                AND sprh.ORG_ID IN
+                <foreach collection="param.orgIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="param.organizationIds != null and param.organizationIds.size() > 0">
+                AND sprl.ORGANIZATION_ID IN
+                <foreach collection="param.organizationIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="param.materialCode != null and param.materialCode != ''">
+                and sprl.MATERIAL_CODE=#{param.materialCode}
+            </if>
+            <if test="param.categoryIds != null and param.categoryIds.size() > 0">
+                AND sprl.CATEGORY_ID IN
+                <foreach collection="param.categoryIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="param.haveSupplier != null and param.haveSupplier != ''">
+                and sprl.HAVE_SUPPLIER = #{param.haveSupplier}
+            </if>
+            <if test="param.esRequirementHeadNum != null and param.esRequirementHeadNum != ''">
+                and sprh.ES_REQUIREMENT_HEAD_NUM = #{param.esRequirementHeadNum}
+            </if>
+            <if test="param.followFormCode!=null and param.followFormCode!=''">
+                and psd.SUBSEQUENT_DOCUMENTS_NUMBER = #{param.followFormCode}
+            </if>
+            <if test='param.ifHaveOrderQuantity !=null and param.ifHaveOrderQuantity  == "N"'>
+                AND sprl.ORDER_QUANTITY = 0
+            </if>
+            <if test='param.ifHaveOrderQuantity!=null and param.ifHaveOrderQuantity == "Y"'>
+                AND sprl.ORDER_QUANTITY > 0 and sprl.APPLY_STATUS != 'RETURNING'
+            </if>
+            <if test="param.haveEffectivePrice!=null and param.haveEffectivePrice != ''">
+                and sprl.HAVE_EFFECTIVE_PRICE = #{param.haveEffectivePrice}
+            </if>
+            <if test="param.dmandLineRequest!=null and param.dmandLineRequest != ''">
+                and sprl.DMAND_LINE_REQUEST = #{param.dmandLineRequest}
+            </if>
+            <if test="param.applyStatus!=null and param.applyStatus != ''">
+                and sprl.APPLY_STATUS = #{param.applyStatus}
+            </if>
+            <if test="param.ceeaIfDirectory != null and param.ceeaIfDirectory != ''">
+                and sprl.CEEA_IF_DIRECTORY = #{param.ceeaIfDirectory}
+            </if>
+            <if test="param.ceeaStrategyUserNickname != null and param.ceeaStrategyUserNickname != ''">
+                and sprl.CEEA_STRATEGY_USER_NICKNAME LIKE CONCAT(#{param.ceeaStrategyUserNickname}, '%')
+            </if>
+            <if test="param.ceeaDepartmentName != null and param.ceeaDepartmentName != ''">
+                and sprh.CEEA_DEPARTMENT_NAME LIKE CONCAT(#{param.ceeaDepartmentName}, '%')
+            </if>
+            <if test="param.requirementSource != null and param.requirementSource != ''">
+                and sprl.REQUIREMENT_SOURCE LIKE CONCAT(#{param.requirementSource}, '%')
+            </if>
+            <if test="param.ceeaPerformUserNickname != null and param.ceeaPerformUserNickname != ''">
+                and sprl.CEEA_PERFORM_USER_NICKNAME LIKE CONCAT(#{param.ceeaPerformUserNickname}, '%')
+            </if>
+            <if test="param.createdFullName != null and param.createdFullName != ''">
+                and sprh.CREATED_FULL_NAME LIKE CONCAT(#{param.createdFullName}, '%')
+            </if>
+            <if test="param.endApplyDate != null">
+                AND sprh.APPLY_DATE &lt;= #{param.endApplyDate}
+            </if>
+            <if test="param.startApplyDate != null">
+                AND sprh.APPLY_DATE &gt;= #{param.startApplyDate}
+            </if>
+            <if test='param.ifCreateOrder != null and param.ifCreateOrder == "N"'>
+                and sprl.IF_CREATE_ORDER = 'N'
+            </if>
+            <if test='param.ifCreateOrder == "Y"'>
+                and psd.ISUBSEQUENT_DOCUMENTSS_TYPE='PURCHASE'
+            </if>
+            <if test='param.ifCreateBid != null and param.ifCreateBid == "N"'>
+                and sprl.IF_CREATE_BID = 'N'
+            </if>
+            <if test='param.ifCreateBid == "Y"'>
+                and (psd.ISUBSEQUENT_DOCUMENTSS_TYPE = 'ENQUIRY' or psd.ISUBSEQUENT_DOCUMENTSS_TYPE='TENDER')
+            </if>
+            <if test="param.followFormCode!=null and param.followFormCode!=''">
+                and psd.SUBSEQUENT_DOCUMENTS_NUMBER = #{param.followFormCode}
+            </if>
+            <if test='param.ifHold == "Y"'>
+                and sprl.CEEA_IF_HOLD = #{param.ifHold}
+            </if>
+            <if test='param.ifHold =="N"'>
+                and (sprl.CEEA_IF_HOLD = 'N' or sprl.CEEA_IF_HOLD IS NULL)
+            </if>
+        </where>
+    </select>
+
+    <!--<select id="listPageByParam_COUNT" resultType="Long">
+        SELECT
+        count(DISTINCT sprl.REQUIREMENT_LINE_ID)
+        FROM scc_pr_requirement_head sprh
+        inner JOIN scc_pr_requirement_line sprl ON sprh.REQUIREMENT_HEAD_ID = sprl.REQUIREMENT_HEAD_ID
+        <if test="followFormCode!=null and followFormCode!=''">
+            left join ceea_pr_subsequent_documents psd on psd.REQUIREMENT_LINE_ID = sprl.REQUIREMENT_LINE_ID
+        </if>
+        <where>
+            <if test="orgIds != null">
+                AND sprh.ORG_ID IN
+                <foreach collection="orgIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="organizationIds != null">
+                AND sprl.ORGANIZATION_ID IN
+                <foreach collection="organizationIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="ceeaDepartmentIds != null">
+                AND sprh.CEEA_DEPARTMENT_ID IN
+                <foreach collection="ceeaDepartmentIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="createdIds != null">
+                AND sprh.CREATED_ID IN
+                <foreach collection="createdIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="materialIds != null">
+                AND sprl.MATERIAL_ID IN
+                <foreach collection="materialIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="materialCodes != null">
+                AND sprl.MATERIAL_CODE IN
+                <foreach collection="materialCodes" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="categoryIds != null">
+                AND sprl.CATEGORY_ID IN
+                <foreach collection="categoryIds" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="requirementHeadNums != null">
+                AND sprh.REQUIREMENT_HEAD_NUM IN
+                <foreach collection="requirementHeadNums" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="item != null">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                AND sprl.MATERIAL_CODE LIKE CONCAT('%', #{materialCode}, '%')
+            </if>
+            <if test="applyStatus != null and applyStatus != ''">
+                AND sprl.APPLY_STATUS = #{applyStatus}
+            </if>
+            <if test="startApplyDate != null and endApplyDate != null">
+                AND (sprh.APPLY_DATE &gt;= #{startApplyDate} AND sprh.APPLY_DATE &lt;= #{endApplyDate})
+            </if>
+            <if test="startApplyDate != null and endApplyDate == null">
+                AND sprh.APPLY_DATE &gt;= #{startApplyDate}
+            </if>
+            <if test="endApplyDate != null and startApplyDate == null">
+                AND sprh.APPLY_DATE &lt;= #{endApplyDate})
+            </if>
+            <if test="ceeaSupUserNickname != null and ceeaSupUserNickname != ''">
+                AND sprl.CEEA_SUP_USER_NICKNAME LIKE CONCAT('%', #{ceeaSupUserNickname}, '%')
+            </if>
+            <if test="ceeaStrategyUserNickname != null and ceeaStrategyUserNickname != ''">
+                AND sprl.CEEA_STRATEGY_USER_NICKNAME LIKE CONCAT('%', #{ceeaStrategyUserNickname}, '%')
+            </if>
+            <if test="ceeaPerformUserNickname != null and ceeaPerformUserNickname != ''">
+                AND sprl.CEEA_PERFORM_USER_NICKNAME LIKE CONCAT('%', #{ceeaPerformUserNickname}, '%')
+            </if>
+            <if test="requirementSource != null and requirementSource != ''">
+                AND sprl.REQUIREMENT_SOURCE LIKE CONCAT('%', #{requirementSource}, '%')
+            </if>
+            <if test="createdFullName != null and createdFullName != ''">
+                AND sprh.CREATED_FULL_NAME LIKE CONCAT('%', #{createdFullName}, '%')
+            </if>
+            <if test="ifCreateFollowForm != null and ifCreateFollowForm != ''">
+                AND sprl.IF_CREATE_FOLLOW_FORM = #{ifCreateFollowForm}
+            </if>
+            <if test="haveEffectivePrice != null and haveEffectivePrice != ''">
+                AND sprl.HAVE_EFFECTIVE_PRICE = #{haveEffectivePrice}
+            </if>
+            <if test="requirementHeadNum != null">
+                AND sprh.REQUIREMENT_HEAD_NUM LIKE CONCAT('%', #{requirementHeadNum}, '%')
+            </if>
+            <if test="vendorId != null">
+                AND sprl.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND sprl.VENDOR_NAME LIKE CONCAT('%', #{vendorName}, '%')
+            </if>
+            <if test="vendorCode != null and vendorCode != ''">
+                AND sprl.VENDOR_CODE LIKE CONCAT('%', #{vendorCode}, '%')
+            </if>
+            <if test="followFormCode!=null and followFormCode!=''">
+                AND  psd.SUBSEQUENT_DOCUMENTS_NUMBER LIKE CONCAT('%', #{followFormCode}, '%')
+            </if>
+            <if test="haveSupplier != null and haveSupplier != ''">
+                AND sprl.HAVE_SUPPLIER = #{haveSupplier}
+            </if>
+            <if test='ifHaveOrderQuantity == "N"'>
+                AND sprl.ORDER_QUANTITY = 0
+            </if>
+            <if test='ifHaveOrderQuantity == "Y"'>
+                AND sprl.ORDER_QUANTITY != 0
+            </if>
+            <if test="ceeaDepartmentId != null and ceeaDepartmentId != ''">
+                AND sprh.CEEA_DEPARTMENT_ID = #{ceeaDepartmentId}
+            </if>
+            AND sprh.AUDIT_STATUS = 'APPROVED'
+        </where>
+    </select> -->
+
+
+    <select id="getRequestNumber" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT count(*) FROM scc_pr_requirement_head
+        WHERE ES_REQUIREMENT_HEAD_NUM = #{param}
+    </select>
+    <select id="getRowNumByOne" resultType="java.lang.Integer"
+            parameterType="com.midea.cloud.srm.model.pm.pr.requirement.entity.RequirementLine">
+        SELECT count(*) FROM scc_pr_requirement_head a
+        INNER JOIN scc_pr_requirement_line b on a.REQUIREMENT_HEAD_ID=b.REQUIREMENT_HEAD_ID
+        WHERE a.ES_REQUIREMENT_HEAD_NUM= #{requirementHeadNum}
+        and b.ROW_NUM=#{rowNum}
+    </select>
+    
+
+</mapper>

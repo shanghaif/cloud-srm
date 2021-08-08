@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bargaining.purchaser.projectmanagement.clearquestion.mapper.BidingAnswerMapper">
+
+    <select id="queryBidingAnswer" resultType="com.midea.cloud.srm.model.bargaining.purchaser.projectmanagement.clearquestion.vo.BidingAnswerVO">
+        select
+        answer.ANSWER_ID answerId,
+        answer.ANSWER_NUM answerNum,
+        answer.QUESTION_ID questionId,
+        question.QUESTION_NUM questionNum,
+        question.QUESTION_TITLE questionTitle,
+        question.QUESTION_STATUS questionStatus,
+        answer.BIDING_ID bidingId,
+        answer.BIDING_NUM bidingNum,
+        answer.BIDING_NAME bidingName,
+        ANSWER_STATUS answerStatus,
+        ANSWER_TITLE answerTitle,
+        ANSWER_COMTENT answerComtent,
+        answer.SUBMIT_TIME submitTime,
+        answer.COMPANY_CODE companyCode,
+        answer.ORGANIZATION_CODE organizationCode
+        from
+        scc_brg_biding_answer answer
+        left join scc_brg_biding_question question on answer.QUESTION_ID = question.QUESTION_ID
+        where
+        1 = 1
+        <if test="bidingAnswerVO.questionId != null">
+            AND answer.QUESTION_ID = #{bidingAnswerVO.questionId}
+        </if>
+        <if test="bidingAnswerVO.questionIds != null">
+            AND answer.QUESTION_ID in
+            <foreach item="questionId" collection="bidingAnswerVO.questionIds" separator="," open="(" close=")" index="">
+                #{questionId, jdbcType=NUMERIC}
+            </foreach>
+        </if>
+        <if test="bidingAnswerVO.answerId != null">
+            AND answer.ANSWER_ID = #{bidingAnswerVO.answerId}
+        </if>
+        <if test="bidingAnswerVO.bidingNum != null">
+            AND answer.BIDING_NUM like concat('%', #{bidingAnswerVO.bidingNum}, '%')
+        </if>
+        <if test="bidingAnswerVO.bidingName != null">
+            AND answer.BIDING_NAME like concat('%', #{bidingAnswerVO.bidingName}, '%')
+        </if>
+
+        <if test="bidingAnswerVO.answerStatus != null">
+            AND answer.ANSWER_STATUS = #{bidingAnswerVO.answerStatus}
+        </if>
+        <if test="bidingAnswerVO.answerNum != null">
+            AND answer.ANSWER_NUM like concat('%', #{bidingAnswerVO.answerNum}, '%')
+        </if>
+        <if test="bidingAnswerVO.answerTitle != null">
+            AND answer.ANSWER_TITLE like concat('%', #{bidingAnswerVO.answerTitle}, '%')
+        </if>
+
+
+        <if test="bidingAnswerVO.questionStatus != null">
+            AND question.QUESTION_STATUS = #{bidingAnswerVO.questionStatus}
+        </if>
+        <if test="bidingAnswerVO.questionNum != null">
+            AND question.QUESTION_NUM like concat('%', #{bidingAnswerVO.questionNum}, '%')
+        </if>
+        <if test="bidingAnswerVO.questionTitle != null">
+            AND question.QUESTION_TITLE like concat('%', #{bidingAnswerVO.questionTitle}, '%')
+        </if>
+
+        order by answer.SUBMIT_TIME desc
+    </select>
+
+</mapper>

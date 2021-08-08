@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bid.purchaser.projectmanagement.clearquestion.mapper.BidingQuestionMapper">
+
+    <select id="queryBidingQuestion" resultType="com.midea.cloud.srm.model.logistics.bid.purchaser.projectmanagement.clearquestion.vo.BidingQuestionVO">
+
+        SELECT QUESTION_ID questionId,
+        QUESTION_NUM questionNum,
+        BIDING_ID bidingId,
+        BIDING_NUM bidingNum,
+        BIDING_NAME bidingName,
+        VENDOR_ID vendorId,
+        QUESTION_STATUS questionStatus,
+        QUESTION_TITLE questionTitle,
+        QUESTION_COMTENT questionComtent,
+        SUBMIT_TIME submitTime,
+        REJECT_REASON rejectReason,
+        COMPANY_CODE companyCode,
+        ORGANIZATION_CODE organizationCode
+        FROM scc_bid_biding_question ques
+        WHERE 1=1
+        <if test="bidingQuestionVo.questionId != null">
+            AND QUESTION_ID = #{bidingQuestionVo.questionId}
+        </if>
+
+        <if test="bidingQuestionVo.questionStatus != null">
+            AND QUESTION_STATUS = #{bidingQuestionVo.questionStatus}
+        </if>
+        <if test="bidingQuestionVo.bidingNum != null">
+            AND BIDING_NUM like concat('%', #{bidingQuestionVo.bidingNum}, '%')
+        </if>
+        <if test="bidingQuestionVo.bidngName != null">
+            AND BIDING_NAME like concat('%', #{bidingQuestionVo.bidngName}, '%')
+        </if>
+        <if test="bidingQuestionVo.questionNum != null">
+            AND QUESTION_NUM like concat('%', #{bidingQuestionVo.questionNum}, '%')
+        </if>
+        <if test="bidingQuestionVo.questionTitle != null">
+            AND QUESTION_TITLE like concat('%', #{bidingQuestionVo.questionTitle}, '%')
+        </if>
+
+        order by SUBMIT_TIME desc
+
+    </select>
+
+</mapper>

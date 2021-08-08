@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.pr.requirement.mapper.RequirementLineMapper">
+
+    <!--根据ID批量修改采购需求行信息 -->
+    <update id="bachUpdateRequirementLine" parameterType="java.util.List">
+        <if test="null != requirementLineList">
+            <foreach collection="requirementLineList" index="0" item="requirementLine" separator=";">
+                update scc_pr_requirement_line
+                <set>
+                    <if test="null != requirementLine.applyStatus and '' != requirementLine.applyStatus">
+                        apply_status = #{requirementLine.applyStatus},
+                    </if>
+                    <if test="null != requirementLine.rejectReason and '' != requirementLine.rejectReason">
+                        reject_reason = #{requirementLine.rejectReason},
+                    </if>
+                    <if test="null != requirementLine.followFormCode and '' != requirementLine.followFormCode">
+                        FOLLOW_FORM_CODE = #{requirementLine.followFormCode},
+                    </if>
+
+                    <!-- 采购员ID和采购员姓名 分配和取消分配的时候都要执行 -->
+                    <if test="null != requirementLine.buyerId or requirementLine.enableUnAssigned">
+                        buyer_id = #{requirementLine.buyerId},
+                    </if>
+                    <if test="(null != requirementLine.buyer and '' != requirementLine.buyer) or requirementLine.enableUnAssigned">
+                        buyer = #{requirementLine.buyer},
+                    </if>
+                    <if test="(null != requirementLine.buyerName and '' != requirementLine.buyerName) or requirementLine.enableUnAssigned">
+                        buyer_name = #{requirementLine.buyerName},
+                    </if>
+                    <if test="null != requirementLine.lastUpdatedId">
+                        last_updated_id = #{requirementLine.lastUpdatedId},
+                    </if>
+                    <if test="null != requirementLine.lastUpdatedBy and '' != requirementLine.lastUpdatedBy">
+                        last_updated_by = #{requirementLine.lastUpdatedBy},
+                    </if>
+                    <if test="null != requirementLine.lastUpdateDate">
+                        last_update_date = #{requirementLine.lastUpdateDate},
+                    </if>
+                    <if test="null != requirementLine.lastUpdatedByIp and '' != requirementLine.lastUpdatedByIp">
+                        last_updated_by_ip = #{requirementLine.lastUpdatedByIp},
+                    </if>
+                </set>
+                where requirement_line_id = #{requirementLine.requirementLineId }
+            </foreach>
+        </if>
+    </update>
+
+    <!-- 获取采购需求合并信息-->
+    <select id="findRequirementMergeList"
+            resultType="com.midea.cloud.srm.model.pm.pr.requirement.entity.RequirementLine">
+        SELECT MAX(RL.ROW_NUM),
+        RL.APPLY_STATUS,
+        RL.ORG_CODE,
+        RL.PURCHASE_ORGANIZATION,
+        RL.CATEGORY_ID,
+        RL.CATEGORY_NAME,
+        RL.CATEGORY_NAME,
+        RL.INVENTORY_PLACE,
+        RL.COST_TYPE,
+        RL.COST_NUM,
+        MAX(RL.UNIT)                 UNIT,
+        SUM(RL.REQUIREMENT_QUANTITY) REQUIREMENT_QUANTITY,
+        MAX(RL.BRAND),
+        RL.NOTAX_PRICE,
+        RL.ITEM_ID,
+        RL.ITEM_CODE,
+        RL.ITEM_DESC,
+        RL.REQUIREMENT_DATE,
+        RL.REQUIREMENT_DEPARTMENT,
+        RL.BRAND,
+        MIN(RL.REQUIREMENT_DATE)
+        FROM SCC_PR_REQUIREMENT_LINE RL
+        <where>
+            <if test="null != requirementLineIdList">
+                RL.REQUIREMENT_LINE_ID in
+                <foreach collection="requirementLineIdList" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="null != item">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        RL.APPLY_STATUS,RL.ORG_CODE,RL.PURCHASE_ORGANIZATION,RL.CATEGORY_ID,RL.CATEGORY_NAME,RL.ITEM_ID,
+        RL.INVENTORY_PLACE,RL.COST_TYPE,RL.COST_NUM
+    </select>
+
+    <select id="queryLineNum" resultType="java.lang.Long">
+        select count(1) from scc_pr_requirement_line where
+        REQUIREMENT_HEAD_ID = #{requirementHeadId}
+        <if test="null != applyStatus and applyStatus != ''">
+            and APPLY_STATUS = #{applyStatus}
+        </if>
+    </select>
+
+    <select id="ceeaListForOrder" resultType="com.midea.cloud.srm.model.pm.pr.requirement.entity.RequirementLine">
+        select l.*
+        from scc_pr_requirement_line l
+        left join scc_pr_requirement_head h on h.REQUIREMENT_HEAD_ID = l.REQUIREMENT_HEAD_ID
+        <where>
+            <if test="materialCode != null and materialCode != ''">
+                and l.MATERIAL_CODE = #{materialCode}
+            </if>
+            <if test="materialName != null and materialName != ''">
+                and l.MATERIAL_NAME = #{materialName}
+            </if>
+            <if test="orgId != null">
+                and l.ORG_ID = #{orgId}
+            </if>
+            <if test="categoryKey != null and categoryKey != ''">
+                and (l.CATEGORY_NAME like concat('%',#{categoryKey},'%') or l.CATEGORY_CODE like concat('%',#{categoryKey},'%'))
+            </if>
+            <if test="organizationId != null">
+                and l.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <if test="requirementHeadNum != null and requirementHeadNum != ''">
+                and l.REQUIREMENT_HEAD_NUM like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="startDate != null">
+                and l.REQUIREMENT_DATE >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and l.REQUIREMENT_DATE &lt;= #{endDate}
+            </if>
+            <if test="purchaseType != null and purchaseType != '' and purchaseType != 'ZERO_PRICE' and purchaseType != 'CONVENIENT'">
+                and h.CEEA_PURCHASE_TYPE = #{purchaseType}
+            </if>
+            <if test="purchaseTypeList != null and purchaseTypeList.size() > 0">
+                and h.CEEA_PURCHASE_TYPE in
+                <foreach collection="purchaseTypeList" index="0" item="item" open="(" close=")" separator=",">
+                    <if test="null != item">
+                        #{item}
+                    </if>
+                </foreach>
+            </if>
+            and l.CEEA_PERFORM_USER_ID = #{ceeaPerformUserId}
+            and l.CATEGORY_ID is not null
+            /*过滤可下单数量为空 并且 为0的采购申请行*/
+            and l.ORDER_QUANTITY is not null
+            and l.ORDER_QUANTITY != 0
+            /*2020-12-26 隆基产品回迁 (因为 null != 'Y'为false,所以增加后续代码 )*/
+            and (l.CEEA_IF_HOLD != 'Y' or l.CEEA_IF_HOLD is null)
+        </where>
+
+    </select>
+
+    <select id="countRequirementChart" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM scc_pr_requirement_line l
+        left join scc_pr_requirement_head h on h.REQUIREMENT_HEAD_ID = l.REQUIREMENT_HEAD_ID
+        <where>
+            <if test="null != ceeaPurchaseType">
+                and h.CEEA_PURCHASE_TYPE = #{ceeaPurchaseType}
+            </if>
+            <if test="null != ceeaPrType">
+                and h.CEEA_PR_TYPE = #{ceeaPrType}
+            </if>
+            <if test="null != ceeaDepartmentId">
+                and h.CEEA_DEPARTMENT_ID = #{ceeaDepartmentId}
+            </if>
+            <if test="null != categoryId">
+                and h.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="null != requirementHeadNum">
+                and h.REQUIREMENT_HEAD_NUM like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="null != createdFullName">
+                and h.CREATED_FULL_NAME like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="null != ceeaProjectNum">
+                and h.CEEA_PROJECT_NUM like concat('%',#{ceeaProjectNum},'%')
+            </if>
+            <if test="null != ceeaProjectName">
+                and h.CEEA_PROJECT_NAME like concat('%',#{ceeaProjectName},'%')
+            </if>
+            <if test="null != ceeaProjectUserNickname">
+                and h.CEEA_PROJECT_USER_NICKNAME like concat('%',#{ceeaProjectUserNickname},'%')
+            </if>
+            <if test="null != auditStatus">
+                and h.AUDIT_STATUS = #{auditStatus}
+            </if>
+            <if test="null != esRequirementHeadNum">
+                and h.ES_REQUIREMENT_HEAD_NUM like concat('%',#{esRequirementHeadNum},'%')
+            </if>
+            <if test="orgIds != null and orgIds.size() > 0">
+                and h.ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+            <if test="ceeaDepartmentIds != null and ceeaDepartmentIds.size() > 0">
+                and h.CEEA_DEPARTMENT_ID in
+                <foreach collection="ceeaDepartmentIds" item="ceeaDepartmentId" index="index" open="(" close=")" separator=",">
+                    #{ceeaDepartmentId}
+                </foreach>
+            </if>
+            <if test="createdIds != null and createdIds.size() > 0">
+                and h.CREATED_ID in
+                <foreach collection="createdIds" item="createdId" index="index" open="(" close=")" separator=",">
+                    #{createdId}
+                </foreach>
+            </if>
+            <if test="null != startApplyDate">
+                and h.APPLY_DATE >= #{startApplyDate}
+            </if>
+            <if test="null != endApplyDate">
+                and h.APPLY_DATE &lt;= #{endApplyDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="listPageRequirementChart"
+            resultType="com.midea.cloud.srm.model.pm.pr.requirement.entity.RequirementLine">
+        SELECT l.CREATION_DATE as CREATION_DATE,l.*,h.*
+        FROM scc_pr_requirement_line l
+        left join scc_pr_requirement_head h on h.REQUIREMENT_HEAD_ID = l.REQUIREMENT_HEAD_ID
+        <where>
+            <if test="null != ceeaPurchaseType">
+                and h.CEEA_PURCHASE_TYPE = #{ceeaPurchaseType}
+            </if>
+            <if test="null != ceeaPrType">
+                and h.CEEA_PR_TYPE = #{ceeaPrType}
+            </if>
+            <if test="null != ceeaDepartmentId">
+                and h.CEEA_DEPARTMENT_ID = #{ceeaDepartmentId}
+            </if>
+            <if test="null != categoryId">
+                and h.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="null != requirementHeadNum">
+                and h.REQUIREMENT_HEAD_NUM like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="null != createdFullName">
+                and h.CREATED_FULL_NAME like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="null != ceeaProjectNum">
+                and h.CEEA_PROJECT_NUM like concat('%',#{ceeaProjectNum},'%')
+            </if>
+            <if test="null != ceeaProjectName">
+                and h.CEEA_PROJECT_NAME like concat('%',#{ceeaProjectName},'%')
+            </if>
+            <if test="null != ceeaProjectUserNickname">
+                and h.CEEA_PROJECT_USER_NICKNAME like concat('%',#{ceeaProjectUserNickname},'%')
+            </if>
+            <if test="null != auditStatus">
+                and h.AUDIT_STATUS = #{auditStatus}
+            </if>
+            <if test="null != esRequirementHeadNum">
+                and h.ES_REQUIREMENT_HEAD_NUM like concat('%',#{esRequirementHeadNum},'%')
+            </if>
+            <if test="orgIds != null and orgIds.size() > 0">
+                and h.ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+            <if test="ceeaDepartmentIds != null and ceeaDepartmentIds.size() > 0">
+                and h.CEEA_DEPARTMENT_ID in
+                <foreach collection="ceeaDepartmentIds" item="ceeaDepartmentId" index="index" open="(" close=")" separator=",">
+                    #{ceeaDepartmentId}
+                </foreach>
+            </if>
+            <if test="createdIds != null and createdIds.size() > 0">
+                and h.CREATED_ID in
+                <foreach collection="createdIds" item="createdId" index="index" open="(" close=")" separator=",">
+                    #{createdId}
+                </foreach>
+            </if>
+            <if test="null != startApplyDate">
+                and h.APPLY_DATE >= #{startApplyDate}
+            </if>
+            <if test="null != endApplyDate">
+                and h.APPLY_DATE &lt;= #{endApplyDate}
+            </if>
+
+        </where>
+        order by l.CREATION_DATE desc
+    </select>
+
+    <select id="countRequirementExport" resultType="java.lang.Integer">
+        select count(1)
+        from scc_pr_requirement_line l
+        left join scc_pr_requirement_head h on h.REQUIREMENT_HEAD_ID = l.REQUIREMENT_HEAD_ID
+        <where>
+            <if test="null != ceeaPurchaseType and '' != ceeaPurchaseType">
+                and h.CEEA_PURCHASE_TYPE = #{ceeaPurchaseType}
+            </if>
+            <if test="null != ceeaPrType and '' != ceeaPrType">
+                and h.CEEA_PR_TYPE = #{ceeaPrType}
+            </if>
+            <if test="null != ceeaDepartmentId">
+                and h.CEEA_DEPARTMENT_ID = #{ceeaDepartmentId}
+            </if>
+            <if test="null != categoryId">
+                and h.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="null != requirementHeadNum and '' != requirementHeadNum">
+                and h.REQUIREMENT_HEAD_NUM like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="null != createdFullName and '' != createdFullName">
+                and h.CREATED_FULL_NAME like concat('%',#{createdFullName},'%')
+            </if>
+            <if test="null != ceeaProjectNum and '' != ceeaProjectNum">
+                and h.CEEA_PROJECT_NUM like concat('%',#{ceeaProjectNum},'%')
+            </if>
+            <if test="null != ceeaProjectName and '' != ceeaProjectName">
+                and h.CEEA_PROJECT_NAME like concat('%',#{ceeaProjectName},'%')
+            </if>
+            <if test="null != ceeaProjectUserNickname and '' != ceeaProjectUserNickname">
+                and h.CEEA_PROJECT_USER_NICKNAME like concat('%',#{ceeaProjectUserNickname},'%')
+            </if>
+            <if test="null != auditStatus and '' != auditStatus">
+                and h.AUDIT_STATUS = #{auditStatus}
+            </if>
+            <if test="null != esRequirementHeadNum and '' != esRequirementHeadNum">
+                and h.ES_REQUIREMENT_HEAD_NUM like concat('%',#{esRequirementHeadNum},'%')
+            </if>
+            <if test="null != orgIds and orgIds.size() > 0">
+                and h.ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+            <if test="null != ceeaDepartmentIds and ceeaDepartmentIds.size() > 0">
+                and h.CEEA_DEPARTMENT_ID in
+                <foreach collection="ceeaDepartmentIds" item="ceeaDepartmentId" index="index" open="(" close=")" separator=",">
+                    #{ceeaDepartmentId}
+                </foreach>
+            </if>
+            <if test="null != createdIds and createdIds.size() > 0">
+                and h.CREATED_ID in
+                <foreach collection="createdIds" item="createdId" index="index" open="(" close=")" separator=",">
+                    #{createdId}
+                </foreach>
+            </if>
+            <if test="null != startApplyDate">
+                and h.APPLY_DATE >= #{startApplyDate}
+            </if>
+            <if test="null != endApplyDate">
+                and h.APPLY_DATE &lt;= #{endApplyDate}
+            </if>
+        </where>
+        order by h.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="listPageRequirementExport" resultType="com.midea.cloud.srm.model.pm.pr.requirement.dto.RequirementExport">
+        select l.*,h.*
+        from scc_pr_requirement_line l
+        left join scc_pr_requirement_head h on h.REQUIREMENT_HEAD_ID = l.REQUIREMENT_HEAD_ID
+        <where>
+            <if test="null != ceeaPurchaseType and '' != ceeaPurchaseType">
+                and h.CEEA_PURCHASE_TYPE = #{ceeaPurchaseType}
+            </if>
+            <if test="null != ceeaPrType and '' != ceeaPrType">
+                and h.CEEA_PR_TYPE = #{ceeaPrType}
+            </if>
+            <if test="null != ceeaDepartmentId">
+                and h.CEEA_DEPARTMENT_ID = #{ceeaDepartmentId}
+            </if>
+            <if test="null != categoryId">
+                and h.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="null != requirementHeadNum and '' != requirementHeadNum">
+                and h.REQUIREMENT_HEAD_NUM like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="null != createdFullName and '' != createdFullName">
+                and h.CREATED_FULL_NAME like concat('%',#{createdFullName},'%')
+            </if>
+            <if test="null != ceeaProjectNum and '' != ceeaProjectNum">
+                and h.CEEA_PROJECT_NUM like concat('%',#{ceeaProjectNum},'%')
+            </if>
+            <if test="null != ceeaProjectName and '' != ceeaProjectName">
+                and h.CEEA_PROJECT_NAME like concat('%',#{ceeaProjectName},'%')
+            </if>
+            <if test="null != ceeaProjectUserNickname and '' != ceeaProjectUserNickname">
+                and h.CEEA_PROJECT_USER_NICKNAME like concat('%',#{ceeaProjectUserNickname},'%')
+            </if>
+            <if test="null != auditStatus and '' != auditStatus">
+                and h.AUDIT_STATUS = #{auditStatus}
+            </if>
+            <if test="null != esRequirementHeadNum and '' != esRequirementHeadNum">
+                and h.ES_REQUIREMENT_HEAD_NUM like concat('%',#{esRequirementHeadNum},'%')
+            </if>
+            <if test="null != orgIds and orgIds.size() > 0">
+                and h.ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+            <if test="null != ceeaDepartmentIds and ceeaDepartmentIds.size() > 0">
+                and h.CEEA_DEPARTMENT_ID in
+                <foreach collection="ceeaDepartmentIds" item="ceeaDepartmentId" index="index" open="(" close=")" separator=",">
+                    #{ceeaDepartmentId}
+                </foreach>
+            </if>
+            <if test="null != createdIds and createdIds.size() > 0">
+                and h.CREATED_ID in
+                <foreach collection="createdIds" item="createdId" index="index" open="(" close=")" separator=",">
+                    #{createdId}
+                </foreach>
+            </if>
+            <if test="null != startApplyDate">
+                and h.APPLY_DATE >= #{startApplyDate}
+            </if>
+            <if test="null != endApplyDate">
+                and h.APPLY_DATE &lt;= #{endApplyDate}
+            </if>
+        </where>
+        order by l.CREATION_DATE desc
+    </select>
+
+    <!--到货计划报表导出订单信息Map -->
+    <!--    <resultMap id="deliveryPlanReportRequirementMap" type="com.midea.cloud.srm.model.pm.pr.requirement.dto.DeliveryPlanReportRequirementDTO">
+            <result column="createFullName" property="createFullName" jdbcType="VARCHAR" />
+            <result column="ceeaDepartmentName" property="ceeaDepartmentName" jdbcType="VARCHAR" />
+            <result column="comments" property="comments" jdbcType="VARCHAR" />
+            <result column="requirementLineId" property="requirementLineId" jdbcType="BIGINT" />
+        </resultMap>-->
+    <!-- 到货计划报表导出订单信息查询 -->
+    <select id="findDeliveryPlanReportRequirement" resultType="com.midea.cloud.srm.model.pm.pr.requirement.dto.DeliveryPlanReportRequirementDTO"
+            parameterType="java.util.List">
+        SELECT
+        e.CREATED_FULL_NAME createFullName,
+        e.CEEA_DEPARTMENT_NAME ceeaDepartmentName,
+        d.COMMENTS  comments,
+        d.REQUIREMENT_LINE_ID requirementLineId
+        FROM  scc_pr_requirement_line d
+        INNER JOIN scc_pr_requirement_head e ON  d.REQUIREMENT_HEAD_ID = e.REQUIREMENT_HEAD_ID
+        <if test="null != requirementLineIds and requirementLineIds.size() > 0">
+            and d.REQUIREMENT_LINE_ID in
+            <foreach collection="requirementLineIds" item="requirementLineId" index="index" open="(" close=")" separator=",">
+                #{requirementLineId}
+            </foreach>
+        </if>
+
+    </select>
+
+
+</mapper>

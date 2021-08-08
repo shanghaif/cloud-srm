@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.report.costreduction.mapper.CostReductionMapper">
+    
+     <select id="queryWarehouse" resultType="com.midea.cloud.srm.model.report.costreduction.dto.OrderWarehouseDTO">
+        select
+		wr.WAREHOUSE_RECEIPT_QUANTITY
+		,RETURN_QUANTITY 
+		,od.UNIT_PRICE_CONTAINING_TAX    
+		,od.CURRENCY   
+		,od.ORDER_NUM   
+		,o.VENDOR_ID
+		,c.COMPANY_NAME
+		,od.CATEGORY_NAME
+		,od.CATEGORY_ID
+		,od.ORGANIZATION_NAME
+		,o.FULL_PATH_ID
+		,o.BUYER_NAME
+		,wr.CONFIRM_TIME
+		,od.MATERIAL_ID
+		,od.MATERIAL_NAME
+		from scc_sc_warehouse_receipt wr 
+		INNER JOIN scc_sc_order_detail od on wr.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+		INNER JOIN scc_sc_order o on od.ORDER_ID = o.ORDER_ID
+		left join (
+			select srd.WAREHOUSE_RECEIPT_ID,sum(srd.return_num) RETURN_QUANTITY  from scc_sc_return_detail srd inner join  scc_sc_return_order sro  on sro.return_order_id = srd.return_order_id where return_status='CONFIRMED'
+			group by srd.WAREHOUSE_RECEIPT_ID
+		) rd  on rd.WAREHOUSE_RECEIPT_ID = wr.WAREHOUSE_RECEIPT_ID
+		INNER JOIN scc_sup_company_info c on o.VENDOR_ID = c.company_id 
+		where wr.WAREHOUSE_RECEIPT_STATUS='CONFIRMED'
+        <if test="list != null and list.size()>0">
+            and od.full_path_id in
+            <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="materialCode != null and materialCode != ''">
+            AND od.MATERIAL_CODE = #{materialCode}
+        </if>
+        <if test="categoryId != null and categoryId != ''">
+           	and od.CATEGORY_ID = #{categoryId}
+        </if>
+        
+        <if test="comfirmTimeBegin != null and comfirmTimeEnd != null">
+	        AND wr.CONFIRM_TIME between #{comfirmTimeBegin} AND #{comfirmTimeEnd}
+	    </if>
+    </select>
+    
+    
+    <select id="queryMaterialInfo" resultType="com.midea.cloud.srm.model.report.costreduction.dto.CrSetMaterialInfoDTO">
+	    select
+		csmi.INFO_ID
+		,csmi.MATERIAL_ID
+		,csmi.MATERIAL_NAME
+		,csm.PRICE
+		from scc_rep_cr_set cs
+		INNER JOIN scc_rep_cr_set_material csm on cs.SET_ID = csm.SET_ID
+		INNER JOIN scc_rep_cr_set_material_info csmi on csmi.SET_MATERIAL_ID = csm.SET_MATERIAL_ID
+		where cs.year= #{year}
+    </select>
+    
+    <select id="queryCategoryInfo" resultType="com.midea.cloud.srm.model.report.costreduction.dto.CrSetCategoryInfoDTO">
+	   select
+		csci.INFO_ID
+		,csc.SET_CATEGORY_ID
+		,csci.CATEGORY_ID
+		,csci.CATEGORY_NAME
+		,csc.RATE
+		from scc_rep_cr_set cs
+		INNER JOIN scc_rep_cr_set_category csc on csc.SET_ID = cs.SET_ID
+		INNER JOIN scc_rep_cr_set_category_info csci on csci.SET_CATEGORY_ID = csc.SET_CATEGORY_ID
+		where cs.YEAR= #{year}
+    </select>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.scoreproject.mapper.PerfScoreItemsManMapper">
+
+    <!-- 绩效评分项目-评分人级别集合
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemsMan">
+        <id column="SCORE_ITEMS_MAN_ID" property="scoreItemsManId" jdbcType="BIGINT" />
+        <result column="SCORE_ITEMS_ID" property="scoreItemsId" jdbcType="BIGINT" />
+        <result column="SCORE_USER_ID" property="scoreUserId" jdbcType="BIGINT" />
+        <result column="SCORE_USER_NAME" property="scoreUserName" jdbcType="VARCHAR" />
+        <result column="SCORE_NICK_NAME" property="scoreNickName" jdbcType="VARCHAR" />
+        <result column="SCORE_USER_EMAIL" property="scoreUserEmail" jdbcType="VARCHAR" />
+        <result column="SCORE_USER_PHONE" property="scoreUserPhone" jdbcType="VARCHAR" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    </resultMap> -->
+    <!-- 根据添加查询绩效评分项目-评分人集合Map
+    <resultMap id="perfScoreItemsManSupListMap" type="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemsMan">
+        <id column="SCORE_ITEMS_MAN_ID" property="scoreItemsManId" jdbcType="BIGINT" />
+        <result column="SCORE_ITEMS_ID" property="scoreItemsId" jdbcType="BIGINT" />
+        <result column="SCORE_USER_ID" property="scoreUserId" jdbcType="BIGINT" />
+        <result column="SCORE_USER_NAME" property="scoreUserName" jdbcType="VARCHAR" />
+        <result column="SCORE_NICK_NAME" property="scoreNickName" jdbcType="VARCHAR" />
+        <result column="SCORE_USER_EMAIL" property="scoreUserEmail" jdbcType="VARCHAR" />
+        <result column="SCORE_USER_PHONE" property="scoreUserPhone" jdbcType="VARCHAR" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        -->
+
+    <!-- 根据条件获取绩效评分项评分人-供应商指标 (多参数时在column中用"{}"将参数包起来， =左侧的为mapper中定义的param， =右侧为主查询的数据库字段名)
+    <collection property="perfScoreItemManSupIndList" column="{scoreItemsManId=SCORE_ITEMS_MAN_ID}" javaType="java.util.ArrayList"
+                ofType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemManSupInd" fetchType="lazy"
+                select="com.midea.cloud.srm.perf.scoreproject.mapper.PerfScoreItemManSupIndMapper.findScoreItemManSupIndList">
+    </collection>-->
+
+    <!-- </resultMap>-->
+
+    <!-- 根据添加查询绩效评分项目-评分人集合-->
+    <select id="listScoreItemsMan" resultType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemsMan"
+            parameterType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemsMan">
+        select SCORE_ITEMS_MAN_ID,SCORE_ITEMS_ID,SCORE_USER_ID,SCORE_USER_NAME,SCORE_NICK_NAME,SCORE_USER_EMAIL,SCORE_USER_PHONE,
+        CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE
+        from scc_perf_score_items_man
+        <include refid="findScoreItemsManSql" />
+    </select>
+
+    <!-- 查询绩效评分项目-评分人表sql组装语句 -->
+    <sql id="findScoreItemsManSql">
+        <where>
+            <if test="null != scoreItemsManId">
+                and SCORE_ITEMS_MAN_ID = #{scoreItemsManId}
+            </if>
+            <if test="null != scoreItemsId">
+                and SCORE_ITEMS_ID = #{scoreItemsId}
+            </if>
+        </where>
+    </sql>
+
+    <!-- 根据绩效评分项目供应商Id、指标维度ID获取有效对应的评分人信息-->
+    <select id="listScoreItemsManByItemsSupIdAndDimWeightId" resultType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemsMan"
+            parameterType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemsMan">
+
+        SELECT im.SCORE_ITEMS_MAN_ID,im.SCORE_USER_NAME,im.SCORE_NICK_NAME
+        FROM scc_perf_score_items_man im
+        LEFT JOIN scc_perf_score_item_man_supind ims ON im.SCORE_ITEMS_MAN_ID = ims.SCORE_ITEMS_MAN_ID
+        <where>
+            <if test="scoreItemsSupId != null">
+                AND ims.SCORE_ITEMS_SUP_ID= #{scoreItemsSupId}
+            </if>
+            <if test="dimWightId != null">
+                AND ims.TEMPLATE_DIM_WEIGHT_ID= #{dimWightId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

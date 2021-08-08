@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.scoring.mapper.PerfOverallScoreMapper">
+
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.perf.scoring.PerfOverallScore">
+        <id column="OVERALL_SCORE_ID" property="overallScoreId" jdbcType="BIGINT" />
+        <result column="SCORE_ITEMS_ID" property="scoreItemsId" jdbcType="BIGINT" />
+        <result column="TEMPLATE_HEAD_ID" property="templateHeadId" jdbcType="BIGINT" />
+        <result column="TEMPLATE_NAME" property="templateName" jdbcType="VARCHAR" />
+        <result column="OVERALL_SCORE_ID" property="overallScoreId" jdbcType="BIGINT" />
+        <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+        <result column="EVALUATION_PERIOD" property="evaluationPeriod" jdbcType="VARCHAR" />
+        <result column="PER_START_MONTH" property="perStartMonth" jdbcType="DATE" />
+        <result column="PER_END_MONTH" property="perEndMonth" jdbcType="DATE" />
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT" />
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+        <result column="CATEGORY_ID" property="categoryId" jdbcType="BIGINT" />
+        <result column="CATEGORY_CODE" property="categoryCode" jdbcType="VARCHAR" />
+        <result column="CATEGORY_NAME" property="categoryName" jdbcType="VARCHAR" />
+        <result column="CATEGORY_FULL_NAME" property="categoryFullName" jdbcType="VARCHAR" />
+        <result column="COMPANY_ID" property="companyId" jdbcType="BIGINT" />
+        <result column="COMPANY_CODE" property="companyCode" jdbcType="VARCHAR" />
+        <result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR" />
+        <result column="COMPANY_EN_NAME" property="companyEnName" jdbcType="VARCHAR" />
+        <result column="INDICATOR_TYPE" property="indicatorType" jdbcType="VARCHAR" />
+        <result column="RANK" property="rank" jdbcType="BIGINT" />
+        <result column="SCORE" property="score" jdbcType="VARCHAR" />
+        <result column="INDICATOR_COUNT" property="indicatorCount" jdbcType="INTEGER" />
+        <result column="LEVEL_ID" property="levelId" jdbcType="BIGINT" />
+        <result column="LEVEL_NAME" property="levelName" jdbcType="VARCHAR" />
+        <result column="SCORE_ATTRIBUTE1" property="scoreAttribute1" jdbcType="VARCHAR" />
+        <result column="SCORE_ATTRIBUTE2" property="scoreAttribute2" jdbcType="VARCHAR" />
+        <result column="SCORE_ATTRIBUTE3" property="scoreAttribute3" jdbcType="VARCHAR" />
+        <result column="SCORE_ATTRIBUTE4" property="scoreAttribute4" jdbcType="VARCHAR" />
+        <result column="SCORE_ATTRIBUTE5" property="scoreAttribute5" jdbcType="VARCHAR" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_FULL_NAME" property="createdFullName" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+
+        <!--获绩效指标绩效得分表集合 -->
+        <collection property="perfIndicatorDimScoreList" column="{overallScoreId=OVERALL_SCORE_ID}" javaType="java.util.List" fetchType="lazy"
+                    ofType="com.midea.cloud.srm.model.perf.scoring.PerfIndicatorDimScore"
+                    select="com.midea.cloud.srm.perf.scoring.mapper.PerfIndicatorDimScoreMapper.findIndicatorDimScoreList" />
+    </resultMap>
+
+    <!-- 根据条件获绩效指标绩效得分主表和子表集合(用于连表查询)-->
+    <select id="findOverallScorelList" resultMap="BaseResultMap" parameterType="com.midea.cloud.srm.model.perf.scoring.PerfOverallScore" >
+        SELECT OVERALL_SCORE_ID,SCORE_ITEMS_ID,TEMPLATE_HEAD_ID,TEMPLATE_NAME,OVERALL_SCORE_ID,PROJECT_NAME,EVALUATION_PERIOD,
+            PER_START_MONTH,PER_END_MONTH,ORGANIZATION_ID,ORGANIZATION_NAME,CATEGORY_ID,CATEGORY_CODE,CATEGORY_NAME,CATEGORY_FULL_NAME,
+            COMPANY_ID,COMPANY_CODE,COMPANY_NAME,COMPANY_EN_NAME,INDICATOR_TYPE,RANK,SCORE,INDICATOR_COUNT,LEVEL_ID,LEVEL_NAME,
+            SCORE_ATTRIBUTE1,SCORE_ATTRIBUTE2,SCORE_ATTRIBUTE3,SCORE_ATTRIBUTE4,SCORE_ATTRIBUTE5,CREATED_BY,CREATION_DATE,
+            CREATED_FULL_NAME,LAST_UPDATED_BY,LAST_UPDATE_DATE
+        FROM scc_perf_overall_score
+        <include refid="overallScoreSql" />
+    </select>
+
+    <!-- 效指标绩效得分主表组合sql -->
+    <sql id="overallScoreSql">
+        <where>
+            <if test="null != overallScoreId">
+                OVERALL_SCORE_ID = #{overallScoreId}
+            </if>
+        </where>
+    </sql>
+</mapper>

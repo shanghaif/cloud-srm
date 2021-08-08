@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.quest.mapper.QuestSupplierMapper">
+
+    <select id="countQuestByCompanyId" resultType="java.lang.Long">
+        select company_id from scc_sup_quest_supplier where 1=1
+        and approval_status in
+        <foreach collection="approvalStatusList" item="approvalStatus" index="index" open="(" close=")" separator=",">
+            #{approvalStatus}
+        </foreach>
+        and company_id in
+        <foreach collection="companyIdList" item="companyId" index="index" open="(" close=")" separator=",">
+            #{companyId}
+        </foreach>
+        and quest_template_org_id in
+        <foreach collection="orgIdList" item="orgId" index="index" open="(" close=")" separator=",">
+            #{orgId}
+        </foreach>
+        group by company_id HAVING COUNT(1)>0
+    </select>
+</mapper>

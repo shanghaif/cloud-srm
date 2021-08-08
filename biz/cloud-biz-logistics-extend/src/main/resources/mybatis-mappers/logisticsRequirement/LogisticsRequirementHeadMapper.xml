@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.pr.logisticsRequirement.mapper.LogisticsRequirementHeadMapper">
+    <select id="list" resultType="com.midea.cloud.srm.model.logistics.pr.requirement.entity.LogisticsRequirementHead">
+        select
+        rh.*,
+        r.BUSINESS_OPEN_BID_TIME businessOpenBidTime
+        from scc_lgt_requirement_head rh
+        left join scc_lgt_biding b on rh.BIDING_ID = b.BIDING_ID
+        left join scc_lgt_round r on r.ROUND = b.CURRENT_ROUND and r.BIDING_ID = b.BIDING_ID
+        <where>
+            <if test="requirementHeadNum != null and requirementHeadNum != ''">
+                and rh.REQUIREMENT_HEAD_NUM like concat('%',#{requirementHeadNum},'%')
+            </if>
+            <if test="requirementTitle != null and requirementTitle != ''">
+                and rh.REQUIREMENT_TITLE like concat('%',#{requirementTitle},'%')
+            </if>
+            <if test="businessModeCode != null and businessModeCode != ''">
+                and rh.BUSINESS_MODE_CODE like concat('%',#{businessModeCode},'%')
+            </if>
+            <if test="businessType != null and businessType != ''">
+                and rh.BUSINESS_TYPE = #{businessType}
+            </if>
+            <if test="applyBy != null and applyBy != ''">
+                and rh.APPLY_BY like concat('%',#{applyBy},'%')
+            </if>
+            <if test="applyDepartmentName != null and applyDepartmentName != ''">
+                and rh.APPLY_DEPARTMENT_NAME like concat('%',#{applyDepartmentName},'%')
+            </if>
+            <if test="serviceProjectName != null and serviceProjectName != ''">
+                and rh.SERVICE_PROJECT_NAME like concat('%',#{serviceProjectName},'%')
+            </if>
+            <if test="ceeaApplyUserNickname != null and ceeaApplyUserNickname != ''">
+                and rh.CEEA_APPLY_USER_NICKNAME like concat('%',#{ceeaApplyUserNickname},'%')
+            </if>
+            <if test="templateName != null and templateName != ''">
+                and rh.TEMPLATE_NAME like concat('%',#{templateName},'%')
+            </if>
+            <if test="requirementStatus != null and requirementStatus != ''">
+                and rh.REQUIREMENT_STATUS = #{requirementStatus}
+            </if>
+            <if test="applyProcessStatus != null and applyProcessStatus != ''">
+                and rh.APPLY_PROCESS_STATUS = #{applyProcessStatus}
+            </if>
+            <if test="applyDepartmentName != null and applyDepartmentName != ''">
+                and rh.APPLY_DEPARTMENT_NAME like concat('%',#{applyDepartmentName},'%')
+            </if>
+        </where>
+        order by rh.LAST_UPDATE_DATE desc
+    </select>
+</mapper>

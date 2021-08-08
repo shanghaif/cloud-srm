@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.scoreproject.mapper.PerfScoreItemsMapper">
+
+    <!-- 绩效评分项目和子表相关ResultMap集合 -->
+    <resultMap id="findScoreItemsAndSonListMap" type="com.midea.cloud.srm.model.perf.scoreproject.dto.PerfScoreItemsDTO">
+        <id column="SCORE_ITEMS_ID" property="scoreItemsId" jdbcType="BIGINT" />
+        <result column="PROJECT_NAME" property="projectName" jdbcType="VARCHAR" />
+        <result column="TEMPLATE_HEAD_ID" property="templateHeadId" jdbcType="BIGINT" />
+        <result column="TEMPLATE_NAME" property="templateName" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT" />
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+        <result column="EVALUATION_PERIOD" property="evaluationPeriod" jdbcType="VARCHAR" />
+        <result column="PER_START_MONTH" property="perStartMonth" jdbcType="DATE" />
+        <result column="PER_END_MONTH" property="perEndMonth" jdbcType="DATE" />
+        <result column="SCORE_START_TIME" property="scoreStartTime" jdbcType="TIMESTAMP" />
+        <result column="SCORE_END_TIME" property="scoreEndTime" jdbcType="TIMESTAMP" />
+        <result column="PROJECT_STATUS" property="projectStatus" jdbcType="VARCHAR" />
+        <result column="APPROVE_STATUS" property="approveStatus" jdbcType="VARCHAR" />
+        <result column="SCORE_PEOPLE" property="scorePeople" jdbcType="INTEGER" />
+        <result column="SCORE_PEOPLE_COUNT" property="scorePeopleCount" jdbcType="INTEGER" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="FULL_PATH_ID" property="fullPathId" jdbcType="VARCHAR" />
+
+        <!-- 根据条件获取绩效评分项目-供应商信息 (多参数时在column中用"{}"将参数包起来， =左侧的为mapper中定义的param， =右侧为主查询的数据库字段名) -->
+        <collection property="perfScoreItemsSupList" column="{scoreItemsId=SCORE_ITEMS_ID}" javaType="java.util.ArrayList"
+                    ofType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemsSup"
+                    select="com.midea.cloud.srm.perf.scoreproject.mapper.PerfScoreItemsSupMapper.findScoreItemsSupList">
+        </collection>
+
+        <!-- 根据条件获取绩效评分项目-评分人信息 (多参数时在column中用"{}"将参数包起来， =左侧的为mapper中定义的param， =右侧为主查询的数据库字段名)-->
+        <collection property="perfScoreItemsManList" column="{scoreItemsId=SCORE_ITEMS_ID}" javaType="java.util.ArrayList"
+                    ofType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItemsMan"
+                    select="com.midea.cloud.srm.perf.scoreproject.mapper.PerfScoreItemsManMapper.findScoreItemsManList">
+        </collection>
+    </resultMap>
+
+    <!-- 根据条件获取绩效评分项目和子表集合 -->
+    <select id="findScoreItemsAndSonList" resultMap="findScoreItemsAndSonListMap"
+            parameterType="com.midea.cloud.srm.model.perf.scoreproject.entity.PerfScoreItems" >
+        select SCORE_ITEMS_ID,PROJECT_NAME,TEMPLATE_HEAD_ID,TEMPLATE_NAME,ORGANIZATION_ID,ORGANIZATION_NAME,EVALUATION_PERIOD,
+            PER_START_MONTH,PER_END_MONTH,SCORE_START_TIME,SCORE_END_TIME,PROJECT_STATUS,APPROVE_STATUS,SCORE_PEOPLE,
+            SCORE_PEOPLE_COUNT,CREATED_BY,CREATION_DATE,LAST_UPDATED_BY,LAST_UPDATE_DATE,FULL_PATH_ID,CBPM_INSTANCE_ID
+        from scc_perf_score_items
+        <include refid="findScoreItemsSql" />
+
+    </select>
+
+    <!-- 条件获取绩效评分项目组装sql -->
+    <sql id="findScoreItemsSql">
+        <where>
+            <if test="null != scoreItemsId">
+                AND SCORE_ITEMS_ID = #{scoreItemsId}
+            </if>
+        </where>
+    </sql>
+</mapper>

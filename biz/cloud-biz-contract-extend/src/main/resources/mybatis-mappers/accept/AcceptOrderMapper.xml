@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.cm.accept.mapper.AcceptOrderMapper">
+    <select id="listByParm" parameterType="com.midea.cloud.srm.model.cm.accept.dto.AcceptOrderDTO"
+            resultType="com.midea.cloud.srm.model.cm.accept.entity.AcceptOrder">
+        SELECT a.* FROM scc_contract_accept_order a
+        LEFT JOIN scc_contract_accept_detail b ON a.ACCEPT_ORDER_ID=b.ACCEPT_ORDER_ID
+        ${ew.customSqlSegment}
+    </select>
+
+</mapper>

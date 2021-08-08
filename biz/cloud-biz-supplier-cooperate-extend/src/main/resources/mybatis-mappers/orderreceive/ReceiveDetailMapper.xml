@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.orderreceive.mapper.ReceiveDetailMapper">
+    <select id="getReceiveDetail" resultType="com.midea.cloud.srm.model.suppliercooperate.orderreceive.dto.ReceiveDetailDTO">
+        SELECT dnd.DELIVERY_QUANTITY,dn.ORG_NAME,dn.ORG_ID,dn.VENDOR_NAME,dn.VENDOR_CODE,dn.VENDOR_ID,dn.DELIVERY_NUMBER,dn.DELIVERY_DATE,od.ORDER_NUMBER,dnd.RECEIVED_NUM AS RECEIVE_SUM,
+        od.CEEA_CATEGORY_NAME as CATEGORY_NAME,od.MATERIAL_CODE,od.MATERIAL_NAME,od.ORDER_NUM,od.RECEIPT_PLACE,dnd.LINE_NUM AS DELIVERY_LINE_NUM,od.CREATED_BY as CREATED_BY,
+        (SELECT CEEA_RECEIVE_ORDER_ADDRESS FROM scc_sc_order WHERE ORDER_ID=od.ORDER_ID)RECEIVE_ORDER_ADDRESS,
+        (SELECT ORDER_LINE_NUM FROM scc_sc_delivery_notice scdn WHERE scdn.DELIVERY_NOTICE_ID =dnd.DELIVERY_NOTE_DETAIL_ID)ORDER_LINE_NUM
+        FROM scc_sc_delivery_note dn
+        JOIN scc_sc_delivery_note_detail dnd ON dn.DELIVERY_NOTE_ID=dnd.DELIVERY_NOTE_ID
+        JOIN scc_sc_order_detail od ON od.ORDER_DETAIL_ID=dnd.ORDER_DETAIL_ID
+        <where>
+            delivery_quantity > dnd.RECEIVED_NUM
+            <if test="ew.customSqlSegment!= null and ew.customSqlSegment.startsWith('WHERE')" >
+                AND
+            </if>
+        </where>
+        ${ew.SqlSegment} order by delivery_date desc
+    </select>
+    <select id="getOne" resultType="com.midea.cloud.srm.model.suppliercooperate.orderreceive.dto.ReceiveDetailDTO">
+SELECT dnd.DELIVERY_QUANTITY,dn.ORG_NAME,dn.ORG_ID,dn.VENDOR_NAME,dn.VENDOR_CODE,dn.VENDOR_ID,dn.DELIVERY_NUMBER,dn.DELIVERY_DATE,od.ORDER_NUMBER,dnd.RECEIVED_NUM AS RECEIVE_SUM,
+       od.CEEA_CATEGORY_NAME as CATEGORY_NAME,od.MATERIAL_CODE,od.MATERIAL_NAME,od.ORDER_NUM,od.RECEIPT_PLACE,dnd.LINE_NUM AS DELIVERY_LINE_NUM,
+       (SELECT CEEA_RECEIVE_ORDER_ADDRESS FROM scc_sc_order WHERE ORDER_ID=od.ORDER_ID)RECEIVE_ORDER_ADDRESS,
+       (SELECT ORDER_LINE_NUM FROM scc_sc_delivery_notice scdn WHERE scdn.DELIVERY_NOTICE_ID =dnd.DELIVERY_NOTE_DETAIL_ID)ORDER_LINE_NUM
+        FROM scc_sc_delivery_note dn
+        JOIN scc_sc_delivery_note_detail dnd ON dn.DELIVERY_NOTE_ID=dnd.DELIVERY_NOTE_ID
+        JOIN scc_sc_order_detail od ON od.ORDER_DETAIL_ID=dnd.ORDER_DETAIL_ID
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

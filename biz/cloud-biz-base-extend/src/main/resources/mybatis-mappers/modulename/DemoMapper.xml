@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.modulename.mapper.DemoMapper">
+    <select id="countRecord" resultType="int">
+        select 100 from dual
+    </select>
+    <resultMap id="demo" type="com.midea.cloud.srm.model.base.modulename.entity.Demo">
+        <result column="name" property="name"/>
+        <result column="age" property="age" typeHandler="com.midea.cloud.srm.model.common.assist.handler.LongFormatAESEncryptHandler"/>
+        <result column="secret" property="secret" typeHandler="com.midea.cloud.srm.model.common.assist.handler.StringFormatAESEncryptHandler"/>
+    </resultMap>
+    <select id="selectAll" resultMap="demo">
+        select * from demo
+    </select>
+    <insert id="insertByDemo" parameterType="com.midea.cloud.srm.model.base.modulename.entity.Demo">
+        insert into demo(age, name, secret) values (
+        #{age, typeHandler=com.midea.cloud.srm.model.common.assist.handler.LongFormatAESEncryptHandler},
+        #{name},
+        #{secret, typeHandler=com.midea.cloud.srm.model.common.assist.handler.StringFormatAESEncryptHandler}
+        )
+    </insert>
+</mapper>

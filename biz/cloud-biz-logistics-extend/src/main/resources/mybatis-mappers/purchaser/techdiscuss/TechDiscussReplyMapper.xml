@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bid.purchaser.techdiscuss.mapper.TechDiscussReplyMapper">
+
+    <select id="listTechDiscussReplyInfo" resultType="com.midea.cloud.srm.model.logistics.bid.purchaser.techdiscuss.vo.TechDiscussReplyVO">
+            SELECT proj.PROJ_ID projId,
+            PROJ_NAME projName,
+            PROJ_CODE projCode,
+            PROJ_TYPE projType,
+            proj.CURRENCY currency,
+            proj.TAX_KEY taxKey,
+            proj.TAX_RATE tax,
+            PUBLISH_RANGE publishRange,
+            proj.STATUS projectStatus,
+            PUBLISH_TIME publishTime,
+            STOP_TIME stopTime,
+            proj.COMPANY_CODE companyCode,
+            proj.ORGANIZATION_CODE organizationCode,
+            proj.RESUME resume,
+
+            FILE_NAME fileName,
+            FILEUPLOAD_ID fileuploadId,
+            proj.REMARK fileRemark,
+
+            REPLY_ID replyId,
+            supplier.SUPPLIER_CODE supplierCode,
+            supplier.SUPPLIER_NAME supplierName,
+            supplier.CONTACT_NAME contactName,
+            supplier.TELEPHONE telephone,
+            supplier.EMAIL email,
+            reply.STATUS status,
+            reply.REMARK remark
+            FROM scc_bid_tech_discuss_proj_info proj
+            LEFT JOIN scc_bid_tech_discuss_reply reply ON proj.PROJ_ID = reply.PROJ_ID
+            LEFT JOIN scc_bid_tech_discuss_supplier supplier ON proj.PROJ_ID = supplier.PROJ_ID
+            where supplier.SUPPLIER_CODE = #{techDiscussReplyVO.supplierCode}
+            <if test="techDiscussReplyVO.projId != null">
+                AND proj.PROJ_ID =  #{techDiscussReplyVO.projId}
+            </if>
+            <if test="techDiscussReplyVO.projName != null">
+                    AND proj.PROJ_NAME =  #{techDiscussReplyVO.projName}
+            </if>
+            <if test="techDiscussReplyVO.projCode != null">
+                    AND proj.PROJ_CODE =  #{techDiscussReplyVO.projCode}
+            </if>
+            <if test="techDiscussReplyVO.projectStatus != null">
+                    AND proj.STATUS =  #{techDiscussReplyVO.projectStatus}
+            </if>
+    </select>
+
+</mapper>

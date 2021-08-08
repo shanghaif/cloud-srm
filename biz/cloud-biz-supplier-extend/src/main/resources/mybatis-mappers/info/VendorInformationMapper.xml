@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.info.mapper.VendorInformationMapper">
+
+    <select id="getCategoryListByCompanyId"
+            resultType="com.midea.cloud.srm.model.supplier.info.dto.CategoryDTO">
+        SELECT DISTINCT oc.COMPANY_ID, oc.CATEGORY_ID, oc.CATEGORY_CODE, oc.CATEGORY_NAME, oc.CATEGORY_FULL_NAME, oc.CATEGORY_FULL_ID
+        FROM scc_sup_org_category oc
+        WHERE oc.COMPANY_ID =
+        <if test="companyId != null and companyId != ''">
+            #{companyId}
+        </if>
+        <if test="categoryId != null and categoryId != ''">
+            AND oc.CATEGORY_ID = #{categoryId}
+        </if>
+        AND oc.SERVICE_STATUS IN ("QUALIFIED","VERIFY","YELLOW","ONE_TIME","REGISTERED")
+    </select>
+
+    <select id="listAttachByDTO" resultType="com.midea.cloud.srm.model.supplier.info.entity.ManagementAttach">
+        SELECT cuma.*, ssci.COMPANY_CODE, ssci.COMPANY_NAME
+        FROM ceea_sup_management_attach cuma, scc_sup_company_info ssci
+        WHERE cuma.COMPANY_ID = ssci.COMPANY_ID and cuma.END_DATE is not null and cuma.END_DATE != ''
+        <if test="companyCode != null and companyCode != ''">
+            AND ssci.COMPANY_CODE = #{companyCode}
+        </if>
+        <if test="companyName != null and companyName != ''">
+            AND ssci.COMPANY_NAME = #{companyName}
+        </if>
+        <if test="dueDate != null and dueDate != ''">
+            AND cuma.END_DATE &gt;= DATE(#{pastDate})
+            AND cuma.END_DATE &lt;= DATE(#{futureDate})
+        </if>
+        <if test="authDate != null">
+            AND cuma.AUTH_DATE >= #{authDate}
+        </if>
+        <if test="endDate != null">
+            AND cuma.END_DATE <![CDATA[<=]]> #{endDate}
+        </if>
+        ORDER BY cuma.END_DATE ASC
+    </select>
+    <select id="listAttachMix" resultType="com.midea.cloud.srm.model.supplier.info.entity.ManagementAttach">
+-- SELECT * FROM
+-- 	(SELECT AUTH_DESCRIPTION,AUTH_NUM,AUTH_DATE,AUTH_ORG,END_DATE,AUTH_TYPE, ssci.COMPANY_CODE, ssci.COMPANY_NAME,management_attach_id
+--         FROM ceea_sup_management_attach cuma, scc_sup_company_info ssci
+--         WHERE cuma.COMPANY_ID = ssci.COMPANY_ID and cuma.END_DATE is not null and cuma.END_DATE != ''
+--         UNION ALL
+-- 	SELECT '营业执照证件' AS AUTH_DESCRIPTION,'' AS AUTH_NUM, NULL AS AUTH_DATE,'' AS AUTH_ORG,BUSINESS_END_DATE AS END_DATE,
+-- 		BUSINESS_LICENSE AS AUTH_TYPE,COMPANY_CODE,COMPANY_NAME,'' as management_attach_id
+-- 		  FROM scc_sup_company_info WHERE BUSINESS_END_DATE !='' AND BUSINESS_END_DATE is not NULL) attachMix
+        SELECT * FROM(
+        SELECT siteForm.SITE_FORM_ID AS management_attach_id, siteForm.SITE_FORM_NUMBER AS dataSources, siteForm.VENDOR_NAME AS COMPANY_NAME, siteForm.VENDOR_CODE AS COMPANY_CODE,
+        record.FILE_RECORD_ID, record.FORM_ID, record.FORM_TYPE, record.FILE_ID, record.FILE_NAME AS AUTH_TYPE, record.FILE_VALID_DATE AS END_DATE,
+        '' AS AUTH_DESCRIPTION, '' AS AUTH_NUM, NULL AS AUTH_DATE, '' AS AUTH_ORG, record.CREATION_DATE, record.IS_USE_REMINDER
+        FROM scc_sup_auth_site_form siteForm,scc_sup_file_record record
+        WHERE siteForm.SITE_FORM_ID = record.FORM_ID AND record.FORM_TYPE='AUTH_FORM' AND record.FILE_VALID_DATE IS NOT NULL AND record.AUTH_RESULT = 'QUALIFIED'
+
+        UNION ALL
+
+        SELECT trial.MATERIAL_TRIAL_ID AS management_attach_id, trial.TRIAL_NUMBER AS dataSources, trial.VENDOR_NAME AS COMPANY_NAME, trial.VENDOR_CODE AS COMPANY_CODE,
+        record.FILE_RECORD_ID, record.FORM_ID, record.FORM_TYPE, record.FILE_ID, record.FILE_NAME AS AUTH_TYPE, record.FILE_VALID_DATE AS END_DATE,
+        '' AS AUTH_DESCRIPTION, '' AS AUTH_NUM, NULL AS AUTH_DATE, '' AS AUTH_ORG, record.CREATION_DATE, record.IS_USE_REMINDER
+        FROM scc_sup_auth_material_trial trial,scc_sup_file_record record
+        WHERE trial.MATERIAL_TRIAL_ID = record.FORM_ID AND record.FORM_TYPE='MATERIAL_FORM' AND record.FILE_VALID_DATE IS NOT NULL
+
+        UNION ALL
+
+        SELECT sample.SAMPLE_ID AS management_attach_id, sample.SAMPLE_NUMBER AS dataSources, sample.VENDOR_NAME AS COMPANY_NAME, sample.VENDOR_CODE AS COMPANY_CODE,
+        record.FILE_RECORD_ID, record.FORM_ID, record.FORM_TYPE, record.FILE_ID, record.FILE_NAME AS AUTH_TYPE, record.FILE_VALID_DATE AS END_DATE,
+        '' AS AUTH_DESCRIPTION, '' AS AUTH_NUM, NULL AS AUTH_DATE, '' AS AUTH_ORG, record.CREATION_DATE, record.IS_USE_REMINDER
+        FROM scc_sup_auth_qua_sample sample,scc_sup_file_record record
+        WHERE sample.SAMPLE_ID = record.FORM_ID AND record.FORM_TYPE='SAMPLE_FORM' AND record.FILE_VALID_DATE IS NOT NULL
+
+        UNION ALL
+
+        SELECT review.REVIEW_FORM_ID AS management_attach_id, review.REVIEW_FORM_NUMBER AS dataSources, review.VENDOR_NAME AS COMPANY_NAME, review.VENDOR_CODE AS COMPANY_CODE,
+        record.FILE_RECORD_ID, record.FORM_ID, record.FORM_TYPE, record.FILE_ID, record.FILE_NAME AS AUTH_TYPE, record.FILE_VALID_DATE AS END_DATE,
+        '' AS AUTH_DESCRIPTION, '' AS AUTH_NUM, NULL AS AUTH_DATE, '' AS AUTH_ORG, record.CREATION_DATE, record.IS_USE_REMINDER
+        FROM scc_sup_auth_review_form review,scc_sup_file_record record
+        WHERE review.REVIEW_FORM_ID = record.FORM_ID AND record.FORM_TYPE='REVIEW_FORM' AND record.FILE_VALID_DATE IS NOT NULL AND record.AUTH_RESULT = 'QUALIFIED'
+
+        UNION ALL
+
+        SELECT management_attach_id, ssci.COMPANY_NAME AS dataSources, ssci.COMPANY_NAME AS COMPANY_NAME, ssci.COMPANY_CODE AS COMPANY_CODE, ''AS FILE_RECORD_ID, ''AS FORM_ID,
+        'MANAGEMENT_ATTACH'AS FORM_TYPE, fileupload_id AS FILE_ID, AUTH_TYPE, END_DATE,AUTH_DESCRIPTION, AUTH_NUM, AUTH_DATE, AUTH_ORG, cuma.CREATION_DATE, cuma.IS_USE_REMINDER
+        FROM ceea_sup_management_attach cuma, scc_sup_company_info ssci
+        WHERE cuma.COMPANY_ID = ssci.COMPANY_ID and cuma.END_DATE is not null and cuma.END_DATE != '' AND ssci.COMPANY_CODE !=''
+
+        UNION ALL
+
+        SELECT company_id AS management_attach_id, COMPANY_NAME AS dataSources, COMPANY_NAME, COMPANY_CODE, '' AS FILE_RECORD_ID,
+        '' AS FORM_ID, 'COMPANY_INFO'AS FORM_TYPE, BUSINESS_LICENSE_FILE_ID AS FILE_ID, BUSINESS_LICENSE AS AUTH_TYPE, BUSINESS_END_DATE AS END_DATE,
+        '' AS AUTH_DESCRIPTION,'' AS AUTH_NUM, NULL AS AUTH_DATE,'' AS AUTH_ORG, CREATION_DATE, IS_USE_REMINDER
+        FROM scc_sup_company_info WHERE BUSINESS_END_DATE !='' AND BUSINESS_END_DATE is not NULL AND COMPANY_CODE !='' AND STATUS ='APPROVED')attachMix
+          <where>
+            <if test="companyCode != null and companyCode != ''">
+                COMPANY_CODE = #{companyCode}
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND COMPANY_NAME like concat('%',#{companyName},'%')
+            </if>
+            <if test="authDate != null">
+                AND END_DATE >= #{authDate}
+            </if>
+            <if test="isUseReminder != null">
+                AND IS_USE_REMINDER = #{isUseReminder}
+            </if>
+            <if test="isUseReminder == null">
+                  AND IS_USE_REMINDER = 'Y'
+            </if>
+            <if test="endDate != null">
+                AND END_DATE <![CDATA[<=]]> #{endDate}
+            </if>
+            AND AUTH_TYPE !='' AND AUTH_TYPE IS NOT NULL
+          </where>
+            ORDER BY END_DATE
+    </select>
+
+</mapper>

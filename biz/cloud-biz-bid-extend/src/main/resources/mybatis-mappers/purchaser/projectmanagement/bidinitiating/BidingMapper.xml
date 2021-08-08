@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.bid.purchaser.projectmanagement.bidinitiating.mapper.BidingMapper">
+
+    <select id="listPage"
+            parameterType="com.midea.cloud.srm.model.bid.purchaser.projectmanagement.bidinitiating.entity.Biding"
+            resultType="com.midea.cloud.srm.model.bid.purchaser.projectmanagement.bidinitiating.entity.Biding">
+        select * from scc_bid_biding a
+        where 1=1
+        <if test="bidingName != null and bidingName != ''">
+            AND a.BIDING_NAME like concat('%',#{bidingName},'%')
+        </if>
+        <if test="bidingNum != null and bidingNum != ''">
+            AND a.BIDING_NUM like concat('%',#{bidingNum},'%')
+        </if>
+        <if test="bidingStatus != null and bidingStatus != ''">
+            AND a.BIDING_STATUS = #{bidingStatus}
+        </if>
+        <if test="auditStatus != null and auditStatus != ''">
+            AND a.AUDIT_STATUS = #{auditStatus}
+        </if>
+        <if test="evaluateMethod != null and evaluateMethod != ''">
+            AND a.EVALUATE_METHOD = #{evaluateMethod}
+        </if>
+        and (
+        a.CREATED_BY = #{createdBy} or
+        exists(select * from scc_bid_group b where a.BIDING_ID = b.BIDING_ID AND b.USER_NAME =  #{createdBy})
+        )
+        order by a.LAST_UPDATE_DATE desc
+    </select>
+</mapper>

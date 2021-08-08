@@ -1,0 +1,959 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.OrderDetailMapper">
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.order.entry.OrderDetail">
+        <id column="ORDER_DETAIL_ID" property="orderDetailId"/>
+        <result column="ORDER_ID" property="orderId"/>
+        <result column="LINE_NUM" property="lineNum"/>
+        <result column="ORDER_NUM" property="orderNum"/>
+        <result column="UNIT_PRICE_CONTAINING_TAX" property="unitPriceContainingTax"/>
+        <result column="UNIT_PRICE_EXCLUDING_TAX" property="unitPriceExcludingTax"/>
+        <result column="DELIVERY_DATE" property="deliveryDate"/>
+        <result column="VENDOR_DELIVERY_DATE" property="vendorDeliveryDate"/>
+        <result column="COMMENTS" property="comments"/>
+        <result column="RECEIVED_FACTORY" property="receivedFactory"/>
+        <result column="INVENTORY_PLACE" property="inventoryPlace"/>
+        <result column="CREATION_DATE" property="creationDate"/>
+        <result column="CREATED_BY" property="createdBy"/>
+        <result column="CREATED_BY_IP" property="createdByIp"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp"/>
+        <result column="VERSION" property="version"/>
+        <result column="TENANT_ID" property="tenantId"/>
+        <result column="RECEIVE_SUM" property="receiveSum"/>
+        <result column="REQUIREMENT_DATE" property="requirementDate"/>
+
+        <!-- 物料表属性 -->
+        <result column="MATERIAL_ID" property="materialId"/>
+        <result column="MATERIAL_CODE" property="materialCode"/>
+        <result column="MATERIAL_NAME" property="materialName"/>
+        <result column="SPECIFICATION" property="specification"/>
+        <result column="UNIT" property="unit"/>
+        <result column="CATEGORY_NAME" property="categoryName"/>
+    </resultMap>
+    <resultMap id="ListResultMap" type="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO"
+               extends="BaseResultMap">
+        <!-- 订单表属性 -->
+        <result column="REFUSE_TIME" property="refuseTime"/>
+        <result column="REFUSE_REASON" property="refuseReason"/>
+        <result column="ORDER_NUMBER" property="orderNumber"/>
+        <result column="TAX_KEY" property="taxKey"/>
+        <result column="TAX_RATE" property="taxRate"/>
+        <result column="RFQ_SETTLEMENT_CURRENCY" property="rfqSettlementCurrency"/>
+        <result column="TERM_OF_PAYMENT" property="termOfPayment"/>
+        <result column="PAYMENT_METHOD" property="paymentMethod"/>
+
+        <result column="ORDER_STATUS" property="orderStatus"/>
+        <result column="ORGANIZATION_NAME" property="organizationName"/>
+        <result column="ORGANIZATION_CODE" property="organizationCode"/>
+        <result column="DELIVERY_LEVEL" property="deliveryLevel"/>
+        <result column="ORDER_AMOUNT" property="orderAmount"/>
+        <result column="ORDER_TYPE" property="orderType"/>
+
+    </resultMap>
+
+    <resultMap id="BaseResultMapCeea" type="com.midea.cloud.srm.model.suppliercooperate.order.entry.OrderDetail">
+        <id column="ORDER_DETAIL_ID" property="orderDetailId" jdbcType="BIGINT"/>
+        <result column="ORDER_ID" property="orderId" jdbcType="BIGINT"/>
+        <result column="LINE_NUM" property="lineNum" jdbcType="INTEGER"/>
+        <result column="ORDER_NUM" property="orderNum" jdbcType="DECIMAL"/>
+        <result column="UNIT_PRICE_CONTAINING_TAX" property="unitPriceContainingTax" jdbcType="DECIMAL"/>
+        <result column="UNIT_PRICE_EXCLUDING_TAX" property="unitPriceExcludingTax" jdbcType="DECIMAL"/>
+        <result column="DELIVERY_DATE" property="deliveryDate" jdbcType="DATE"/>
+        <result column="VENDOR_DELIVERY_DATE" property="vendorDeliveryDate" jdbcType="DATE"/>
+        <result column="COMMENTS" property="comments" jdbcType="VARCHAR"/>
+        <result column="RECEIVED_FACTORY" property="receivedFactory" jdbcType="VARCHAR"/>
+        <result column="INVENTORY_PLACE" property="inventoryPlace" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR"/>
+        <result column="VERSION" property="version" jdbcType="BIGINT"/>
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT"/>
+        <result column="RECEIVE_SUM" property="receiveSum" jdbcType="DECIMAL"/>
+        <result column="REQUIREMENT_DATE" property="requirementDate" jdbcType="DATE"/>
+        <!-- 物料表属性 -->
+        <!--<result column="MATERIAL_ID" property="materialId"/>
+        <result column="MATERIAL_CODE" property="materialCode"/>
+        <result column="MATERIAL_NAME" property="materialName"/>
+        <result column="SPECIFICATION" property="specification"/>
+        <result column="UNIT" property="unit"/>
+        <result column="CATEGORY_NAME" property="categoryName"/>-->
+        <!--隆基新增属性-->
+
+    </resultMap>
+
+    <resultMap id="ceeaListResultMap" type="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        <result column="numberRemaining" property="numberRemaining"/>
+        <result column="CEEA_PLAN_RECEIVE_NUM" property="ceeaPlanReceiveNum"/>
+
+        <!-- 物料表属性 -->
+        <result column="MATERIAL_ID" property="materialId"/><!-- 物料ID -->
+        <result column="MATERIAL_CODE" property="materialCode"/><!-- 物料编码 -->
+        <result column="MATERIAL_NAME" property="materialName"/><!-- 物料名称 -->
+        <result column="SPECIFICATION" property="specification"/>
+        <result column="UNIT" property="unit"/><!-- 单位 -->
+        <result column="CEEA_CATEGORY_NAME" property="ceeaCategoryName"/><!-- 采购分类全名(物料小类名称) -->
+        <result column="unreceivedSum" property="unreceivedSum"/>
+        <result column="CEEA_PURCHASE_ORDER_DATE" property="ceeaPurchaseOrderDate"/><!--订单日期-->
+        <result column="CEEA_ORG_ID" property="ceeaOrgId"/><!--业务实体-->
+        <result column="CEEA_ORG_NAME" property="ceeaOrgName"/><!--业务实体-->
+        <result column="ORDER_NUMBER" property="orderNumber"></result><!--采购订单号-->
+    </resultMap>
+
+    <parameterMap id="orderRequestDTO"
+                  type="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"></parameterMap>
+
+    <select id="getJitOrderDetail" resultMap="BaseResultMapCeea" parameterMap="orderRequestDTO">
+        SELECT od.*
+        FROM scc_sc_order_detail od
+        INNER JOIN scc_sc_order o ON o.ORDER_ID = od.ORDER_ID
+        where
+            od.ORDER_ID = #{orderId}
+            AND od.MATERIAL_CODE = #{materialCode}
+            AND od.LINE_NUM = #{lineNum}
+            AND o.JIT_ORDER = #{jitOrder}
+    </select>
+
+    <select id="findList" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO" resultMap="ceeaListResultMap">
+        SELECT
+        o.REFUSE_TIME, o.REFUSE_REASON, o.ORDER_NUMBER, o.TAX_KEY, o.TAX_RATE, o.RFQ_SETTLEMENT_CURRENCY, o.TERM_OF_PAYMENT
+        , o.PAYMENT_METHOD, o.ORDER_STATUS, o.ORGANIZATION_NAME, o.ORGANIZATION_CODE, o.DELIVERY_LEVEL, o.ORDER_AMOUNT, o.ORDER_TYPE,
+        o.CEEA_PURCHASE_ORDER_DATE,o.CEEA_ORG_ID,o.CEEA_ORG_NAME,
+        (IFNULL(od.ORDER_NUM,0) - IFNULL(od.RECEIVE_SUM,0)) AS unreceivedSum,
+        od.*
+        FROM scc_sc_order o
+        INNER JOIN scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+        <where>
+        1=1
+            <if test="startTime != null and startTime != ''">
+                 and o.SUBMITTED_TIME &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and o.SUBMITTED_TIME &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="vendorCodes != null and vendorCodes.size() > 0">
+                and.o.VENDOR_CODE in
+                <foreach collection="vendorCodes" item="vendorCode" index="index" open="(" close=")" separator=",">
+                    #{vendorCode}
+                </foreach>
+            </if>
+            <if test="userIds != null and userIds.size() > 0">
+                and o.SUBMITTED_ID in
+                <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="organizationIdList != null and organizationIdList.size() > 0">
+                and o.ORGANIZATION_ID in
+                <foreach collection="organizationIdList" item="organizationId" index="index" open="(" close=")"
+                         separator=",">
+                    #{organizationId}
+                </foreach>
+            </if>
+            <if test="orderId != null and orderId != ''">
+                and o.ORDER_ID LIKE CONCAT('%',#{orderId},'%')
+            </if>
+            <if test="ceeaPurchaseType != null and ceeaPurchaseType != ''">
+                and.o.CEEA_PURCHASE_TYPE = #{ceeaPurchaseType}
+            </if>
+            <if test="orderStatus != null and orderStatus !=''">
+                and o.ORDER_STATUS = #{orderStatus}
+            </if>
+            <if test="ceeaIfSupplierConfirm != null and ceeaIfSupplierConfirm != ''">
+                and o.CEEA_IF_SUPPLIER_CONFIRM = #{ceeaIfSupplierConfirm}
+            </if>
+            <if test="ceeaIfConSignment != null and ceeaIfConSignment != ''">
+                and o.CEEA_IF_CONSIGNMENT = #{ceeaIfConSignment}
+            </if>
+            <if test="ceeaIfPowerStationBusiness != null and ceeaIfPowerStationBusiness != ''">
+                and o.CEEA_IF_POWER_STATION_BUSINESS = #{ceeaIfPowerStationBusiness}
+            </if>
+            <if test="unreceivedSum!=null">
+                and (IFNULL(od.ORDER_NUM,0)-IFNULL(od.RECEIVE_SUM,0)-IFNULL(od.CEEA_ASSIGNED_QUANTITY,0))>0
+            </if>
+            <if test="vendorId!=null">
+                and o.VENDOR_ID=#{vendorId}
+            </if>
+            <if test="materialIds!=null and materialIds.size()>0">
+                and od.MATERIAL_ID in
+                <foreach collection="materialIds" item="materialIdss" index="index" open="(" close=")" separator=",">
+                    #{materialIdss}
+                </foreach>
+            </if>
+            /*交货地址*/
+            <if test="ceeaDeliveryPlaces!=null and ceeaDeliveryPlaces.size()>0">
+                and od.RECEIPT_PLACE in
+                <foreach collection="ceeaDeliveryPlaces" item="ceeaDeliveryPlace" index="index" open="(" close=")" separator=",">
+                    #{ceeaDeliveryPlace}
+                </foreach>
+            </if>
+            <!-- 业务实体-->
+            <if test="ceeaOrgId != null and ceeaOrgId != ''">
+                and o.CEEA_ORG_ID = #{ceeaOrgId}
+            </if>
+            <if test="orderDetailId !=null">
+                and od.ORDER_DETAIL_ID=#{orderDetailId}
+            </if>
+            <if test="orderNumber != null and orderNumber !=''">
+                and o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+        </where>
+        ORDER BY o.CREATION_DATE DESC
+    </select>
+
+    <select id="listUnDeliveryPage"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"
+            resultMap="ListResultMap">
+        SELECT
+        od.*
+        , o.REFUSE_TIME, o.REFUSE_REASON, o.ORDER_NUMBER, o.TAX_KEY, o.TAX_RATE, o.RFQ_SETTLEMENT_CURRENCY,
+        o.TERM_OF_PAYMENT
+        , o.PAYMENT_METHOD, o.ORDER_STATUS, o.ORGANIZATION_NAME, o.ORGANIZATION_CODE, o.DELIVERY_LEVEL, o.ORDER_AMOUNT,
+        o.ORDER_TYPE
+        FROM scc_sc_order o
+        INNER JOIN scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+        <where>
+            and od.RECEIVE_SUM &lt; od.ORDER_NUM
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId} and o.ORDER_STATUS != 'UNISSUED'
+            </if>
+            <if test="vendorCode != null and vendorCode !=''">
+                and o.VENDOR_CODE LIKE CONCAT('%',#{vendorCode},'%')
+            </if>
+            <if test="vendorName != null and vendorName !=''">
+                and o.VENDOR_NAME LIKE CONCAT('%',#{vendorName},'%')
+            </if>
+            <if test="orderId != null">
+                and o.ORDER_ID = #{orderId}
+            </if>
+            <if test="jitOrder != null">
+                and o.JIT_ORDER = #{jitOrder}
+            </if>
+            <if test="orderNumber != null and orderNumber !=''">
+                and o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="orderStatus != null and orderStatus !=''">
+                and o.ORDER_STATUS = #{orderStatus}
+            </if>
+            <if test="deliveryLevel != null and deliveryLevel !=''">
+                and o.DELIVERY_LEVEL = #{deliveryLevel}
+            </if>
+            <if test="organizationId != null">
+                and o.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <if test="materialId != null">
+                and od.MATERIAL_ID = #{materialId}
+            </if>
+            <if test="materialName != null">
+                and od.MATERIAL_NAME LIKE CONCAT("%",#{materialName},"%")
+            </if>
+            <if test="materialCode != null">
+                and od.MATERIAL_CODE LIKE CONCAT("%",#{materialCode},"%")
+            </if>
+            <if test="startComfirmTime != null and startComfirmTime != ''">
+                and o.COMFIRM_TIME &gt;= STR_TO_DATE(CONCAT(#{startComfirmTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endComfirmTime != null and endComfirmTime != ''">
+                and o.COMFIRM_TIME &lt;= STR_TO_DATE(CONCAT(#{endComfirmTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="startSubmittedTime != null and startSubmittedTime != ''">
+                and o.SUBMITTED_TIME &gt;= STR_TO_DATE(CONCAT(#{startSubmittedTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endSubmittedTime != null and endSubmittedTime != ''">
+                and o.SUBMITTED_TIME &lt;= STR_TO_DATE(CONCAT(#{endSubmittedTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="receivedFactory != null and '' != receivedFactory">
+                and od.RECEIVED_FACTORY = #{receivedFactory}
+            </if>
+            <if test="requirementDateStr != null and requirementDateStr != ''">
+                and od.REQUIREMENT_DATE &gt;= STR_TO_DATE(CONCAT(#{requirementDateStr},' 00:00:00'), '%Y-%m-%d
+                %H:%i:%s')
+                and od.REQUIREMENT_DATE &lt;= STR_TO_DATE(CONCAT(#{requirementDateStr},' 23:59:59'), '%Y-%m-%d
+                %H:%i:%s')
+            </if>
+            <if test="startRequirementDateStr != null and startRequirementDateStr != ''">
+                and od.REQUIREMENT_DATE &gt;= STR_TO_DATE(CONCAT(#{startRequirementDateStr},' 00:00:00'), '%Y-%m-%d
+                %H:%i:%s')
+            </if>
+            <if test="endRequirementDateStr != null and endRequirementDateStr != ''">
+                and od.REQUIREMENT_DATE &lt;= STR_TO_DATE(CONCAT(#{endRequirementDateStr},' 23:59:59'), '%Y-%m-%d
+                %H:%i:%s')
+            </if>
+            <if test="creationDateStr != null and creationDateStr != ''">
+                and o.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{creationDateStr},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                and o.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{creationDateStr},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="startCreationDateStr != null and startCreationDateStr != ''">
+                and o.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startCreationDateStr},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endCreationDateStr != null and endCreationDateStr != ''">
+                and o.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endCreationDateStr},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="orderDetailStatus != null and '' != orderDetailStatus">
+                and od.ORDER_DETAIL_STATUS = #{orderDetailStatus}
+            </if>
+            <if test="orderType != null and '' != orderType">and od.ORDER_TYPE = #{orderType}</if>
+        </where>
+        ORDER BY o.CREATION_DATE DESC, od.LINE_NUM
+    </select>
+
+    <select id="aggregateAmount" resultType="java.math.BigDecimal">
+        select sum(price)
+        from (SELECT wr.WAREHOUSE_RECEIPT_QUANTITY,                                     # 入库数量
+                     od.UNIT_PRICE_CONTAINING_TAX,                                      # 含税单价
+                     wr.WAREHOUSE_RECEIPT_QUANTITY * od.UNIT_PRICE_CONTAINING_TAX price # 入库含税金额
+
+              FROM scc_sc_delivery_note dn,
+                   scc_sc_delivery_note_detail dnd
+                       JOIN
+                   scc_sc_warehouse_receipt wr
+                   ON dnd.DELIVERY_NOTE_DETAIL_ID = wr.DELIVERY_NOTE_DETAIL_ID AND wr.WRITE_OFF != 'Y',
+                   scc_sc_order so,
+                   scc_sc_order_detail od
+              WHERE 1 = 1
+                AND dn.DELIVERY_NOTE_ID = dnd.DELIVERY_NOTE_ID
+                AND dnd.ORDER_DETAIL_ID = od.ORDER_DETAIL_ID
+                AND so.ORDER_ID = od.ORDER_ID
+                AND so.VENDOR_ID = #{vendorId}
+                AND od.CATEGORY_ID = #{categoryId}
+                AND wr.WAREHOUSE_RECEIPT_STATUS = 'CONFIRMED' # 状态: 完成
+                AND wr.CREATION_DATE BETWEEN #{startDate} AND #{endDate}) a
+    </select>
+
+    <select id="findListCopy" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+    SELECT
+        o.REFUSE_TIME,
+        o.REFUSE_REASON,
+        o.ORDER_NUMBER,
+        o.TAX_KEY,
+        o.TAX_RATE,
+        o.RFQ_SETTLEMENT_CURRENCY,
+        o.ORDER_STATUS,
+        o.CEEA_PURCHASE_ORDER_DATE,
+        o.CEEA_ORG_ID,
+        o.CEEA_ORG_CODE,
+        o.CEEA_ORG_NAME,
+        o.VENDOR_ID,
+        o.VENDOR_CODE,
+        o.VENDOR_NAME,
+        o.CEEA_RECEIVE_ADDRESS,
+        o.CEEA_EMP_USER_ID,
+        o.CEEA_EMP_USERNAME,
+        (IFNULL(od.ORDER_NUM,0) - IFNULL(od.RECEIVE_SUM,0)) AS unreceivedSum,
+        (IFNULL(od.RECEIVED_QUANTITY,0) - IFNULL(od.RECEIVE_NUM,0)) AS WAIT_ACCEPT_QUANTITY,
+       	od.ORDER_DETAIL_ID
+		,od.CATEGORY_ID
+		,od.CATEGORY_CODE
+		,od.CATEGORY_NAME
+		,od.MATERIAL_ID
+		,od.MATERIAL_CODE
+		,od.MATERIAL_NAME
+		,od.RECEIPT_PLACE
+		,od.RECEIPT_PLACE_ID
+		,od.UNIT
+		,od.UNIT_CODE
+		,od.ORDER_NUM
+		,od.REQUIREMENT_DATE
+		,od.REQUIREMENT_QUANTITY
+		,od.CURRENCY_ID
+		,od.CURRENCY_CODE
+		,od.CURRENCY_NAME
+		,od.COMMENTS
+		,od.CREATED_ID
+		,od.CREATED_BY
+		,od.CREATION_DATE
+		,od.CREATED_BY_IP
+		,IFNULL(od.RECEIVE_SUM,0) as RECEIVE_SUM
+		,od.LINE_NUM
+		,od.CURRENCY
+		,od.CEEA_REQUIREMENT_LINE_ID
+		,od.CEEA_REQUIREMENT_HEAD_NUM
+		,od.CEEA_ROW_NUM
+		,od.CEEA_ORGANIZATION_ID
+		,od.CEEA_ORGANIZATION_NAME
+		,od.CEEA_ORGANIZATION_CODE
+		,od.CEEA_FIRST_APPROVED_NUM
+		,od.CEEA_APPROVED_NUM
+		,od.CEEA_PLAN_RECEIVE_DATE
+		,od.CEEA_PROMISE_RECEIVE_DATE
+		,od.CEEA_UNIT_TAX_PRICE
+		,od.CEEA_UNIT_NO_TAX_PRICE
+		,od.CEEA_TAX_KEY
+		,od.CEEA_TAX_RATE
+		,od.CEEA_AMOUNT_INCLUDING_TAX
+		,od.CEEA_AMOUNT_EXCLUDING_TAX
+		,od.CEEA_TAX_AMOUNT
+		,od.CEEA_CONTRACT_NO
+		,od.CEEA_BATCH_NUM
+		,od.CEEA_CONSIGNMENT_NUM
+		,od.CEEA_BOX_NUM
+		,od.CEEA_PRODUCE_DATE
+		,od.CEEA_EFFECTIVE_DATE
+		,od.CEEA_JUDGE_STANDARD
+		,od.CEEA_USING_STATUS
+		,od.CEEA_IF_REQUIREMENT
+		,od.CEEA_PLAN_RECEIVE_NUM
+		,od.CEEA_ASSIGNED_QUANTITY
+		,IFNULL(od.RECEIVE_NUM,0) as RECEIVE_NUM
+		,od.CEEA_PROJECT_NUM
+		,od.CEEA_PROJECT_NAME
+		,od.CEEA_BUSINESS_SMALL_CODE
+		,od.CEEA_BUSINESS_SMALL
+		,od.CEEA_CATEGORY_ID
+		,od.CEEA_CATEGORY_NAME
+		,od.RECEIVED_QUANTITY
+		,od.SHIPPED_QUANTITY
+		,od.BILLED_QUANTITY
+		,od.NOT_INVOICE_QUANTITY
+		,od.INVOICE_QUANTITY
+		,od.USER_HOLD_FLAG
+		,od.CANCEL_FLAG
+		,od.OLD_LINE_ID
+		,od.CREATED_BY_CODE
+		,od.CLOSED_FLAG
+		,od.NO_TAX_AMOUNT
+		,od.BEFORE_UPDATE_QUANTITY
+		,od.BIG_CATEGORY_CODE
+		,od.FEEDBACK_LINE_ID
+		,od.CEEA_CONTRACT_LINE_ID
+		,od.SOURCE_REF_TYPE
+		,o.ORDER_ID
+    FROM scc_sc_order o
+    INNER JOIN scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+    ${ew.customSqlSegment}
+    </select>
+
+    <select id="findListByCopy" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+    SELECT
+        o.REFUSE_TIME,
+        o.REFUSE_REASON,
+        o.ORDER_NUMBER,
+        o.TAX_KEY,
+        o.TAX_RATE,
+        o.RFQ_SETTLEMENT_CURRENCY,
+        o.ORDER_STATUS,
+        o.CEEA_PURCHASE_ORDER_DATE,
+        o.CEEA_ORG_ID,
+        o.CEEA_ORG_CODE,
+        o.CEEA_ORG_NAME,
+        o.VENDOR_ID,
+        o.VENDOR_CODE,
+        o.VENDOR_NAME,
+        o.CEEA_RECEIVE_ADDRESS,
+        o.CEEA_EMP_USER_ID,
+        o.CEEA_EMP_USERNAME,
+        (IFNULL(od.ORDER_NUM,0) - IFNULL(od.RECEIVE_SUM,0)) AS unreceivedSum,
+        (IFNULL(od.ORDER_NUM,0) - IFNULL(od.RECEIVE_NUM,0)) AS WAIT_ACCEPT_QUANTITY,
+        od.ORDER_NUM as RECEIVED_QUANTITY,
+        od.*
+    FROM scc_sc_order o
+    INNER JOIN scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+    ${ew.customSqlSegment}
+    </select>
+
+    <select id="listUnDeliveryPage" parameterMap="orderRequestDTO" resultMap="ListResultMap">
+        SELECT
+        od.*
+        , o.REFUSE_TIME, o.REFUSE_REASON, o.ORDER_NUMBER, o.TAX_KEY, o.TAX_RATE, o.RFQ_SETTLEMENT_CURRENCY,
+        o.TERM_OF_PAYMENT
+        , o.PAYMENT_METHOD, o.ORDER_STATUS, o.ORGANIZATION_NAME, o.ORGANIZATION_CODE, o.DELIVERY_LEVEL, o.ORDER_AMOUNT,
+        o.ORDER_TYPE
+        FROM scc_sc_order o
+        INNER JOIN scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+        <where>
+            and od.RECEIVE_SUM &lt; od.ORDER_NUM
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId} and o.ORDER_STATUS != 'UNISSUED'
+            </if>
+            <if test="vendorCode != null and vendorCode !=''">
+                and o.VENDOR_CODE LIKE CONCAT('%',#{vendorCode},'%')
+            </if>
+            <if test="vendorName != null and vendorName !=''">
+                and o.VENDOR_NAME LIKE CONCAT('%',#{vendorName},'%')
+            </if>
+            <if test="orderId != null">
+                and o.ORDER_ID = #{orderId}
+            </if>
+            <if test="jitOrder != null">
+                and o.JIT_ORDER = #{jitOrder}
+            </if>
+            <if test="orderNumber != null and orderNumber !=''">
+                and o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="orderStatus != null and orderStatus !=''">
+                and o.ORDER_STATUS = #{orderStatus}
+            </if>
+            <if test="deliveryLevel != null and deliveryLevel !=''">
+                and o.DELIVERY_LEVEL = #{deliveryLevel}
+            </if>
+            <if test="organizationId != null">
+                and o.ORGANIZATION_ID = #{organizationId}
+            </if>
+            <if test="materialId != null">
+                and od.MATERIAL_ID = #{materialId}
+            </if>
+            <if test="materialName != null">
+                and od.MATERIAL_NAME LIKE CONCAT("%",#{materialName},"%")
+            </if>
+            <if test="materialCode != null">
+                and od.MATERIAL_CODE LIKE CONCAT("%",#{materialCode},"%")
+            </if>
+            <if test="startComfirmTime != null and startComfirmTime != ''">
+                and o.COMFIRM_TIME &gt;= STR_TO_DATE(CONCAT(#{startComfirmTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endComfirmTime != null and endComfirmTime != ''">
+                and o.COMFIRM_TIME &lt;= STR_TO_DATE(CONCAT(#{endComfirmTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="startSubmittedTime != null and startSubmittedTime != ''">
+                and o.SUBMITTED_TIME &gt;= STR_TO_DATE(CONCAT(#{startSubmittedTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endSubmittedTime != null and endSubmittedTime != ''">
+                and o.SUBMITTED_TIME &lt;= STR_TO_DATE(CONCAT(#{endSubmittedTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="receivedFactory != null and '' != receivedFactory">
+                and od.RECEIVED_FACTORY = #{receivedFactory}
+            </if>
+            <if test="requirementDateStr != null and requirementDateStr != ''">
+                and od.REQUIREMENT_DATE &gt;= STR_TO_DATE(CONCAT(#{requirementDateStr},' 00:00:00'), '%Y-%m-%d
+                %H:%i:%s')
+                and od.REQUIREMENT_DATE &lt;= STR_TO_DATE(CONCAT(#{requirementDateStr},' 23:59:59'), '%Y-%m-%d
+                %H:%i:%s')
+            </if>
+            <if test="startRequirementDateStr != null and startRequirementDateStr != ''">
+                and od.REQUIREMENT_DATE &gt;= STR_TO_DATE(CONCAT(#{startRequirementDateStr},' 00:00:00'), '%Y-%m-%d
+                %H:%i:%s')
+            </if>
+            <if test="endRequirementDateStr != null and endRequirementDateStr != ''">
+                and od.REQUIREMENT_DATE &lt;= STR_TO_DATE(CONCAT(#{endRequirementDateStr},' 23:59:59'), '%Y-%m-%d
+                %H:%i:%s')
+            </if>
+            <if test="creationDateStr != null and creationDateStr != ''">
+                and o.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{creationDateStr},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                and o.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{creationDateStr},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="startCreationDateStr != null and startCreationDateStr != ''">
+                and o.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startCreationDateStr},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endCreationDateStr != null and endCreationDateStr != ''">
+                and o.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endCreationDateStr},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="orderDetailStatus != null and '' != orderDetailStatus">
+                and od.ORDER_DETAIL_STATUS = #{orderDetailStatus}
+            </if>
+            <if test="orderType != null and '' != orderType">
+            and od.ORDER_TYPE = #{orderType}
+            </if>
+
+        </where>
+        ORDER BY o.CREATION_DATE DESC, od.LINE_NUM
+    </select>
+
+    <select id="findMaterialList" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        SELECT
+        od.ORDER_DETAIL_ID,
+        o.ORDER_NUMBER,
+        od.LINE_NUM,
+        od.CEEA_PLAN_RECEIVE_NUM,
+        od.CEEA_CATEGORY_NAME,
+        od.MATERIAL_CODE,
+        od.MATERIAL_NAME,
+        od.CEEA_BATCH_NUM,
+        od.PRICE_UNIT,
+        od.ORDER_NUM,
+        od.ORDER_NUM-od.RECEIVE_SUM as numberRemaining,
+        od.CEEA_PROMISE_RECEIVE_DATE,
+        o.VENDOR_CODE,o.SUBMITTED_ID,o.CEEA_ORG_ID,o.ORGANIZATION_ID,o.CEEA_RECEIVE_ADDRESS
+        FROM scc_sc_order o
+        left JOIN scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+        <where>
+            1=1
+            <!--采购订单模糊查询-->
+            <if test="orderNumber!=null and orderNumber!=''">
+                and o.ORDER_NUMBER like concat('%',#{orderNumber},'%')
+            </if>
+            /*日期条件查询*/
+            <if test=" startTime != null and  startTime != ''">
+                and o.SUBMITTED_TIME &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test=" endTime != null and  endTime != ''">
+                and o.SUBMITTED_TIME &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            /*供应商*/
+            <if test="vendorCode != null and vendorCode != ''">
+                and o.VENDOR_CODE = #{vendorCode}
+            </if>
+            <!-- 采购员id多条件查询 -->
+            <if test=" userIds != null and  userIds.size() > 0">
+                and o.SUBMITTED_ID in
+                <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            /*业务实体条件查询*/
+            <if test=" orgId != null">
+                and o.CEEA_ORG_ID=#{orgId}
+            </if>
+            /*库存组织*/
+            <if test="organizationId != null and organizationId!=''">
+                and o.ORGANIZATION_ID = #{organizationId}
+            </if>
+            /*交货地址*/
+            <if test="ceeaReceiveAddress != null and ceeaReceiveAddress!=''">
+                and o.CEEA_RECEIVE_ADDRESS = #{ceeaReceiveAddress}
+            </if>
+            /*多个物料编号查询*/
+            <if test="materialIds!=null and materialIds.size>0">
+                and o.MATERIAL_CODE in
+                <foreach collection="materialIds" item="materialId" index="index" open="(" close=")" separator=",">
+                    #{materialId}
+                </foreach>
+            </if>
+            /*物料编码*/
+            <if test="materialCode!=null and materialCode!=''">
+                and od.MATERIAL_CODE=#{materialCode}
+            </if>
+            /*物料名称*/
+            <if test="materialName!=null and materialName !=''">
+                and od.MATERIAL_NAME=#{materialName}
+            </if>
+            <!-- <if test="vendorNames != null and vendorNames.size() > 0">
+                 and o.VENDOR_NAME in
+                 <foreach collection="vendorNames" item="vendorName" index="index" open="(" close=")" separator=",">
+                     #{vendorName}
+                 </foreach>
+             </if>-->
+            /*订单id*/
+            <if test=" orderId != null and  orderId != ''">
+                and o.ORDER_ID LIKE CONCAT('%',#{orderId},'%')
+            </if>
+            <!--<if test="ceeaPurchaseType != null and ceeaPurchaseType != ''">
+                and.o.CEEA_PURCHASE_TYPE = #{ceeaPurchaseType}
+            </if>-->
+            /*订单状态*/
+            <if test=" orderStatus != null and  orderStatus !=''">
+                and o.ORDER_STATUS = #{orderStatus}
+            </if>
+            <!--<if test="ceeaIfSupplierConfirm != null and ceeaIfSupplierConfirm != ''">
+                and o.CEEA_IF_SUPPLIER_CONFIRM = #{ceeaIfSupplierConfirm}
+            </if>-->
+            <!--<if test="ceeaIfConSignment != null and ceeaIfConSignment != ''">
+                and o.CEEA_IF_CONSIGNMENT = #{ceeaIfConSignment}
+           &lt;!&ndash; </if>&ndash;&gt;
+            <if test="ceeaIfPowerStationBusiness != null and ceeaIfPowerStationBusiness != ''">
+                and o.CEEA_IF_POWER_STATION_BUSINESS = #{ceeaIfPowerStationBusiness}
+            </if>-->
+        </where>
+        ORDER BY o.CREATION_DATE DESC, od.LINE_NUM
+    </select>
+
+    <select id="findMaterialListCopy" parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        SELECT
+        od.ORDER_DETAIL_ID,
+        od.REQUIREMENT_DATE,
+        od.UNIT,
+        o.ORDER_NUMBER,
+        od.LINE_NUM,
+        od.CEEA_PLAN_RECEIVE_NUM,
+        od.CEEA_CATEGORY_NAME,
+        od.MATERIAL_ID,
+        od.MATERIAL_CODE,
+        od.MATERIAL_NAME,
+        od.CATEGORY_ID,
+        od.CATEGORY_CODE,
+        od.CATEGORY_NAME,
+        od.CEEA_BATCH_NUM,
+        od.PRICE_UNIT,
+        od.ORDER_NUM,
+        /*2020-12-29号 隆基产品回迁 bugfix 解决返回为科学计数法的bug*/
+        concat('',IFNULL(od.ORDER_NUM,0)-IFNULL(od.RECEIVE_SUM,0)) as numberRemaining,
+        od.CEEA_PLAN_RECEIVE_DATE,
+        od.CEEA_PROMISE_RECEIVE_DATE,
+        o.VENDOR_CODE,o.SUBMITTED_ID,o.CEEA_ORG_ID,od.CEEA_ORGANIZATION_ID,o.CEEA_RECEIVE_ADDRESS
+        FROM scc_sc_order o
+        left JOIN scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+        ${ew.customSqlSegment}
+    </select>
+
+    <select id="falgList" parameterMap="orderRequestDTO" resultMap="ceeaListResultMap">
+        SELECT *
+        FROM scc_sc_order_detail
+        WHERE ORDER_DETAIL_ID=#{orderDetailId}
+         and (IFNULL(ORDER_NUM,0)-IFNULL(RECEIVE_SUM,0)-IFNULL(CEEA_ASSIGNED_QUANTITY,0))>=0
+    </select>
+
+    <select id="selectByIdAndCode" parameterType="java.lang.Long" resultMap="ceeaListResultMap">
+        SELECT b.ORDER_NUMBER,a.*  FROM scc_sc_order_detail a
+        LEFT JOIN scc_sc_order b ON a.ORDER_ID=b.ORDER_ID
+        where a.ORDER_DETAIL_ID=#{orderDetailId}
+
+    </select>
+
+    <select id="getOrderDetailForCheck" resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.OrderDetail">
+        select od.* from scc_order_order_detail od
+        left join scc_order_order o on o.ORDER_ID = od.ORDER_ID
+        where o.ORDER_STATUS = 'UNDER_APPROVAL' and od.CEEA_REQUIREMENT_LINE_ID = #{requirementLineId}
+    </select>
+
+    <select id="getOrderDetailByOrderStatus" resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.OrderDetail">
+        select od.CEEA_REQUIREMENT_LINE_ID,od.ORDER_NUM
+        from scc_sc_order_detail od
+        left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+        where o.ORDER_STATUS = 'UNDER_APPROVAL'
+    </select>
+
+    <select id="listValidOrderDetail" resultType="com.midea.cloud.srm.model.suppliercooperate.order.entry.OrderDetail">
+        select od.*
+        from scc_sc_order_detail od
+        left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+        <where>
+            o.ORDER_STATUS in('UNDER_APPROVAL' ,'APPROVED' ,'REJECT' ,'ACCEPT' ,'REFUSED')
+            <if test="priceSourceIds != null and priceSourceIds.size() > 0">
+                and od.CEEA_PRICE_SOURCE_ID in
+                <foreach collection="priceSourceIds" item="priceSourceId" open="(" close=")" separator=",">
+                    #{priceSourceId}
+                </foreach>
+            </if>
+            <if test="orderDetail.ceeaPriceSourceType != null and orderDetail.ceeaPriceSourceType !=''">
+                and od.CEEA_PRICE_SOURCE_TYPE = #{orderDetail.ceeaPriceSourceType}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="listInDeliveryNotice" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        select
+        o.VENDOR_NAME,
+        o.VENDOR_CODE,
+        o.ORDER_NUMBER,
+        o.CEEA_ORG_NAME,
+        o.CEEA_RECEIVE_ADDRESS,
+        o.CEEA_RECEIVE_ORDER_ADDRESS,
+        od.*
+        from scc_sc_order_detail od
+        left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+        <where>
+            <if test="orgIds != null and orgIds.size() > 0">
+                and o.CEEA_ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                and o.VENDOR_NAME like concat('%',#{vendorName},'%')
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                and o.ORDER_NUMBER = #{orderNumber}
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                and od.MATERIAL_CODE = #{materialCode}
+            </if>
+            <if test="materialName != null and materialName != ''">
+                and od.MATERIAL_NAME like concat('%',#{materialName},'%')
+            </if>
+            and od.ORDER_DETAIL_STATUS = 'ACCEPT'
+            and o.ORDER_STATUS = 'APPROVED'
+        </where>
+        order by od.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="list" resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        select
+        o.ORDER_NUMBER,
+        o.ORDER_STATUS,
+        o.ORDER_TYPE,
+        o.VENDOR_NAME,
+        o.CEEA_EMP_USERNAME,
+        o.CREATION_DATE,
+        o.CEEA_IF_SUPPLIER_CONFIRM,
+        o.CEEA_IF_CONSIGNMENT,
+        o.CEEA_IF_POWER_StATION_BUSINESS,
+        o.CEEA_ORG_NAME,
+        od.LINE_NUM,
+        od.MATERIAL_CODE,
+        od.MATERIAL_NAME,
+        od.ORDER_NUM,
+        od.UNIT,
+        od.CEEA_PLAN_RECEIVE_DATE,
+        od.CEEA_PROMISE_RECEIVE_DATE,
+        od.CEEA_UNIT_NO_TAX_PRICE,
+        od.CEEA_UNIT_TAX_PRICE,
+        od.CURRENCY_NAME,
+        od.CEEA_TAX_RATE,
+        od.ORDER_DETAIL_STATUS,
+        od.CEEA_CONTRACT_NO,
+        od.ORDER_DETAIL_ID
+        from scc_sc_order_detail od
+        left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+        <where>
+            <if test="orderNumber != null and orderNumber != ''">
+                and o.ORDER_NUMBER LIKE CONCAT('%',#{orderNumber},'%')
+            </if>
+            <if test="orderType != null and orderType != ''">
+                and o.ORDER_TYPE = #{orderType}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and o.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and o.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="orgIds != null and orgIds.size() > 0">
+                and o.CEEA_ORG_ID in
+                <foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
+                    #{orgId}
+                </foreach>
+            </if>
+            <if test="ceeaIfPowerStationBusiness != null and ceeaIfPowerStationBusiness != ''">
+                and o.CEEA_IF_POWER_STATION_BUSINESS = #{ceeaIfPowerStationBusiness}
+            </if>
+            <if test="ceeaIfConSignment != null and ceeaIfConSignment != ''">
+                and o.CEEA_IF_CONSIGNMENT = #{ceeaIfConSignment}
+            </if>
+            <if test="userIds != null and userIds.size() > 0">
+                and o.CEEA_EMP_USER_ID in
+                <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="orderDetailStatus != null and orderDetailStatus != ''">
+                and od.ORDER_DETAIL_STATUS = #{orderDetailStatus}
+            </if>
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId}
+                and (o.ORDER_STATUS in ('APPROVED','ACCEPT','REFUSED'))
+            </if>
+        </where>
+        ORDER BY od.LAST_UPDATE_DATE DESC
+    </select>
+
+    <select id="listInDeliveryNote"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        select
+        od.ORDER_DETAIL_ID,
+        od.REQUIREMENT_DATE,
+        od.UNIT,
+        o.ORDER_NUMBER,
+        od.LINE_NUM,
+        od.CEEA_PLAN_RECEIVE_NUM,
+        od.CEEA_CATEGORY_NAME,
+        od.MATERIAL_ID,
+        od.MATERIAL_CODE,
+        od.MATERIAL_NAME,
+        od.CATEGORY_ID,
+        od.CATEGORY_CODE,
+        od.CATEGORY_NAME,
+        od.CEEA_BATCH_NUM,
+        od.PRICE_UNIT,
+        od.ORDER_NUM,
+        od.CEEA_PLAN_RECEIVE_DATE,
+        od.CEEA_PROMISE_RECEIVE_DATE,
+        o.VENDOR_CODE,
+        o.SUBMITTED_ID,
+        o.CEEA_ORG_ID,
+        od.CEEA_ORGANIZATION_ID,
+        o.CEEA_RECEIVE_ADDRESS
+        from scc_sc_order_detail od
+        left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+        <where>
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                and o.ORDER_NUMBER like concat('%',#{orderNumber},'%')
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                and od.MATERIAL_CODE = #{materialCode}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and od.CREATION_DATE >= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and od.CREATION_DATE &lt;= #{endTime}
+            </if>
+            <if test="ceeaReceiveAddress != null and ceeaReceiveAddress != ''">
+                and o.CEEA_RECEIVE_ADDRESS = #{ceeaReceiveAddress}
+            </if>
+            and od.ORDER_DETAIL_STATUS = 'ACCEPT'
+        </where>
+        order by od.LAST_UPDATE_DATE desc
+    </select>
+
+    <select id="findInDeliveryOrder"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderRequestDTO"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.order.dto.OrderDetailDTO">
+        SELECT
+        od.ORDER_DETAIL_ID,
+        od.REQUIREMENT_DATE,
+        od.UNIT,
+        o.ORDER_NUMBER,
+        od.LINE_NUM,
+        od.CEEA_PLAN_RECEIVE_NUM,
+        od.CEEA_CATEGORY_NAME,
+        od.MATERIAL_ID,
+        od.MATERIAL_CODE,
+        od.MATERIAL_NAME,
+        od.CATEGORY_ID,
+        od.CATEGORY_CODE,
+        od.CATEGORY_NAME,
+        od.CEEA_BATCH_NUM,
+        od.PRICE_UNIT,
+        od.ORDER_NUM,
+        /*2020-12-29号 隆基产品回迁 bugfix 解决返回为科学计数法的bug*/
+        concat('',IFNULL(od.ORDER_NUM,0)-IFNULL(od.DELIVERY_NOTICE_QUANTITY,0)) as numberRemaining,
+        od.CEEA_PLAN_RECEIVE_DATE,
+        od.CEEA_PROMISE_RECEIVE_DATE,
+        o.VENDOR_CODE,
+        o.SUBMITTED_ID,
+        o.CEEA_ORG_ID,
+        od.CEEA_ORGANIZATION_ID,
+        o.CEEA_RECEIVE_ADDRESS
+        FROM scc_sc_order o
+        left JOIN scc_sc_order_detail od on od.ORDER_ID = o.ORDER_ID
+        <where>
+            <if test="vendorId != null">
+                and o.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                and o.ORDER_NUMBER like concat('%',#{orderNumber},'%')
+            </if>
+            <if test="vendorCode != null and vendorCode != ''">
+                and o.VENDOR_CODE = #{vendorCode}
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                and od.MATERIAL_CODE = #{materialCode}
+            </if>
+            <if test="ceeaOrgId != null">
+                and o.CEEA_ORG_ID = #{ceeaOrgId}
+            </if>
+            <if test="organizationId != null">
+                and od.CEEA_ORGANIZATION_ID = #{organizationId}
+            </if>
+            <if test="deliverPlanNum != null and deliverPlanNum != ''">
+                and od.CEEA_PLAN_RECEIVE_NUM like concat('%',#{deliverPlanNum},'%')
+            </if>
+            <if test="ceeaReceiveAddress != null and ceeaReceiveAddress != ''">
+                and o.CEEA_RECEIVE_ADDRESS = #{ceeaReceiveAddress}
+            </if>
+            <if test="orderDetailIdList != null and orderDetailIdList.size() > 0">
+                and od.ORDER_DETAIL_ID in
+                <foreach collection="orderDetailIdList" item="orderDetailId" index="index" open="(" close=")" separator=",">
+                    #{orderDetailId}
+                </foreach>
+            </if>
+            <if test="purchaseCategoryIds != null and purchaseCategoryIds.size() > 0">
+                and od.CATEGORY_ID not in
+                <foreach collection="purchaseCategoryIds" item="purchaseCategoryId" index="index" open="(" close=")" separator=",">
+                    #{purchaseCategoryId}
+                </foreach>
+            </if>
+            and od.ORDER_DETAIL_STATUS = 'ACCEPT'
+            and IFNULL(od.ORDER_NUM,0)-IFNULL(od.RECEIVE_SUM,0) > 0
+        </where>
+        order by od.LAST_UPDATE_DATE desc
+    </select>
+</mapper>

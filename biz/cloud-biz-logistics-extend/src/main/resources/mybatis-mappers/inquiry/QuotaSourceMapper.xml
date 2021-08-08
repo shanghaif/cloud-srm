@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.inq.inquiry.mapper.QuotaSourceMapper">
+    <select id="quotaSourceList" parameterType="com.midea.cloud.srm.model.inq.inquiry.entity.QuotaSource"
+            resultType="com.midea.cloud.srm.model.inq.inquiry.dto.QuotaSourceDTO">
+            SELECT
+            a.QUOTA_SOURCE_ID,
+            a.QUOTA_ADJUST_ID,
+            a.CEEA_SOURCE_NO,
+            a.SOURCE_TYPE,
+            a.APPROVAL_BIDDING_ITEM_ID,
+            a.TARGET_PROPORTION,
+            a.AMOUNT_DIFFERENCE,
+            <!--价格差异-->
+            b.CATEGORY_CODE,
+            b.VENDOR_NAME,
+            b.CATEGORY_ID,
+            b.ORG_ID,
+            b.ORG_NAME,
+            b.ITEM_CODE,
+            b.ITEM_NAME,
+            b.CATEGORY_NAME,
+            b.NEED_NUM,
+            b.UNIT,
+            b.TAX_PRICE,
+            b.QUOTA_PROPORTION,
+            b.START_TIME,
+            b.END_TIME
+            FROM ceea_inquiry_quota_source a
+            LEFT JOIN ceea_price_approval_bidding_item b ON a.APPROVAL_BIDDING_ITEM_ID =b.APPROVAL_BIDDING_ITEM_ID
+            ${ew.customSqlSegment}
+</select>
+
+</mapper>

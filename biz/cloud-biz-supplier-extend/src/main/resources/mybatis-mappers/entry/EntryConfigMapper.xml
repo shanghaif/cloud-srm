@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supauth.entry.mapper.EntryConfigMapper">
+
+    <select id="listPageByParam" parameterType="com.midea.cloud.srm.model.supplierauth.entry.entity.EntryConfig"
+            resultType="com.midea.cloud.srm.model.supplierauth.entry.entity.EntryConfig">
+        select ssec.*
+        from scc_sup_entry_config ssec
+        LEFT JOIN scc_sup_entry_category_config ssecc
+        on ssec.ENTRY_CONFIG_ID = ssecc.ENTRY_CONFIG_ID
+        ${ew.customSqlSegment}
+    </select>
+
+</mapper>

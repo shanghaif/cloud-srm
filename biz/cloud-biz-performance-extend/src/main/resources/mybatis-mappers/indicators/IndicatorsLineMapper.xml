@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.indicators.mapper.IndicatorsLineMapper">
+
+    <select id="queruIndicatorsLine" resultType="com.midea.cloud.srm.model.perf.inditors.entity.IndicatorsLine">
+        select a.* from scc_perf_indicators_line a
+            JOIN scc_perf_indicators_header b on a.INDICATOR_HEAD_ID = b.INDICATOR_HEAD_ID
+            JOIN scc_perf_score_man_scoring_v1 c on c.INDICATOR_DIMENSION_TYPE = b.INDICATOR_DIMENSION AND c.INDICATOR_NAME = b.INDICATOR_NAME
+                                            AND c.SCORE_MAN_SCORING_ID = #{scoreManScoringId}
+    </select>
+</mapper>

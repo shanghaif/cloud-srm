@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.reconciliation.mapper.UnsettledPenaltyMapper">
+    <resultMap id="BaseResultMap"
+               type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.UnsettledPenalty">
+        <id column="UNSETTLED_PENALTY_ID" property="unsettledPenaltyId" jdbcType="BIGINT"/>
+        <result column="UNSETTLED_ORDER_ID" property="unsettledOrderId" jdbcType="BIGINT"/>
+        <result column="PENALTY_ID" property="penaltyId" jdbcType="BIGINT"/>
+        <result column="CREATED_ID" property="createdId" jdbcType="BIGINT"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR"/>
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT"/>
+        <result column="VERSION" property="version" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <resultMap id="BaseDTOResultMap"
+               type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.dto.UnsettledPenaltyDTO">
+        <id column="UNSETTLED_PENALTY_ID" property="unsettledPenaltyId" jdbcType="BIGINT"/>
+        <result column="UNSETTLED_ORDER_ID" property="unsettledOrderId" jdbcType="BIGINT"/>
+
+        <result column="PENALTY_ID" property="penaltyId" jdbcType="BIGINT"/>
+        <result column="PENALTY_NUMBER" property="penaltyNumber" jdbcType="VARCHAR"/>
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT"/>
+        <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR"/>
+        <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR"/>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT"/>
+        <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR"/>
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR"/>
+        <result column="INVOICE_ID" property="invoiceId" jdbcType="BIGINT"/>
+        <result column="INVOICE_NUMBER" property="invoiceNumber" jdbcType="VARCHAR"/>
+        <result column="INVOICE_STATUS" property="invoiceStatus" jdbcType="VARCHAR"/>
+        <result column="MATCH_INVOICE_TIME" property="matchInvoiceTime" jdbcType="TIMESTAMP"/>
+        <result column="MATCH_USER_ID" property="matchUserId" jdbcType="BIGINT"/>
+        <result column="MATCH_USER_NAME" property="matchUserName" jdbcType="VARCHAR"/>
+        <result column="RECONCILIAT_ID" property="reconciliatId" jdbcType="BIGINT"/>
+        <result column="RECONCILIAT_NUMBER" property="reconciliatNumber" jdbcType="VARCHAR"/>
+        <result column="RECONCILIAT_STATUS" property="reconciliatStatus" jdbcType="VARCHAR"/>
+        <result column="RECONCILIAT_TIME" property="reconciliatTime" jdbcType="TIMESTAMP"/>
+        <result column="RECONCILIAT_USER_ID" property="reconciliatUserId" jdbcType="BIGINT"/>
+        <result column="RECONCILIAT_USER_NAME" property="reconciliatUserName" jdbcType="VARCHAR"/>
+        <result column="PENALTY_TIME" property="penaltyTime" jdbcType="TIMESTAMP"/>
+        <result column="PENALTY_TYPE" property="penaltyType" jdbcType="VARCHAR"/>
+        <result column="PENALTY_COMMONS" property="penaltyCommons" jdbcType="VARCHAR"/>
+        <result column="RFQ_SETTLEMENT_CURRENCY" property="rfqSettlementCurrency" jdbcType="VARCHAR"/>
+        <result column="PENALTY_AMOUNT" property="penaltyAmount" jdbcType="DECIMAL"/>
+
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR"/>
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT"/>
+        <result column="VERSION" property="version" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <select id="findUnsettledList" resultMap="BaseDTOResultMap"
+            parameterType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.dto.UnsettledOrderRequestDTO">
+        <choose>
+            <when test="unsettledOrderId == null">
+                SELECT * FROM (
+                SELECT p.*,up.UNSETTLED_PENALTY_ID,up.UNSETTLED_ORDER_ID
+                FROM scc_sc_penalty p
+                LEFT JOIN scc_sc_unsettled_penalty up ON up.PENALTY_ID = p.PENALTY_ID
+                <where>
+                    AND up.UNSETTLED_PENALTY_ID IS NULL
+                    <if test="vendorId != null">
+                        AND p.VENDOR_ID = #{vendorId}
+                    </if>
+                    <if test="rfqSettlementCurrency != null and rfqSettlementCurrency !=''">
+                        AND p.RFQ_SETTLEMENT_CURRENCY = #{rfqSettlementCurrency}
+                    </if>
+                    <if test="organizationId != null">
+                        AND p.ORGANIZATION_ID = #{organizationId}
+                    </if>
+                    <if test="startDateStr != null and startDateStr != ''">
+                        and p.PENALTY_TIME &gt;= STR_TO_DATE(CONCAT(#{startDateStr},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                    <if test="endDateStr != null and endDateStr != ''">
+                        and p.PENALTY_TIME &lt;= STR_TO_DATE(CONCAT(#{endDateStr},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                </where>
+                UNION ALL
+                SELECT p.*,up.UNSETTLED_PENALTY_ID,up.UNSETTLED_ORDER_ID
+                FROM scc_sc_penalty p
+                INNER JOIN scc_sc_unsettled_penalty up ON up.PENALTY_ID = p.PENALTY_ID
+                INNER JOIN scc_sc_unsettled_order uo ON uo.UNSETTLED_ORDER_ID = up.UNSETTLED_ORDER_ID
+                <where>
+                    <if test="rfqSettlementCurrency != null and rfqSettlementCurrency !=''">
+                        AND p.RFQ_SETTLEMENT_CURRENCY = #{rfqSettlementCurrency}
+                    </if>
+                    <if test="vendorId != null">
+                        AND p.VENDOR_ID = #{vendorId}
+                    </if>
+                    <if test="organizationId != null">
+                        AND p.ORGANIZATION_ID = #{organizationId}
+                    </if>
+                    AND uo.STATUS = 'CANCAL'
+                    <if test="startDateStr != null and startDateStr != ''">
+                        and p.PENALTY_TIME &gt;= STR_TO_DATE(CONCAT(#{startDateStr},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                    <if test="endDateStr != null and endDateStr != ''">
+                        and p.PENALTY_TIME &lt;= STR_TO_DATE(CONCAT(#{endDateStr},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                </where>
+                )p
+                ORDER BY p.PENALTY_TIME DESC
+            </when>
+            <otherwise>
+                SELECT p.*,up.UNSETTLED_PENALTY_ID,up.UNSETTLED_ORDER_ID
+                FROM scc_sc_penalty p
+                INNER JOIN scc_sc_unsettled_penalty up ON up.PENALTY_ID = p.PENALTY_ID
+                INNER JOIN scc_sc_unsettled_order uo ON uo.UNSETTLED_ORDER_ID = up.UNSETTLED_ORDER_ID
+                <where>
+                    AND uo.UNSETTLED_ORDER_ID = #{unsettledOrderId}
+                    <if test="rfqSettlementCurrency != null and rfqSettlementCurrency !=''">
+                        AND p.RFQ_SETTLEMENT_CURRENCY = #{rfqSettlementCurrency}
+                    </if>
+                    <if test="vendorId != null">
+                        AND p.VENDOR_ID = #{vendorId}
+                    </if>
+                    <if test="organizationId != null">
+                        AND p.ORGANIZATION_ID = #{organizationId}
+                    </if>
+                    <if test="startDateStr != null and startDateStr != ''">
+                        and p.PENALTY_TIME &gt;= STR_TO_DATE(CONCAT(#{startDateStr},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                    <if test="endDateStr != null and endDateStr != ''">
+                        and p.PENALTY_TIME &lt;= STR_TO_DATE(CONCAT(#{endDateStr},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                </where>
+                ORDER BY p.PENALTY_TIME DESC
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

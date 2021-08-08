@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.base.notice.mapper.NoticeMapper">
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.base.notice.entry.Notice">
+        <id column="NOTICE_ID" property="noticeId" jdbcType="BIGINT"/>
+        <result column="NOTICE_TYPE" property="noticeType" jdbcType="VARCHAR"/>
+        <result column="NOTICE_STATUS" property="noticeStatus" jdbcType="VARCHAR"/>
+        <result column="TITLE" property="title" jdbcType="VARCHAR"/>
+        <result column="DETAIL" property="detail" jdbcType="VARCHAR"/>
+        <result column="FILE_RELATION_ID" property="fileRelationId" jdbcType="BIGINT"/>
+        <result column="FILE_NAME" property="fileName" jdbcType="VARCHAR"/>
+        <result column="IS_TOP" property="isTop" jdbcType="VARCHAR"/>
+        <result column="NOTICE_ALL" property="noticeAll" jdbcType="VARCHAR"/>
+        <result column="PUBLISHER_ID" property="publisherId" jdbcType="BIGINT"/>
+        <result column="PUBLISH_BY" property="publishBy" jdbcType="VARCHAR"/>
+        <result column="PUBLISH_TIME" property="publishTime" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_ID" property="createdId" jdbcType="BIGINT"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR"/>
+        <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR"/>
+        <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT"/>
+        <result column="VERSION" property="version" jdbcType="BIGINT"/>
+    </resultMap>
+    <resultMap id="DetailResultMap" extends="BaseResultMap" type="com.midea.cloud.srm.model.base.notice.dto.NoticeDetailDTO">
+        <collection property="noticeVendors" column="NOTICE_ID" javaType="java.util.List"
+                    ofType="com.midea.cloud.srm.model.base.notice.entry.NoticeVendor">
+            <id column="NOTICE_VENDOR_ID" property="noticeVendorId" jdbcType="BIGINT" />
+            <result column="NOTICE_ID" property="noticeId" jdbcType="BIGINT" />
+            <result column="READ_STATUS" property="readStatus" jdbcType="VARCHAR" />
+            <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT" />
+            <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR" />
+            <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+    <select id="getDetail" resultMap="DetailResultMap">
+        SELECT n.*
+         ,vn.NOTICE_VENDOR_ID, vn.READ_STATUS, vn.VENDOR_ID, vn.VENDOR_CODE, vn.VENDOR_NAME
+         FROM scc_base_notice n
+        LEFT JOIN scc_base_notice_vendor vn ON vn.NOTICE_ID = n.NOTICE_ID
+        WHERE n.NOTICE_ID = #{noticeId}
+    </select>
+
+    <select id="findList" parameterType="com.midea.cloud.srm.model.base.notice.dto.NoticeRequestDTO"
+            resultMap="BaseResultMap">
+        <choose>
+            <when test="vendorId !=null">
+                SELECT n.* FROM (
+                SELECT n.NOTICE_ID, n.NOTICE_TYPE, n.NOTICE_STATUS, n.TITLE, n.FILE_RELATION_ID, n.FILE_NAME,
+                n.IS_TOP, n.CREATED_ID, n.CREATED_BY, n.CREATION_DATE, n.CREATED_BY_IP, n.LAST_UPDATE_DATE,
+                n.LAST_UPDATED_ID,
+                n.LAST_UPDATED_BY, n.LAST_UPDATED_BY_IP, n.TENANT_ID, n.VERSION, n.PUBLISHER_ID, n.PUBLISH_BY,
+                n.PUBLISH_TIME, n.NOTICE_ALL
+                FROM scc_base_notice n WHERE n.NOTICE_ALL = "YES" AND n.NOTICE_STATUS &lt;&gt; 'UNPUBLISHED'
+                <if test="noticeType !=null and noticeType !=''">
+                    AND n.NOTICE_TYPE = #{noticeType}
+                </if>
+                <if test="noticeStatus !=null and noticeStatus !=''">
+                    AND n.NOTICE_STATUS = #{noticeStatus}
+                </if>
+                <if test="publishBy !=null and publishBy !=''">
+                    AND n.PUBLISH_BY LIKE CONCAT("%",#{publishBy},"%")
+                </if>
+                <if test="title !=null and title !=''">
+                    AND n.TITLE LIKE CONCAT("%",#{title},"%")
+                </if>
+                <if test="startPublisherTime != null and startPublisherTime != ''">
+                    and n.PUBLISH_TIME &gt;= STR_TO_DATE(CONCAT(#{startPublisherTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                </if>
+                <if test="endPublisherTime != null and endPublisherTime != ''">
+                    and n.PUBLISH_TIME &lt;= STR_TO_DATE(CONCAT(#{endPublisherTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                </if>
+                <if test="startCreationDate != null and startCreationDate != ''">
+                    and n.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startCreationDate},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                </if>
+                <if test="endCreationDate != null and endCreationDate != ''">
+                    and n.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endCreationDate},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                </if>
+                UNION ALL
+                SELECT n.NOTICE_ID, n.NOTICE_TYPE, n.NOTICE_STATUS, n.TITLE, n.FILE_RELATION_ID, n.FILE_NAME,
+                n.IS_TOP, n.CREATED_ID, n.CREATED_BY, n.CREATION_DATE, n.CREATED_BY_IP, n.LAST_UPDATE_DATE,
+                n.LAST_UPDATED_ID,
+                n.LAST_UPDATED_BY, n.LAST_UPDATED_BY_IP, n.TENANT_ID, n.VERSION, n.PUBLISHER_ID, n.PUBLISH_BY,
+                n.PUBLISH_TIME, n.NOTICE_ALL
+                FROM scc_base_notice n
+                INNER JOIN scc_base_notice_vendor nv ON nv.NOTICE_ID = n.NOTICE_ID
+                WHERE (n.NOTICE_ALL != "YES" OR n.NOTICE_ALL IS null)
+                AND nv.VENDOR_ID = #{vendorId} AND n.NOTICE_STATUS &lt;&gt; 'UNPUBLISHED'
+                <if test="noticeType !=null and noticeType !=''">
+                    AND n.NOTICE_TYPE = #{noticeType}
+                </if>
+                <if test="noticeStatus !=null and noticeStatus !=''">
+                    AND n.NOTICE_STATUS = #{noticeStatus}
+                </if>
+                <if test="publishBy !=null and publishBy !=''">
+                    AND n.PUBLISH_BY LIKE CONCAT("%",#{publishBy},"%")
+                </if>
+                <if test="title !=null and title !=''">
+                    AND n.TITLE LIKE CONCAT("%",#{title},"%")
+                </if>
+                <if test="startPublisherTime != null and startPublisherTime != ''">
+                    and n.PUBLISH_TIME &gt;= STR_TO_DATE(CONCAT(#{startPublisherTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                </if>
+                <if test="endPublisherTime != null and endPublisherTime != ''">
+                    and n.PUBLISH_TIME &lt;= STR_TO_DATE(CONCAT(#{endPublisherTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                </if>
+                <if test="startCreationDate != null and startCreationDate != ''">
+                    and n.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startCreationDate},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                </if>
+                <if test="endCreationDate != null and endCreationDate != ''">
+                    and n.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endCreationDate},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                </if>
+                )n
+                ORDER BY n.IS_TOP DESC,n.CREATION_DATE DESC
+            </when>
+            <otherwise>
+                SELECT n.NOTICE_ID, n.NOTICE_TYPE, n.NOTICE_STATUS, n.TITLE, n.FILE_RELATION_ID, n.FILE_NAME,
+                n.IS_TOP, n.CREATED_ID, n.CREATED_BY, n.CREATION_DATE, n.CREATED_BY_IP, n.LAST_UPDATE_DATE,
+                n.LAST_UPDATED_ID,
+                n.LAST_UPDATED_BY, n.LAST_UPDATED_BY_IP, n.TENANT_ID, n.VERSION, n.PUBLISHER_ID, n.PUBLISH_BY,
+                n.PUBLISH_TIME, n.NOTICE_ALL
+                FROM scc_base_notice n
+                <where>
+                    <if test="noticeType !=null and noticeType !=''">
+                        AND n.NOTICE_TYPE = #{noticeType}
+                    </if>
+                    <if test="noticeStatus !=null and noticeStatus !=''">
+                        AND n.NOTICE_STATUS = #{noticeStatus}
+                    </if>
+                    <if test="publishBy !=null and publishBy !=''">
+                        AND n.PUBLISH_BY LIKE CONCAT("%",#{publishBy},"%")
+                    </if>
+                    <if test="title !=null and title !=''">
+                        AND n.TITLE LIKE CONCAT("%",#{title},"%")
+                    </if>
+                    <if test="startPublisherTime != null and startPublisherTime != ''">
+                        and n.PUBLISH_TIME &gt;= STR_TO_DATE(CONCAT(#{startPublisherTime},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                    <if test="endPublisherTime != null and endPublisherTime != ''">
+                        and n.PUBLISH_TIME &lt;= STR_TO_DATE(CONCAT(#{endPublisherTime},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                    <if test="startCreationDate != null and startCreationDate != ''">
+                        and n.CREATION_DATE &gt;= STR_TO_DATE(CONCAT(#{startCreationDate},' 00:00:00'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                    <if test="endCreationDate != null and endCreationDate != ''">
+                        and n.CREATION_DATE &lt;= STR_TO_DATE(CONCAT(#{endCreationDate},' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+                    </if>
+                </where>
+                ORDER BY n.IS_TOP DESC,n.CREATION_DATE DESC
+            </otherwise>
+        </choose>
+
+    </select>
+</mapper>

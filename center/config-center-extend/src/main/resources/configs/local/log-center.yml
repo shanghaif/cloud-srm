@@ -1,0 +1,51 @@
+logging:
+  level:
+    root: info
+    com.midea: debug
+  file: logs/${spring.application.name}.log
+  config: classpath:logback-local.xml
+  logstashhost: 10.0.10.50 #logstash服务器
+spring:
+  redis:
+    host: 10.17.145.83
+    port: 6379
+    password: midea123456
+    timeout: 60000
+    jedis:
+      pool:
+        max-active: 100
+        max-wait: 10
+        max-Idle: 10
+        min-Idle: 0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.17.149.182:3306/nsrm_cloud_log?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: cdc_base_new
+    password: 123456
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  aop:
+    proxy-target-class: true
+mybatis-plus:
+  type-aliases-package: com.midea.cloud.srm.model.log
+  mapper-locations: classpath*:/mybatis-mappers/**/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+security:
+  oauth2:
+    resource:
+      prefer-token-info: false
+elasticsearch:
+  clusterName: elasticsearch
+  clusterNodes: 10.17.149.190:9300
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000
+cloud:
+  scc:
+    logDataClean:
+      maxSurDay: 3

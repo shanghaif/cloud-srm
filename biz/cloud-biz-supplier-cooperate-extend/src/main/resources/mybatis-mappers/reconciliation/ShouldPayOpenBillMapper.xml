@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.reconciliation.mapper.ShouldPayOpenBillMapper">
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.ShouldPayOpenBill">
+    <id column="SHOULD_PAY_OPEN_BILL_ID" jdbcType="BIGINT" property="shouldPayOpenBillId" />
+    <result column="VENDOR_ID" jdbcType="BIGINT" property="vendorId" />
+    <result column="VENDOR_CODE" jdbcType="VARCHAR" property="vendorCode" />
+    <result column="VENDOR_NAME" jdbcType="VARCHAR" property="vendorName" />
+    <result column="ORGANIZATION_ID" jdbcType="BIGINT" property="organizationId" />
+    <result column="ORGANIZATION_CODE" jdbcType="VARCHAR" property="organizationCode" />
+    <result column="ORGANIZATION_NAME" jdbcType="VARCHAR" property="organizationName" />
+    <result column="MATERIAL_ID" jdbcType="BIGINT" property="materialId" />
+    <result column="MATERIAL_CODE" jdbcType="VARCHAR" property="materialCode" />
+    <result column="MATERIAL_NAME" jdbcType="VARCHAR" property="materialName" />
+    <result column="BILL_TYPE" jdbcType="VARCHAR" property="billType" />
+    <result column="BILL_CODE" jdbcType="VARCHAR" property="billCode" />
+    <result column="BUSINESS_DATE" jdbcType="DATE" property="businessDate" />
+    <result column="RFQ_SETTLEMENT_CURRENCY" jdbcType="VARCHAR" property="rfqSettlementCurrency" />
+    <result column="INITIAL_BALANCE" jdbcType="DECIMAL" property="initialBalance" />
+    <result column="CURRENT_SHOULD_PAY" jdbcType="DECIMAL" property="currentShouldPay" />
+    <result column="CURRENT_ISSUE" jdbcType="DECIMAL" property="currentIssue" />
+    <result column="ENDING_BALANCE" jdbcType="DECIMAL" property="endingBalance" />
+    <result column="CREATED_ID" jdbcType="BIGINT" property="createdId" />
+    <result column="CREATED_BY" jdbcType="VARCHAR" property="createdBy" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY_IP" jdbcType="VARCHAR" property="createdByIp" />
+    <result column="LAST_UPDATED_ID" jdbcType="BIGINT" property="lastUpdatedId" />
+    <result column="LAST_UPDATED_BY" jdbcType="VARCHAR" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATEscc_base_material_itemD_BY_IP" jdbcType="VARCHAR" property="lastUpdatesccBaseMaterialItemdByIp" />
+    <result column="TENANT_ID" jdbcType="BIGINT" property="tenantId" />
+    <result column="VERSION" jdbcType="BIGINT" property="version" />
+  </resultMap>
+
+  <select id="sum" resultMap="BaseResultMap"
+                   parameterType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.dto.ShouldPayOpenBillRequestDTO">
+  SELECT SUM(CURRENT_SHOULD_PAY) AS 'CURRENT_SHOULD_PAY',
+  SUM(CURRENT_ISSUE) AS 'CURRENT_ISSUE'
+  FROM scc_sc_should_pay_open_bill
+  <where>
+    <if test="organizationId != null">
+      AND ORGANIZATION_ID = #{organizationId}
+    </if>
+    <if test="vendorId != null">
+      AND VENDOR_ID = #{vendorId}
+    </if>
+    <if test="vendorCode != null and vendorCode != null">
+      AND VENDOR_CODE = #{vendorCode}
+    </if>
+    <if test="billType != null and billType != null">
+      AND BILL_TYPE = #{billType}
+    </if>
+    <if test="billCode != null and billCode != null">
+      AND BILL_CODE = #{billCode}
+    </if>
+    <if test="startBusinessDate != null and startBusinessDate !=''">
+      AND BUSINESS_DATE &gt;= STR_TO_DATE(#{startBusinessDate}, '%Y-%m-%d')
+    </if>
+    <if test="endBusinessDate != null and endBusinessDate !=''">
+      AND BUSINESS_DATE &lt;= STR_TO_DATE(#{endBusinessDate}, '%Y-%m-%d')
+    </if>
+  </where>
+</select>
+  <select id="getLastEndingBalance" resultType="java.math.BigDecimal"
+          parameterType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.dto.ShouldPayOpenBillRequestDTO">
+    SELECT ENDING_BALANCE
+    FROM scc_sc_should_pay_open_bill
+    <where>
+      <if test="vendorId != null">
+        AND VENDOR_ID = #{vendorId}
+      </if>
+      <if test="vendorCode != null and vendorCode != ''">
+        AND VENDOR_CODE = #{vendorCode}
+      </if>
+      <if test="billType != null and billType != ''">
+        AND BILL_TYPE = #{billType}
+      </if>
+      <if test="billCode != null and billCode != ''">
+        AND BILL_CODE = #{billCode}
+      </if>
+      <if test="startBusinessDate != null and startBusinessDate !=''">
+        AND BUSINESS_DATE &gt;= STR_TO_DATE(#{startBusinessDate}, '%Y-%m-%d')
+      </if>
+      <if test="endBusinessDate != null and endBusinessDate !=''">
+        AND BUSINESS_DATE &lt;= STR_TO_DATE(#{endBusinessDate}, '%Y-%m-%d')
+      </if>
+    </where>
+    ORDER BY BUSINESS_DATE DESC,CREATION_DATE DESC,LINE_NUM DESC
+  </select>
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.midea.cloud.srm.supcooperate.reconciliation.mapper.PenaltyMapper" >
+  <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.Penalty" >
+    <id column="PENALTY_ID" property="penaltyId" jdbcType="BIGINT" />
+    <result column="PENALTY_NUMBER" property="penaltyNumber" jdbcType="VARCHAR" />
+    <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT" />
+    <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR" />
+    <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR" />
+    <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT" />
+    <result column="ORGANIZATION_CODE" property="organizationCode" jdbcType="VARCHAR" />
+    <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+    <result column="INVOICE_ID" property="invoiceId" jdbcType="BIGINT" />
+    <result column="INVOICE_NUMBER" property="invoiceNumber" jdbcType="VARCHAR" />
+    <result column="INVOICE_STATUS" property="invoiceStatus" jdbcType="VARCHAR" />
+    <result column="MATCH_INVOICE_TIME" property="matchInvoiceTime" jdbcType="TIMESTAMP" />
+    <result column="MATCH_USER_ID" property="matchUserId" jdbcType="BIGINT" />
+    <result column="MATCH_USER_NAME" property="matchUserName" jdbcType="VARCHAR" />
+    <result column="RECONCILIAT_ID" property="reconciliatId" jdbcType="BIGINT" />
+    <result column="RECONCILIAT_NUMBER" property="reconciliatNumber" jdbcType="VARCHAR" />
+    <result column="RECONCILIAT_STATUS" property="reconciliatStatus" jdbcType="VARCHAR" />
+    <result column="RECONCILIAT_TIME" property="reconciliatTime" jdbcType="TIMESTAMP" />
+    <result column="RECONCILIAT_USER_ID" property="reconciliatUserId" jdbcType="BIGINT" />
+    <result column="RECONCILIAT_USER_NAME" property="reconciliatUserName" jdbcType="VARCHAR" />
+    <result column="PENALTY_TIME" property="penaltyTime" jdbcType="TIMESTAMP" />
+    <result column="PENALTY_TYPE" property="penaltyType" jdbcType="VARCHAR" />
+    <result column="PENALTY_COMMONS" property="penaltyCommons" jdbcType="VARCHAR" />
+    <result column="RFQ_SETTLEMENT_CURRENCY" property="rfqSettlementCurrency" jdbcType="VARCHAR" />
+    <result column="PENALTY_AMOUNT" property="penaltyAmount" jdbcType="DECIMAL" />
+
+    <result column="CREATED_BY" property="createdBy" jdbcType="VARCHAR" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY_IP" property="createdByIp" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_ID" property="lastUpdatedId" jdbcType="BIGINT" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_BY_IP" property="lastUpdatedByIp" jdbcType="VARCHAR" />
+    <result column="TENANT_ID" property="tenantId" jdbcType="BIGINT" />
+    <result column="VERSION" property="version" jdbcType="BIGINT" />
+  </resultMap>
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.pr.division.mapper.DivisionCategoryMapper">
+<select id="getListOrgByPurchaseCategory" parameterType="java.util.Map" resultType="com.midea.cloud.srm.model.pm.pr.division.entity.DivisionCategory">
+    select  * from  ceea_pr_division_category
+    where
+    1=1
+    and (ORGANIZATION_CODE,CATEGORY_ID,IF_MAIN_PERSON,DUTY) in
+    <foreach collection="maps.entrySet()" index="key" item="value" separator="," open="(" close=")">
+        (#{key},#{value},'Y','Purchase_Strategy')
+    </foreach>
+    UNION ALL
+    select  * from  ceea_pr_division_category
+    where
+    1=1
+    and (ORGANIZATION_CODE,CATEGORY_ID,IF_MAIN_PERSON,DUTY) in
+    <foreach collection="maps.entrySet()" index="key" item="value" separator="," open="(" close=")">
+        (#{key},#{value},'Y','Carry_Out')
+    </foreach>
+
+</select>
+</mapper>

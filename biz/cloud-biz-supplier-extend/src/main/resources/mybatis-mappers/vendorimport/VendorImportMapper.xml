@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.vendorimport.mapper.VendorImportMapper">
+
+    <select id="getOrgListByVendorId"
+            resultType="com.midea.cloud.srm.model.supplier.vendorimport.dto.OrgDTO">
+        select ssoc.ORG_ID, ssoc.ORG_CODE, ssoc.ORG_NAME
+        from scc_sup_org_category ssoc
+        where
+        ssoc.COMPANY_ID = #{vendorId}
+        AND ssoc.SERVICE_STATUS IN ('GREEN', 'YELLOW', 'REGISTERED')
+        group by ssoc.ORG_ID;
+    </select>
+    <select id="getCategoryListByParams"
+            resultType="com.midea.cloud.srm.model.supplier.vendorimport.dto.VendorImportCategoryDTO">
+        select ssoc.CATEGORY_ID, ssoc.CATEGORY_CODE, ssoc.CATEGORY_NAME, ssoc.CATEGORY_FULL_ID, ssoc.CATEGORY_FULL_NAME
+        from scc_sup_org_category ssoc
+        where
+        ssoc.COMPANY_ID = #{vendorId}
+        AND ssoc.ORG_ID = #{orgId}
+    </select>
+</mapper>

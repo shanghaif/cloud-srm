@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.perf.template.mapper.PerfTemplateIndsLineMapper">
+
+    <!-- 绩效模型指标信息行表基础查询Map-->
+    <resultMap id="BaseResultMap" type="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateIndsLine">
+        <id column="TEMPLATE_INDS_LINE_ID" property="templateIndsLineId" jdbcType="BIGINT" />
+        <result column="TEMPLATE_LINE_ID" property="templateLineId" jdbcType="BIGINT" />
+        <result column="INDICATOR_LINE_DES" property="indicatorLineDes" jdbcType="VARCHAR" />
+        <result column="PEF_SCORE" property="pefScore" jdbcType="DECIMAL" />
+        <result column="ASSESSMENT_PENALTY" property="assessmentPenalty" jdbcType="DECIMAL" />
+        <result column="SCORE_START" property="scoreStart" jdbcType="DECIMAL" />
+        <result column="SCORE_END" property="scoreEnd" jdbcType="DECIMAL" />
+        <result column="DELETE_FLAG" property="deleteFlag" jdbcType="VARCHAR" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="BIGINT" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="BIGINT" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 根据条件获取绩效模型指标行表集合 -->
+    <select id="findTempateIndsLineByParam" resultMap="BaseResultMap" parameterType="com.midea.cloud.srm.model.perf.template.entity.PerfTemplateIndsLine">
+        select TEMPLATE_INDS_LINE_ID, TEMPLATE_LINE_ID, INDICATOR_LINE_DES, PEF_SCORE, ASSESSMENT_PENALTY, SCORE_START,
+                SCORE_END, DELETE_FLAG, CREATED_BY, CREATION_DATE, CREATED_BY_IP, LAST_UPDATED_ID
+        from scc_perf_template_inds_line
+        <include refid="templateIndsLineSql" />
+    </select>
+
+    <!-- 绩效模型指标行表查询语句组合 -->
+    <sql id="templateIndsLineSql">
+        <where>
+            <if test="templateIndsLineId != null">
+                and TEMPLATE_INDS_LINE_ID = #{templateIndsLineId}
+            </if>
+            <if test="templateLineId != null">
+                and TEMPLATE_LINE_ID = #{templateLineId}
+            </if>
+            <if test="deleteFlag != null and '' != deleteFlag">
+                and DELETE_FLAG = #{deleteFlag}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

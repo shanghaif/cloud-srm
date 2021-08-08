@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.sup.info.mapper.CompanyInfoMapper">
+
+    <select id="listPageByOrgCodeAndKeyWord"
+            resultType="com.midea.cloud.srm.model.supplier.info.entity.CompanyInfo">
+        SELECT
+        CI.*
+        FROM
+        scc_sup_company_info CI
+        WHERE CI.COMPANY_ID
+        IN (SELECT OI.COMPANY_ID FROM scc_sup_org_category OI WHERE OI.ORG_ID = #{orgId}
+         <if test="serviceStatus != null and serviceStatus != ''">
+         	and OI.service_status = #{serviceStatus}
+         </if>
+        )
+        AND CI.IS_BACKLIST = 'N'
+        <if test="keyWord != null and keyWord != ''">
+            AND (CI.COMPANY_NAME like CONCAT('%', #{keyWord}, '%') OR CI.COMPANY_CODE like CONCAT('%', #{keyWord}, '%'))
+        </if>
+    </select>
+
+    <select id="queryVendorByNameAndOrgId" resultType="com.midea.cloud.srm.model.supplier.info.entity.CompanyInfo">
+        SELECT CI.*
+        FROM SCC_SUP_COMPANY_INFO CI
+        WHERE CI.COMPANY_ID
+            IN (SELECT OI.COMPANY_ID FROM scc_sup_org_category OI WHERE OI.ORG_ID = #{orgId})
+          AND CI.COMPANY_NAME = #{vendorName}
+    </select>
+
+    <select id="getVendorAccountsByCompanyId"
+            resultType="com.midea.cloud.srm.model.rbac.user.entity.User">
+        SELECT
+        CI.*
+        FROM
+        scc_sup_company_info CI
+        WHERE CI.COMPANY_ID
+        IN (SELECT OI.COMPANY_ID FROM scc_sup_org_category OI WHERE OI.ORG_ID = #{orgId})
+        AND CI.IS_BACKLIST = 'N'
+        <if test="keyWord != null and keyWord != ''">
+            AND (CI.COMPANY_NAME like CONCAT('%', #{keyWord}, '%') OR CI.COMPANY_CODE like CONCAT('%', #{keyWord}, '%'))
+        </if>
+    </select>
+
+    <select id="listAllForImport" resultType="com.midea.cloud.srm.model.supplier.info.entity.CompanyInfo">
+        select CI.COMPANY_ID,CI.COMPANY_CODE,CI.COMPANY_NAME
+        from scc_sup_company_info CI
+    </select>
+
+    <select id="queryVendorIdByUserId" resultType="java.lang.Long">
+        SELECT a.COMPANY_ID
+        FROM cloud_biz_supplier.scc_sup_org_category a
+                 JOIN cloud_biz_supplier.scc_sup_company_info c ON a.COMPANY_ID = c.COMPANY_ID
+        WHERE 1 = 1
+          AND c.STATUS = 'SUBMITTED'
+          AND (c.COMPANY_CODE IS NULL OR c.COMPANY_CODE = '')
+          AND a.CATEGORY_ID IN (SELECT b.CATEGORY_ID
+                                FROM cloud_biz_supplier_cooperate.ceea_pr_division_category b
+                                WHERE b.PERSON_IN_CHARGE_USER_ID = #{userId})
+          AND a.ORG_ID IN
+              (SELECT e.ORGANIZATION_ID FROM cloud_biz_base.scc_base_organization_user e WHERE e.USER_ID = #{userId})
+        UNION
+        SELECT d.COMPANY_ID
+        FROM cloud_biz_supplier.scc_sup_company_info d
+        WHERE d.STATUS != 'SUBMITTED'
+        UNION
+        SELECT f.COMPANY_ID
+        FROM cloud_biz_supplier.scc_sup_company_info f
+        WHERE f.STATUS = 'SUBMITTED'
+          AND (f.COMPANY_CODE IS NOT NULL AND f.COMPANY_CODE != '')
+    </select>
+    <select id="listCompanyInfosByStringList" resultType="com.midea.cloud.srm.model.base.questionairesurvey.dto.VendorDTO">
+        SELECT COMPANY_CODE AS VENDOR_CODE, COMPANY_NAME AS VENDOR_NAME
+        FROM scc_sup_company_info
+        WHERE COMPANY_CODE IN
+        <foreach item="item" index="index" collection="list"
+            open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

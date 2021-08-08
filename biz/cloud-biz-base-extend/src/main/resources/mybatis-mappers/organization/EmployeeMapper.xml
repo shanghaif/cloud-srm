@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.base.organization.mapper.EmployeeMapper">
+
+    <select id="getEmployees" resultType="com.midea.cloud.srm.model.base.organization.entity.Employee"
+    parameterType="INTEGER">
+        select * from ceea_base_employee
+        limit #{rowNumber}, 1000
+    </select>
+    <select id="getEmployeeCount" resultType="java.lang.Integer">
+        select count(*) from ceea_base_employee
+    </select>
+</mapper>

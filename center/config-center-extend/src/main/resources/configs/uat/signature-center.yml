@@ -1,0 +1,61 @@
+logging:
+  file: logs/${spring.application.name}.log
+  level:
+    com:
+      midea: debug
+    root: info
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 600000
+security:
+  oauth2:
+    resource:
+      prefer-token-info: false
+spring:
+  aop:
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  redis:
+    host: 10.17.149.194
+    jedis:
+      pool:
+        max-Idle: 10
+        max-active: 100
+        max-wait: 10
+        min-Idle: 0
+    password: midea123456
+    port: 6479
+    timeout: 60000
+cloud:
+  scc:
+    ## 第三方调用认证接口支持
+    supportExternalAnon: cloud-biz-gateway
+    ## 以下是智慧签配置
+    srmSourceUrl: http://10.16.87.99/cloud-srm/api-file
+    srmDownloadUrl: /files-anon/file/fileupload/download?fileuploadId=
+    url: https://fenqitest.midea.com/msign
+    appId: MCSRM
+    appKey: f60d1296d1bf4b86acd1900de4135e78
+    #新增智慧签合同接口
+    addSigning: /foreign/addSigning
+    #撤回智慧签合同接口
+    rejectSigning: /foreign/rejectSigning
+    #下载签署合同文件
+    contractUrl: /foreign/contractUrl
+    #source下载智慧签合同文件
+    sourceByContract: /foreign/sourceByContract
+    #签署状态查询
+    signStatus: /foreign/signStatus
+    #签署状态查询页面
+    signStatusPage: /foreign/signStatusPage
+    #同步授权信息
+    getUserAuthorizationList: /userManagementPrivilege/getUserAuthorizationList

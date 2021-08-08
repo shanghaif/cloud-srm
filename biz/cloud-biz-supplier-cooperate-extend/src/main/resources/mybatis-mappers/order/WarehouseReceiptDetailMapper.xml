@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.supcooperate.order.mapper.WarehouseReceiptDetailMapper">
+    <select id="list"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.reconciliation.entry.WarehouseReceiptDetail"
+            parameterType="java.lang.Long">
+        select
+        wrd.*,
+        dn.DELIVERY_NUMBER,
+        dnd.LINE_NUM,
+        dnd.DELIVERY_QUANTITY,
+        o.ORDER_NUMBER,
+        od.LINE_NUM as orderLineNum,
+        od.CATEGORY_ID,
+        od.CATEGORY_CODE,
+        od.CATEGORY_NAME,
+        od.MATERIAL_ID,
+        od.MATERIAL_NAME,
+        od.MATERIAL_CODE
+        from scc_sc_warehouse_receipt_detail wrd
+        left join scc_sc_delivery_note_detail dnd on dnd.DELIVERY_NOTE_DETAIL_ID = wrd.DELIVERY_NOTE_DETAIL_ID
+        left join scc_sc_delivery_note dn on dn.DELIVERY_NOTE_ID = dnd.DELIVERY_NOTE_ID
+        left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dnd.ORDER_DETAIL_ID
+        left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+        where wrd.WAREHOUSE_RECEIPT_ID = #{warehouseReceiptId}
+    </select>
+
+
+    <select id="listInWarehouseReceipt"
+            resultType="com.midea.cloud.srm.model.suppliercooperate.order.vo.WarehouseReceiptDetailVO">
+        select
+        wrd.*,
+        o.CEEA_ORG_ID orgId,
+        o.CEEA_ORG_CODE orgCode,
+        o.CEEA_ORG_NAME orgName,
+        o.VENDOR_ID,
+        o.VENDOR_CODE,
+        o.VENDOR_NAME,
+        o.ORDER_NUMBER,
+        od.CEEA_ORGANIZATION_ID organizationId,
+        od.CEEA_ORGANIZATION_NAME organizationName,
+        od.CEEA_ORGANIZATION_CODE organizationCode,
+        od.MATERIAL_ID,
+        od.MATERIAL_CODE,
+        od.MATERIAL_NAME,
+        od.UNIT,
+        od.UNIT_CODE,
+        od.LINE_NUM,
+        od.CEEA_CONTRACT_NO contractNo,
+        od.CEEA_CONTRACT_NUM contractCode,
+        od.CEEA_TAX_KEY taxKey,
+        od.CEEA_TAX_RATE taxRate,
+        od.CEEA_UNIT_TAX_PRICE unitPriceContainingTax,
+        od.CEEA_UNIT_NO_TAX_PRICE unitPriceExcludingTax,
+        od.CURRENCY_ID,
+        od.CURRENCY_CODE,
+        od.CURRENCY_NAME,
+        od.ORDER_DETAIL_ID poLineId,
+        dn.DELIVERY_NUMBER deliveryNumber,
+        dnd.LINE_NUM deliveryLineNum
+        from scc_sc_warehouse_receipt_detail wrd
+        left join scc_sc_delivery_note_detail dnd on dnd.DELIVERY_NOTE_DETAIL_ID = wrd.DELIVERY_NOTE_DETAIL_ID
+        LEFT JOIN scc_sc_delivery_note dn ON dnd.DELIVERY_NOTE_ID = dn.DELIVERY_NOTE_ID
+        left join scc_sc_order_detail od on od.ORDER_DETAIL_ID = dnd.ORDER_DETAIL_ID
+        left join scc_sc_order o on o.ORDER_ID = od.ORDER_ID
+        where wrd.WAREHOUSE_RECEIPT_DETAIL_ID in
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

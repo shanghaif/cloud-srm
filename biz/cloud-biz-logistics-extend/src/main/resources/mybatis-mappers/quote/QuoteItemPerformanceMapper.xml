@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.midea.cloud.srm.inq.quote.mapper.QuoteItemPerformanceMapper">
+
+    <resultMap id="performanceQueryMap" type="com.midea.cloud.srm.model.inq.quote.domain.QuoteItemPerformanceQueryResult">
+        <id column="ITEM_PERFORMANCE_ID" property="itemPerformanceId" jdbcType="BIGINT"></id>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="BIGINT"></result>
+        <result column="INQUIRY_NO" property="inquiryNo" jdbcType="VARCHAR"></result>
+        <result column="VENDOR_ID" property="vendorId" jdbcType="BIGINT"></result>
+        <result column="VENDOR_CODE" property="vendorCode" jdbcType="VARCHAR"></result>
+        <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR"></result>
+        <result column="ITEM_ID" property="itemId" jdbcType="BIGINT"></result>
+        <result column="ITEM_CODE" property="itemCode" jdbcType="VARCHAR"></result>
+        <result column="ITEM_DESC" property="itemDesc" jdbcType="VARCHAR"></result>
+        <result column="SCORE_ITEM" property="scoreItem" jdbcType="VARCHAR"></result>
+        <result column="SCORE_RULE" property="scoreRule" jdbcType="VARCHAR"></result>
+        <result column="FULL_SCORE" property="fullScore" jdbcType="DECIMAL"></result>
+        <result column="SCORE" property="score" jdbcType="DECIMAL"></result>
+    </resultMap>
+    <select id="getQuoteItemPerformances" resultMap="performanceQueryMap">
+        SELECT
+			per.ITEM_PERFORMANCE_ID,
+			temp.ORGANIZATION_ID,
+			temp.INQUIRY_NO,
+            temp.VENDOR_ID,
+            temp.VENDOR_CODE,
+            temp.VENDOR_NAME,
+            temp.ITEM_ID,
+            temp.ITEM_CODE,
+            temp.ITEM_DESC,
+            temp.SCORE_ITEM,
+            temp.SCORE_RULE,
+            temp.FULL_SCORE,
+            per.SCORE
+        FROM
+			(SELECT
+	        item.ORGANIZATION_ID,
+	        inheader.INQUIRY_ID,
+	        inheader.INQUIRY_NO,
+	        vendor.VENDOR_ID,
+            vendor.VENDOR_CODE,
+            vendor.VENDOR_NAME,
+            item.ITEM_ID,
+            item.ITEM_CODE,
+            item.ITEM_DESC,
+            rule_item.SCORE_ITEM,
+            rule_item.SCORE_RULE,
+            rule_item.FULL_SCORE
+        FROM
+        	scc_inquiry_header inheader,
+            scc_inquiry_vendor vendor,
+            scc_quote_header quheader,
+            scc_quote_item item,
+            scc_inquiry_score_rule rule,
+            scc_inquiry_score_rule_item rule_item
+        WHERE inheader.INQUIRY_ID = quheader.INQUIRY_ID
+            AND vendor.INQUIRY_ID = inheader.INQUIRY_ID
+            AND vendor.VENDOR_ID = quheader.VENDOR_ID
+            AND item.QUOTE_ID = quheader.QUOTE_ID
+            AND rule.INQUIRY_ID = inheader.INQUIRY_ID
+            AND rule.SCORE_RULE_ID = rule_item.SCORE_RULE_ID
+            AND rule_item.DIMENSION = 'PERFORMANCE_DIME'
+            AND inheader.INQUIRY_ID = #{inquiryId}) temp
+            LEFT JOIN scc_quote_item_performance per
+            ON temp.ORGANIZATION_ID = per.ORGANIZATION_ID AND temp.VENDOR_ID = per.VENDOR_ID AND temp.ITEM_ID = per.ITEM_ID AND temp.INQUIRY_ID = per.INQUIRY_ID
+    </select>
+</mapper>
